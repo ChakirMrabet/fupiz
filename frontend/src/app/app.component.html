@@ -1,1 +1,36 @@
-<router-outlet></router-outlet>
+<div class="app-wrapper">
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="global-footer glass-card">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <h3 class="gradient-text logo-small">Fuipiz</h3>
+        <p>Shorten, manage, and track your links with ease.</p>
+      </div>
+      
+      <div class="footer-links">
+        <div class="footer-column">
+          <h4>Service</h4>
+          <ul>
+            <li><a routerLink="/how-it-works">How it Works</a></li>
+            <li><a routerLink="/faq">FAQ</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Legal</h4>
+          <ul>
+            <li><a routerLink="/privacy">Privacy Policy</a></li>
+            <li><a routerLink="/terms">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2026 Fuipiz URL Shortener. All rights reserved.</p>
+    </div>
+  </footer>
+</div>
