@@ -252,3 +252,61 @@
     flex-direction: column;
   }
 }
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  padding: 2.5rem;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  border: 1px solid var(--glass-border);
+}
+
+.modal-content h3 {
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.qr-code-container {
+  background: white; /* QR needs contrast */
+  padding: 1rem;
+  border-radius: 12px;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+.qr-code-container img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.modal-actions .btn-primary {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

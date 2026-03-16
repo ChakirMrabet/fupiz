@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { LinksService } from '../../services/links.service';
 import { AuthService } from '../../services/auth.service';
 import { Router, RouterLink } from '@angular/router';
+import { toDataURL } from 'qrcode';
 
 @Component({
   selector: 'app-dashboard',
@@ -79,6 +80,24 @@ export class DashboardComponent implements OnInit {
       next: (data) => this.links = data,
       error: (err) => console.error(err)
     });
+  }
+
+  qrCodeUrl: string | null = null;
+  qrCodeLink: any = null;
+
+  async showQrCode(link: any) {
+    try {
+      const url = `http://localhost:3000/s/${link.shortCode}`;
+      this.qrCodeUrl = await toDataURL(url, { width: 300, margin: 2 });
+      this.qrCodeLink = link;
+    } catch (err) {
+      console.error('Failed to generate QR code', err);
+    }
+  }
+
+  closeQrModal() {
+    this.qrCodeUrl = null;
+    this.qrCodeLink = null;
   }
 
   onCreateLink() {

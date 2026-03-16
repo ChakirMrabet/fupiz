@@ -60,6 +60,7 @@
             </div>
           </div>
           <div class="link-actions">
+            <button class="btn-secondary" (click)="showQrCode(link)">QR Code</button>
             <button class="btn-secondary toggle-btn" (click)="toggleActive(link)">
               {{ link.isActive ? 'Disable' : 'Enable' }}
             </button>
@@ -102,4 +103,19 @@
     </div>
 
   </main>
+</div>
+
+<!-- QR Code Modal -->
+<div class="modal-overlay" *ngIf="qrCodeUrl" (click)="closeQrModal()">
+  <div class="modal-content glass-card" (click)="$event.stopPropagation()">
+    <h3>QR Code</h3>
+    <p>Scan to visit the short link</p>
+    <div class="qr-code-container">
+      <img [src]="qrCodeUrl" alt="QR Code">
+    </div>
+    <div class="modal-actions">
+      <a class="btn-primary" [href]="qrCodeUrl" [download]="'qrcode-' + qrCodeLink?.shortCode + '.png'">Download</a>
+      <button class="btn-secondary" (click)="closeQrModal()">Close</button>
+    </div>
+  </div>
 </div>
