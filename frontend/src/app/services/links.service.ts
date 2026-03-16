@@ -31,6 +31,6 @@ export class LinksService {
   }
 
   verifyPassword(shortCode: string, password: string) {
-    return this.http.post<{url: string}>(`http://localhost:3000/api/s/${shortCode}/verify-password`, { password });
+    return this.http.post<{url: string}>(`http://localhost:3000/s/${shortCode}/verify-password`, { password });
   }
 }

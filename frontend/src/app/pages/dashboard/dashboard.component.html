@@ -28,7 +28,7 @@
   <div class="links-list">
     <div class="glass-card link-item" *ngFor="let link of links">
       <div class="link-details">
-        <h4><a [href]="'http://localhost:3000/api/s/' + link.shortCode" target="_blank" class="short-link">http://localhost:3000/api/s/{{ link.shortCode }}</a></h4>
+        <h4><a [href]="'http://localhost:3000/s/' + link.shortCode" target="_blank" class="short-link">http://localhost:3000/s/{{ link.shortCode }}</a></h4>
         <p class="original-link">{{ link.originalUrl }}</p>
         <div class="link-meta">
           <span class="badge" *ngIf="link.password">🔒 Password Protected</span>
