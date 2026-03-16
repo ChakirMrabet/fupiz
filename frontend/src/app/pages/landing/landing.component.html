@@ -1,0 +1,17 @@
+<nav class="navbar container">
+  <div class="logo gradient-text">Fuipiz</div>
+  <div class="nav-links">
+    <a routerLink="/login" class="btn-secondary">Login</a>
+    <a routerLink="/register" class="btn-primary" style="text-decoration: none;">Get Started</a>
+  </div>
+</nav>
+
+<main class="hero container">
+  <h1 class="hero-title">Shorten Your Links, <br><span class="gradient-text">Expand Your Reach</span></h1>
+  <p class="hero-subtitle">Fuipiz is the modern, fast, and secure way to manage your scattered links. Password protect them, set expirations, and track your success.</p>
+  
+  <div class="quick-shorten glass-card">
+    <input type="url" class="input-field" placeholder="Paste your long URL here..." [(ngModel)]="urlToShorten">
+    <button class="btn-primary" (click)="onShorten()">Shorten Now</button>
+  </div>
+</main>

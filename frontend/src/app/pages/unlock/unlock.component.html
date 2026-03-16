@@ -1,0 +1,17 @@
+<div class="auth-container container">
+  <div class="glass-card auth-card">
+    <h2 class="hero-title auth-title gradient-text">Link Protected</h2>
+    <p class="auth-subtitle">Please enter the password to continue</p>
+
+    <form (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" class="input-field" [(ngModel)]="password" name="password" required>
+      </div>
+      <button type="submit" class="btn-primary w-full" [disabled]="isLoading">
+        {{ isLoading ? 'Verifying...' : 'Unlock Link' }}
+      </button>
+      <p class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</p>
+    </form>
+  </div>
+</div>

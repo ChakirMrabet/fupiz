@@ -1,0 +1,25 @@
+<div class="auth-container container">
+  <div class="glass-card auth-card">
+    <h2 class="hero-title auth-title gradient-text">Get Started</h2>
+    <p class="auth-subtitle">Create an account to shorten URLs</p>
+
+    <form (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" class="input-field" [(ngModel)]="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" class="input-field" [(ngModel)]="password" name="password" required>
+      </div>
+      <button type="submit" class="btn-primary w-full" [disabled]="isLoading">
+        {{ isLoading ? 'Creating Account...' : 'Sign Up' }}
+      </button>
+      <p class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</p>
+    </form>
+    
+    <div class="auth-footer">
+      Already have an account? <a routerLink="/login">Login</a>
+    </div>
+  </div>
+</div>
