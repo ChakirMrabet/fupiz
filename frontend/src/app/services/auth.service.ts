@@ -38,6 +38,18 @@ export class AuthService {
     );
   }
 
+  getProfile() {
+    return this.http.get<any>(`http://localhost:3000/api/users/me`, {
+      headers: { Authorization: `Bearer ${this.token}` }
+    });
+  }
+
+  updateProfile(data: any) {
+    return this.http.patch<any>(`http://localhost:3000/api/users/me`, data, {
+      headers: { Authorization: `Bearer ${this.token}` }
+    });
+  }
+
   logout() {
     localStorage.removeItem('token');
     this.tokenSubject.next(null);

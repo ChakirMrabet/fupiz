@@ -5,50 +5,101 @@
   </div>
 </nav>
 
-<div class="container dashboard-container">
-  <div class="dashboard-header">
-    <h2 class="hero-title dashboard-title">Your <span class="gradient-text">Links</span></h2>
-  </div>
+<div class="container dashboard-layout">
+  <!-- Sidebar Navigation -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-header">
+      <h3 class="gradient-text">Menu</h3>
+    </div>
+    <ul class="sidebar-nav">
+      <li [class.active]="activeTab === 'links'" (click)="setTab('links')">
+        <span>🔗 My Links</span>
+      </li>
+      <li [class.active]="activeTab === 'account'" (click)="setTab('account')">
+        <span>👤 My Account</span>
+      </li>
+    </ul>
+  </aside>
 
-  <div class="glass-card create-link-card">
-    <h3>Create New Link</h3>
-    <form (ngSubmit)="onCreateLink()" class="create-form">
-      <div class="form-row">
-        <input type="url" class="input-field" placeholder="Original URL (https://...)" [(ngModel)]="newLink.originalUrl" name="url" required>
-        <button type="submit" class="btn-primary" [disabled]="isCreating">Shorten</button>
+  <!-- Main Content Area -->
+  <main class="dashboard-content">
+    
+    <!-- MY LINKS TAB -->
+    <div *ngIf="activeTab === 'links'">
+      <div class="dashboard-header">
+        <h2 class="hero-title dashboard-title">Your <span class="gradient-text">Links</span></h2>
       </div>
-      <div class="advanced-options">
-        <input type="text" class="input-field half" placeholder="Custom Code (optional)" [(ngModel)]="newLink.customCode" name="customCode">
-        <input type="password" class="input-field half" placeholder="Password (optional)" [(ngModel)]="newLink.password" name="password">
-        <input type="datetime-local" class="input-field half" [(ngModel)]="newLink.expiresAt" name="expiresAt" title="Expiration (optional)">
-      </div>
-    </form>
-  </div>
 
-  <div class="links-list">
-    <div class="glass-card link-item" *ngFor="let link of links">
-      <div class="link-details">
-        <h4><a [href]="'http://localhost:3000/s/' + link.shortCode" target="_blank" class="short-link">http://localhost:3000/s/{{ link.shortCode }}</a></h4>
-        <p class="original-link">{{ link.originalUrl }}</p>
-        <div class="link-meta">
-          <span class="badge" *ngIf="link.password">🔒 Password Protected</span>
-          <span class="badge" *ngIf="link.expiresAt">⏰ Expires: {{ link.expiresAt | date:'shortDate' }}</span>
-          <span class="badge clicks">📈 Clicks: {{ link.clicks }}</span>
-          <span class="badge status-badge" [class.active]="link.isActive" [class.inactive]="!link.isActive">
-            {{ link.isActive ? 'Active' : 'Disabled' }}
-          </span>
+      <div class="glass-card create-link-card">
+        <h3>Create New Link</h3>
+        <form (ngSubmit)="onCreateLink()" class="create-form">
+          <div class="form-row">
+            <input type="url" class="input-field" placeholder="Original URL (https://...)" [(ngModel)]="newLink.originalUrl" name="url" required>
+            <button type="submit" class="btn-primary" [disabled]="isCreating">Shorten</button>
+          </div>
+          <div class="advanced-options">
+            <input type="text" class="input-field half" placeholder="Custom Code (optional)" [(ngModel)]="newLink.customCode" name="customCode">
+            <input type="password" class="input-field half" placeholder="Password (optional)" [(ngModel)]="newLink.password" name="password">
+            <input type="datetime-local" class="input-field half" [(ngModel)]="newLink.expiresAt" name="expiresAt" title="Expiration (optional)">
+          </div>
+        </form>
+      </div>
+
+      <div class="links-list">
+        <div class="glass-card link-item" *ngFor="let link of links">
+          <div class="link-details">
+            <h4><a [href]="'http://localhost:3000/s/' + link.shortCode" target="_blank" class="short-link">http://localhost:3000/s/{{ link.shortCode }}</a></h4>
+            <p class="original-link">{{ link.originalUrl }}</p>
+            <div class="link-meta">
+              <span class="badge" *ngIf="link.password">🔒 Password Protected</span>
+              <span class="badge" *ngIf="link.expiresAt">⏰ Expires: {{ link.expiresAt | date:'shortDate' }}</span>
+              <span class="badge clicks">📈 Clicks: {{ link.clicks }}</span>
+              <span class="badge status-badge" [class.active]="link.isActive" [class.inactive]="!link.isActive">
+                {{ link.isActive ? 'Active' : 'Disabled' }}
+              </span>
+            </div>
+          </div>
+          <div class="link-actions">
+            <button class="btn-secondary toggle-btn" (click)="toggleActive(link)">
+              {{ link.isActive ? 'Disable' : 'Enable' }}
+            </button>
+            <button class="btn-secondary delete-btn" (click)="deleteLink(link.id)">Delete</button>
+          </div>
+        </div>
+        
+        <div *ngIf="links.length === 0" class="empty-state">
+          <p>You haven't created any links yet.</p>
         </div>
       </div>
-      <div class="link-actions">
-        <button class="btn-secondary toggle-btn" (click)="toggleActive(link)">
-          {{ link.isActive ? 'Disable' : 'Enable' }}
-        </button>
-        <button class="btn-secondary delete-btn" (click)="deleteLink(link.id)">Delete</button>
+    </div>
+
+    <!-- MY ACCOUNT TAB -->
+    <div *ngIf="activeTab === 'account'">
+      <div class="dashboard-header">
+        <h2 class="hero-title dashboard-title">My <span class="gradient-text">Account</span></h2>
+      </div>
+
+      <div class="glass-card account-card">
+        <h3>Account Settings</h3>
+        <p class="account-email">Signed in as: <strong>{{ profile.email }}</strong></p>
+        
+        <form (ngSubmit)="onUpdateProfile()" class="account-form">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" class="input-field" placeholder="Enter your name" [(ngModel)]="profile.name" name="name">
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" class="input-field" placeholder="Enter new password (optional)" [(ngModel)]="passwordUpdate.newPassword" name="newPassword">
+            <small class="help-text">Leave blank to keep current password</small>
+          </div>
+          <button type="submit" class="btn-primary w-full" [disabled]="isUpdatingProfile">
+            {{ isUpdatingProfile ? 'Saving...' : 'Save Changes' }}
+          </button>
+          <p class="success-msg" *ngIf="profileMessage">{{ profileMessage }}</p>
+        </form>
       </div>
     </div>
-    
-    <div *ngIf="links.length === 0" class="empty-state">
-      <p>You haven't created any links yet.</p>
-    </div>
-  </div>
+
+  </main>
 </div>

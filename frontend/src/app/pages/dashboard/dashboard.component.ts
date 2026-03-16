@@ -13,9 +13,15 @@ import { Router, RouterLink } from '@angular/router';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+  activeTab: 'links' | 'account' = 'links';
   links: any[] = [];
   newLink = { originalUrl: '', customCode: '', password: '', expiresAt: '' };
   isCreating = false;
+
+  profile = { name: '', email: '' };
+  passwordUpdate = { newPassword: '' };
+  isUpdatingProfile = false;
+  profileMessage = '';
 
   constructor(
     private linksService: LinksService,
@@ -29,6 +35,43 @@ export class DashboardComponent implements OnInit {
       return;
     }
     this.loadLinks();
+    this.loadProfile();
+  }
+
+  setTab(tab: 'links' | 'account') {
+    this.activeTab = tab;
+  }
+
+  loadProfile() {
+    this.authService.getProfile().subscribe({
+      next: (data) => {
+        this.profile = { name: data.name || '', email: data.email };
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  onUpdateProfile() {
+    this.isUpdatingProfile = true;
+    this.profileMessage = '';
+    
+    const updatePayload: any = { name: this.profile.name };
+    if (this.passwordUpdate.newPassword.trim()) {
+      updatePayload.password = this.passwordUpdate.newPassword;
+    }
+
+    this.authService.updateProfile(updatePayload).subscribe({
+      next: (res) => {
+        this.profileMessage = 'Profile updated successfully!';
+        this.passwordUpdate.newPassword = ''; // clear password field
+        this.isUpdatingProfile = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.profileMessage = 'Failed to update profile.';
+        this.isUpdatingProfile = false;
+      }
+    });
   }
 
   loadLinks() {
