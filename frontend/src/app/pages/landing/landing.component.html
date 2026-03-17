@@ -1,6 +1,9 @@
 <nav class="navbar container">
-  <div class="logo gradient-text">Fuipiz</div>
+  <div class="logo gradient-text">Fupiz</div>
   <div class="nav-links">
+    <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
+      {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
+    </button>
     <a routerLink="/login" class="btn-secondary">Login</a>
     <a routerLink="/register" class="btn-primary" style="text-decoration: none;">Get Started</a>
   </div>
@@ -8,8 +11,9 @@
 
 <main class="hero container">
   <h1 class="hero-title">Shorten Your Links, <br><span class="gradient-text">Expand Your Reach</span></h1>
-  <p class="hero-subtitle">Fuipiz is the modern, fast, and secure way to manage your scattered links. Password protect them, set expirations, and track your success.</p>
-  
+  <p class="hero-subtitle">Fuipiz is the modern, fast, and secure way to manage your scattered links. Password protect
+    them, set expirations, and track your success.</p>
+
   <div class="quick-shorten glass-card">
     <input type="url" class="input-field" placeholder="Paste your long URL here..." [(ngModel)]="urlToShorten">
     <button class="btn-primary" (click)="onShorten()">Shorten Now</button>
@@ -35,29 +39,33 @@
       <div class="sponsor-logo"><span class="sponsor-icon">📚</span> Flowstack</div>
     </div>
   </div>
-</section><section id="how-it-works" class="features-section container">
+</section>
+<section id="how-it-works" class="features-section container">
   <div class="section-header">
     <h2 class="hero-title">How It <span class="gradient-text">Works</span></h2>
     <p class="hero-subtitle">Simple, fast, and feature-rich link management.</p>
   </div>
-  
+
   <div class="features-grid">
     <div class="feature-card glass-card">
       <div class="feature-icon">1</div>
       <h3>Paste Your Link</h3>
-      <p>Start by entering any long URL into the input field. We accept URLs to websites, videos, images, and documents.</p>
+      <p>Start by entering any long URL into the input field. We accept URLs to websites, videos, images, and documents.
+      </p>
     </div>
-    
+
     <div class="feature-card glass-card">
       <div class="feature-icon">2</div>
       <h3>Customize Options</h3>
-      <p>Don't just shorten it—own it. Create a custom alias, secure it behind a password, or give it an expiration date.</p>
+      <p>Don't just shorten it—own it. Create a custom alias, secure it behind a password, or give it an expiration
+        date.</p>
     </div>
-    
+
     <div class="feature-card glass-card">
       <div class="feature-icon">3</div>
       <h3>Share and Track</h3>
-      <p>Copy your new short link or download a generated QR code. Share it anywhere, and track your click analytics.</p>
+      <p>Copy your new short link or download a generated QR code. Share it anywhere, and track your click analytics.
+      </p>
     </div>
   </div>
 </section>
@@ -96,7 +104,8 @@
     <div class="df-card glass-card">
       <div class="df-icon">⏰</div>
       <h3>Expiration Dates</h3>
-      <p>Set auto-expiration on any link. Great for limited-time promotions, event registrations, or temporary access.</p>
+      <p>Set auto-expiration on any link. Great for limited-time promotions, event registrations, or temporary access.
+      </p>
     </div>
 
     <div class="df-card glass-card">
@@ -106,4 +115,3 @@
     </div>
   </div>
 </section>
-

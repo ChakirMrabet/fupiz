@@ -13,6 +13,17 @@
   --success: #10b981;
 }
 
+.light-theme {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --accent-primary: #7c3aed;
+  --accent-secondary: #db2777;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(15, 23, 42, 0.1);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -84,6 +95,35 @@ body {
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   font-size: 1rem;
+}
+
+.theme-toggle {
+  background: var(--glass-border);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  margin-right: 0.5rem;
+}
+
+.theme-toggle:hover {
+  background: var(--glass-bg);
+  transform: rotate(15deg);
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.glass-card {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .input-field:focus {

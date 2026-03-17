@@ -1,6 +1,9 @@
 <nav class="navbar container">
   <div class="logo gradient-text" routerLink="/">Fuipiz</div>
   <div class="nav-links">
+    <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
+      {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
+    </button>
     <button class="btn-secondary" (click)="logout()">Logout</button>
   </div>
 </nav>

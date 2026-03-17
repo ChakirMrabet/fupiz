@@ -5,6 +5,7 @@ import { LinksService } from '../../services/links.service';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
 import { Router, RouterLink } from '@angular/router';
+import { ThemeService } from '../../services/theme.service';
 import { toDataURL } from 'qrcode';
 
 @Component({
@@ -29,7 +30,8 @@ export class DashboardComponent implements OnInit {
     private linksService: LinksService,
     private authService: AuthService,
     private notificationService: NotificationService,
-    private router: Router
+    private router: Router,
+    public themeService: ThemeService
   ) {}
 
   ngOnInit() {
