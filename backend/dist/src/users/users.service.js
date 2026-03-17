@@ -27,6 +27,11 @@ let UsersService = class UsersService {
             where: { id },
         });
     }
+    async findByActivationToken(token) {
+        return this.prisma.user.findUnique({
+            where: { activationToken: token },
+        });
+    }
     async create(data) {
         return this.prisma.user.create({
             data,

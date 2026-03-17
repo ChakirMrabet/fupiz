@@ -30,12 +30,11 @@ export class AuthService {
   }
 
   register(data: any) {
-    return this.http.post<{access_token: string}>(`${this.apiUrl}/register`, data).pipe(
-      tap(res => {
-        localStorage.setItem('token', res.access_token);
-        this.tokenSubject.next(res.access_token);
-      })
-    );
+    return this.http.post<{message: string}>(`${this.apiUrl}/register`, data);
+  }
+
+  activateAccount(token: string) {
+    return this.http.post<{message: string; status: string}>(`${this.apiUrl}/activate`, { token });
   }
 
   getProfile() {

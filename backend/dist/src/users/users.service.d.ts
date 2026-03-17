@@ -5,6 +5,7 @@ export declare class UsersService {
     constructor(prisma: PrismaService);
     findOne(email: string): Promise<User | null>;
     findById(id: number): Promise<User | null>;
+    findByActivationToken(token: string): Promise<User | null>;
     create(data: Prisma.UserCreateInput): Promise<User>;
-    update(id: number, data: Partial<User>): Promise<User>;
+    update(id: number, data: Prisma.UserUpdateInput): Promise<User>;
 }

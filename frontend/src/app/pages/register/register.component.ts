@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { LinksService } from '../../services/links.service';
 
 @Component({
   selector: 'app-register',
@@ -12,41 +11,34 @@ import { LinksService } from '../../services/links.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent {
   email = '';
   password = '';
+  confirmPassword = '';
   isLoading = false;
   errorMsg = '';
-  pendingUrl = '';
+  successMsg = '';
 
   constructor(
-    private auth: AuthService, 
-    private router: Router,
-    private route: ActivatedRoute,
-    private linksService: LinksService
+    private auth: AuthService,
   ) {}
 
-  ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      if (params['url']) {
-        this.pendingUrl = params['url'];
-      }
-    });
-  }
-
   onSubmit() {
+    if (this.password !== this.confirmPassword) {
+      this.errorMsg = 'Passwords do not match';
+      return;
+    }
+
     this.isLoading = true;
     this.errorMsg = '';
+    this.successMsg = '';
+
     this.auth.register({ email: this.email, password: this.password }).subscribe({
-      next: () => {
-        if (this.pendingUrl) {
-          this.linksService.create({ originalUrl: this.pendingUrl }).subscribe({
-            next: () => this.router.navigate(['/dashboard']),
-            error: () => this.router.navigate(['/dashboard'])
-          });
-        } else {
-          this.router.navigate(['/dashboard']);
-        }
+      next: (response) => {
+        this.isLoading = false;
+        this.successMsg = response.message;
+        this.password = '';
+        this.confirmPassword = '';
       },
       error: (err) => {
         this.isLoading = false;

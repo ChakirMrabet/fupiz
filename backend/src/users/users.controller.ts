@@ -14,7 +14,7 @@ export class UsersController {
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    const { password, ...result } = user;
+    const { password, activationToken, activationTokenExpiresAt, ...result } = user;
     return result; // Includes 'plan' implicitly
   }
 
@@ -32,7 +32,7 @@ export class UsersController {
     }
     
     const user = await this.usersService.update(req.user.userId, updateData);
-    const { password, ...result } = user;
+    const { password, activationToken, activationTokenExpiresAt, ...result } = user;
     return result;
   }
 }

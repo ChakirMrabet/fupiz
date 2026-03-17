@@ -47,17 +47,25 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
+const crypto_1 = require("crypto");
+const mail_service_1 = require("../mail/mail.service");
 let AuthService = class AuthService {
     usersService;
     jwtService;
-    constructor(usersService, jwtService) {
+    mailService;
+    activationTtlHours = Number(process.env.ACCOUNT_ACTIVATION_TTL_HOURS || 24);
+    constructor(usersService, jwtService, mailService) {
         this.usersService = usersService;
         this.jwtService = jwtService;
+        this.mailService = mailService;
     }
     async validateUser(email, pass) {
         const user = await this.usersService.findOne(email);
         if (user && await bcrypt.compare(pass, user.password)) {
-            const { password, ...result } = user;
+            if (!user.isActive) {
+                throw new common_1.UnauthorizedException('Account not activated. Check your email.');
+            }
+            const { password, activationToken, activationTokenExpiresAt, ...result } = user;
             return result;
         }
         return null;
@@ -69,18 +77,83 @@ let AuthService = class AuthService {
         };
     }
     async register(data) {
+        if (!data?.email || !data?.password) {
+            throw new common_1.BadRequestException('Email and password are required');
+        }
         const hashedPassword = await bcrypt.hash(data.password, 10);
-        const user = await this.usersService.create({
-            email: data.email,
-            password: hashedPassword,
+        const activationToken = (0, crypto_1.randomBytes)(32).toString('hex');
+        const activationTokenExpiresAt = new Date(Date.now() + this.activationTtlHours * 60 * 60 * 1000);
+        const existingUser = await this.usersService.findOne(data.email);
+        if (existingUser?.isActive) {
+            throw new common_1.ConflictException('An account with this email already exists');
+        }
+        const user = existingUser
+            ? await this.usersService.update(existingUser.id, {
+                password: hashedPassword,
+                activationToken,
+                activationTokenExpiresAt,
+                activatedAt: null,
+                isActive: false,
+            })
+            : await this.usersService.create({
+                email: data.email,
+                password: hashedPassword,
+                activationToken,
+                activationTokenExpiresAt,
+            });
+        try {
+            await this.mailService.sendActivationEmail(user.email, activationToken);
+        }
+        catch (error) {
+            if (error instanceof common_1.BadRequestException || error instanceof common_1.ConflictException) {
+                throw error;
+            }
+            if (error instanceof common_1.UnauthorizedException) {
+                throw error;
+            }
+            if (error instanceof common_1.InternalServerErrorException) {
+                throw error;
+            }
+            throw new common_1.InternalServerErrorException('Failed to send activation email');
+        }
+        return {
+            message: 'Account created. Check your email to activate it.',
+        };
+    }
+    async activateAccount(token) {
+        if (!token) {
+            throw new common_1.BadRequestException('Activation token is required');
+        }
+        const user = await this.usersService.findByActivationToken(token);
+        if (!user) {
+            throw new common_1.BadRequestException('Invalid activation link');
+        }
+        if (user.isActive) {
+            return {
+                message: 'Account already activated',
+                status: 'already_active',
+            };
+        }
+        if (!user.activationTokenExpiresAt || user.activationTokenExpiresAt.getTime() < Date.now()) {
+            throw new common_1.BadRequestException('Activation link has expired');
+        }
+        await this.usersService.update(user.id, {
+            isActive: true,
+            activationToken: null,
+            activationTokenExpiresAt: null,
+            activatedAt: new Date(),
         });
-        return this.login(user);
+        return {
+            message: 'Account activated successfully',
+            status: 'activated',
+        };
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_service_1.UsersService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        mail_service_1.MailService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

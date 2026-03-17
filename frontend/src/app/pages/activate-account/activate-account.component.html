@@ -1,0 +1,16 @@
+<div class="auth-container container">
+  <div class="glass-card auth-card">
+    <h2 class="hero-title auth-title gradient-text">{{ title }}</h2>
+    <p class="auth-subtitle">{{ message }}</p>
+
+    <div class="status-block" [class.status-success]="isSuccess" [class.status-error]="!isSuccess && !isLoading">
+      <p *ngIf="isLoading">Checking activation token...</p>
+      <p *ngIf="!isLoading">{{ message }}</p>
+    </div>
+
+    <div class="auth-footer" *ngIf="!isLoading">
+      <a routerLink="/login" *ngIf="isSuccess">Continue to login</a>
+      <a routerLink="/register" *ngIf="!isSuccess">Create a new activation link</a>
+    </div>
+  </div>
+</div>

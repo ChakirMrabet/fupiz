@@ -1,1 +1,6 @@
 @import '../login/login.component.css';
+
+.success-msg {
+  color: #8dd694;
+  text-align: center;
+}

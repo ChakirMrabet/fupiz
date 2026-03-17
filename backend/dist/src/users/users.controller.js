@@ -60,7 +60,7 @@ let UsersController = class UsersController {
         if (!user) {
             throw new common_1.BadRequestException('User not found');
         }
-        const { password, ...result } = user;
+        const { password, activationToken, activationTokenExpiresAt, ...result } = user;
         return result;
     }
     async updateProfile(req, body) {
@@ -75,7 +75,7 @@ let UsersController = class UsersController {
             updateData.plan = body.plan;
         }
         const user = await this.usersService.update(req.user.userId, updateData);
-        const { password, ...result } = user;
+        const { password, activationToken, activationTokenExpiresAt, ...result } = user;
         return result;
     }
 };

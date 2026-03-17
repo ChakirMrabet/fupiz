@@ -4,6 +4,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { UnlockComponent } from './pages/unlock/unlock.component';
+import { ActivateAccountComponent } from './pages/activate-account/activate-account.component';
 
 import { TermsComponent } from './pages/terms/terms.component';
 import { PrivacyComponent } from './pages/privacy/privacy.component';
@@ -16,6 +17,7 @@ export const routes: Routes = [
   { path: '', component: LandingComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'activate-account', component: ActivateAccountComponent },
   { path: 'pricing', component: PricingComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'analytics/:id', component: AnalyticsComponent, canActivate: [AuthGuard] },

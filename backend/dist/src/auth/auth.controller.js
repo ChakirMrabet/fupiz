@@ -23,6 +23,9 @@ let AuthController = class AuthController {
     async register(body) {
         return this.authService.register(body);
     }
+    async activate(body) {
+        return this.authService.activateAccount(body?.token);
+    }
     async login(body) {
         const user = await this.authService.validateUser(body.email, body.password);
         if (!user) {
@@ -39,6 +42,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
+__decorate([
+    (0, common_1.Post)('activate'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "activate", null);
 __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, common_1.Post)('login'),
