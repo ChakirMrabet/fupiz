@@ -55,7 +55,7 @@
 
 /* Sponsors Carousel */
 .sponsors-section {
-  padding: 4rem 0 2rem;
+  padding: 6rem 0 0rem;
   text-align: center;
   overflow: hidden;
   position: relative;
@@ -119,13 +119,14 @@
 }
 
 .sponsor-icon {
-  font-size: 1.8rem;
+  font-size: 2.8rem;
 }
 
 @keyframes scroll-logos {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -247,12 +248,15 @@
   .hero-title {
     font-size: 2.5rem;
   }
+
   .section-header .hero-title {
     font-size: 2rem;
   }
+
   .quick-shorten {
     flex-direction: column;
   }
+
   .dashboard-features-grid {
     grid-template-columns: 1fr;
   }
