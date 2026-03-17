@@ -1,0 +1,45 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">Choose Your <span class="gradient-text">Plan</span></h1>
+    <p class="page-subtitle">Simple, transparent pricing. No hidden fees.</p>
+  </div>
+
+  <div class="pricing-grid">
+    <div
+      class="glass-card pricing-card"
+      *ngFor="let plan of plans"
+      [class.pricing-featured]="plan.id === 'PRO'"
+    >
+      <div class="pricing-badge" *ngIf="plan.id === 'PRO'">Most Popular</div>
+      <h2 class="pricing-name">{{ plan.name }}</h2>
+      <p class="pricing-price">{{ plan.price }}</p>
+      <p class="pricing-desc">{{ plan.description }}</p>
+
+      <ul class="pricing-features">
+        <li>
+          <span class="feature-check">✓</span>
+          Up to <strong>{{ plan.maxLinks }}</strong> links
+        </li>
+        <li [class.feature-disabled]="!plan.canUseCustomCode">
+          <span class="feature-check">{{ plan.canUseCustomCode ? '✓' : '✕' }}</span>
+          Custom short codes
+        </li>
+        <li [class.feature-disabled]="!plan.canUsePassword">
+          <span class="feature-check">{{ plan.canUsePassword ? '✓' : '✕' }}</span>
+          Password protection
+        </li>
+        <li [class.feature-disabled]="!plan.canUseExpiration">
+          <span class="feature-check">{{ plan.canUseExpiration ? '✓' : '✕' }}</span>
+          Link expiration
+        </li>
+        <li [class.feature-disabled]="!plan.canAccessStats">
+          <span class="feature-check">{{ plan.canAccessStats ? '✓' : '✕' }}</span>
+          Advanced analytics
+        </li>
+      </ul>
+
+      <a routerLink="/register" class="btn-primary pricing-cta" *ngIf="plan.id === 'FREE'">Get Started Free</a>
+      <a routerLink="/register" class="btn-primary pricing-cta pricing-cta-pro" *ngIf="plan.id === 'PRO'">Upgrade to Pro</a>
+    </div>
+  </div>
+</div>

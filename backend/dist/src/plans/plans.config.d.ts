@@ -1,4 +1,7 @@
 export interface PlanConfig {
+    name: string;
+    price: string;
+    description: string;
     maxLinks: number;
     canUseCustomCode: boolean;
     canUsePassword: boolean;

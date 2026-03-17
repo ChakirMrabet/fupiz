@@ -8,9 +8,11 @@ import { UnlockComponent } from './pages/unlock/unlock.component';
 import { TermsComponent } from './pages/terms/terms.component';
 import { PrivacyComponent } from './pages/privacy/privacy.component';
 import { FaqComponent } from './pages/faq/faq.component';
+import { PricingComponent } from './pages/pricing/pricing.component';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
+  { path: 'pricing', component: PricingComponent },
   { path: 'terms', component: TermsComponent },
   { path: 'privacy', component: PrivacyComponent },
   { path: 'faq', component: FaqComponent },
