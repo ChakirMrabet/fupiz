@@ -9,16 +9,26 @@ export declare class LinksService {
     findByShortCode(shortCode: string): Promise<Link | null>;
     update(id: number, userId: number, data: any): Promise<Link>;
     remove(id: number, userId: number): Promise<Link>;
-    incrementClicks(id: number): Promise<{
-        id: number;
-        originalUrl: string;
-        shortCode: string;
-        password: string | null;
-        expiresAt: Date | null;
-        isActive: boolean;
-        clicks: number;
-        userId: number;
-        createdAt: Date;
-        updatedAt: Date;
+    recordClick(linkId: number, metadata: {
+        ip: string;
+        userAgent: string;
+        referer: string;
+    }): Promise<any>;
+    getAnalytics(id: number, userId: number): Promise<{
+        link: any;
+        stats: {
+            totalClicks: number;
+            browsers: any;
+            os: {
+                name: any;
+                count: number;
+            }[];
+            referers: {
+                name: any;
+                count: number;
+            }[];
+            timeline: any;
+            recentClicks: any;
+        };
     }>;
 }

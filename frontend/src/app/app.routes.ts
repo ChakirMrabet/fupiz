@@ -9,16 +9,19 @@ import { TermsComponent } from './pages/terms/terms.component';
 import { PrivacyComponent } from './pages/privacy/privacy.component';
 import { FaqComponent } from './pages/faq/faq.component';
 import { PricingComponent } from './pages/pricing/pricing.component';
+import { AnalyticsComponent } from './pages/analytics/analytics.component';
+import { AuthGuard } from './auth.guard';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
   { path: 'pricing', component: PricingComponent },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  { path: 'analytics/:id', component: AnalyticsComponent, canActivate: [AuthGuard] },
   { path: 'terms', component: TermsComponent },
   { path: 'privacy', component: PrivacyComponent },
   { path: 'faq', component: FaqComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'dashboard', component: DashboardComponent },
   { path: 'unlock/:shortCode', component: UnlockComponent },
   { path: '**', redirectTo: '' }
 ];

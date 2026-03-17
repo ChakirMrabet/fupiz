@@ -131,6 +131,7 @@ export class DashboardComponent implements OnInit {
         this.newLink = { originalUrl: '', customCode: '', password: '', expiresAt: '' };
         this.loadLinks();
         this.isCreating = false;
+        this.notificationService.success('Link created successfully!');
       },
       error: (err) => {
         console.error(err);
@@ -138,6 +139,13 @@ export class DashboardComponent implements OnInit {
         const msg = err?.error?.message || 'Custom code might be taken or URL is invalid.';
         this.notificationService.error(msg, 'Link Creation Failed');
       }
+    });
+  }
+
+  copyLink(shortCode: string) {
+    const url = `http://localhost:3000/s/${shortCode}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.notificationService.success('Link copied to clipboard!');
     });
   }
 

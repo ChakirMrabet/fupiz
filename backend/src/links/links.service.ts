@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestj
 import { PrismaService } from '../prisma/prisma.service';
 import { Link, Prisma } from '@prisma/client';
 import { randomBytes } from 'crypto';
+import { UAParser } from 'ua-parser-js';
 
 import { PLAN_FEATURES } from '../plans/plans.config';
 
@@ -105,10 +106,93 @@ export class LinksService {
     });
   }
 
-  async incrementClicks(id: number) {
-    return this.prisma.link.update({
-      where: { id },
-      data: { clicks: { increment: 1 } },
+  async recordClick(linkId: number, metadata: { ip: string; userAgent: string; referer: string }) {
+    const parser = new UAParser(metadata.userAgent);
+    const result = parser.getResult();
+
+    return (this.prisma as any).$transaction([
+      (this.prisma as any).linkClick.create({
+        data: {
+          linkId,
+          ipAddress: metadata.ip,
+          userAgent: metadata.userAgent,
+          browser: result.browser.name || 'Unknown',
+          os: result.os.name || 'Unknown',
+          referer: metadata.referer || 'Direct',
+        },
+      }),
+      this.prisma.link.update({
+        where: { id: linkId },
+        data: { clicks: { increment: 1 } },
+      }),
+    ]);
+  }
+
+  async getAnalytics(id: number, userId: number) {
+    const link = await (this.prisma as any).link.findFirst({
+      where: { id, userId },
+      include: {
+        clickEvents: {
+          orderBy: { createdAt: 'desc' },
+          take: 100,
+        },
+      },
     });
+
+    if (!link) throw new NotFoundException('Link not found');
+
+    // Aggregate data
+    const totalClicks = link.clicks;
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const [browsers, os, referers, timeline] = await Promise.all([
+      (this.prisma as any).linkClick.groupBy({
+        by: ['browser'],
+        where: { linkId: id },
+        _count: { _all: true },
+        orderBy: { _count: { browser: 'desc' } },
+        take: 5,
+      }),
+      this.prisma.linkClick.groupBy({
+        by: ['os'],
+        where: { linkId: id },
+        _count: { _all: true },
+        orderBy: { _count: { os: 'desc' } },
+        take: 5,
+      }),
+      this.prisma.linkClick.groupBy({
+        by: ['referer'],
+        where: { linkId: id },
+        _count: { _all: true },
+        orderBy: { _count: { referer: 'desc' } },
+        take: 5,
+      }),
+      (this.prisma as any).$queryRaw<any[]>`
+        SELECT date(createdAt) as date, count(*) as count
+        FROM LinkClick
+        WHERE linkId = ${id} AND createdAt > ${sevenDaysAgo}
+        GROUP BY date(createdAt)
+        ORDER BY date ASC
+      `,
+    ]);
+
+    // Ensure all counts are Numbers (not BigInts) for JSON serialization
+    const formattedTimeline = (timeline || []).map((entry: any) => ({
+      date: entry.date,
+      count: Number(entry.count || 0)
+    }));
+
+    return {
+      link,
+      stats: {
+        totalClicks: Number(totalClicks),
+        browsers: browsers.map((b: any) => ({ name: b.browser, count: Number(b._count._all) })),
+        os: os.map((o: any) => ({ name: o.os, count: Number(o._count._all) })),
+        referers: referers.map((r: any) => ({ name: r.referer, count: Number(r._count._all) })),
+        timeline: formattedTimeline,
+        recentClicks: link.clickEvents,
+      }
+    };
   }
 }

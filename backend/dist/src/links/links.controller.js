@@ -33,6 +33,9 @@ let LinksController = class LinksController {
     remove(req, id) {
         return this.linksService.remove(+id, req.user.userId);
     }
+    getAnalytics(req, id) {
+        return this.linksService.getAnalytics(+id, req.user.userId);
+    }
 };
 exports.LinksController = LinksController;
 __decorate([
@@ -67,6 +70,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], LinksController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)(':id/analytics'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], LinksController.prototype, "getAnalytics", null);
 exports.LinksController = LinksController = __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Controller)('links'),

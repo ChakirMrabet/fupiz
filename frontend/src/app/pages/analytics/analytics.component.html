@@ -1,0 +1,88 @@
+<div class="analytics-container" *ngIf="!loading && analytics">
+  <div class="header">
+    <div class="title-group">
+      <a routerLink="/dashboard" class="back-link">← Back to Dashboard</a>
+      <h1>Analytics for <span class="gradient-text">{{ analytics.link.shortCode }}</span></h1>
+      <p class="subtitle">{{ analytics.link.originalUrl }}</p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="label">Total Clicks</div>
+      <div class="value">{{ analytics.stats.totalClicks }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Top Browser</div>
+      <div class="value">{{ analytics.stats.browsers[0]?.name || 'N/A' }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Top OS</div>
+      <div class="value">{{ analytics.stats.os[0]?.name || 'N/A' }}</div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="card chart-card">
+      <h3>Clicks by Browser</h3>
+      <div class="bar-chart">
+        <div class="bar-row" *ngFor="let b of analytics.stats.browsers">
+          <div class="bar-label">{{ b.name }}</div>
+          <div class="bar-track">
+            <div class="bar-fill" [style.width.%]="getPercent(b.count, analytics.stats.totalClicks)"></div>
+          </div>
+          <div class="bar-value">{{ b.count }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card chart-card">
+      <h3>Clicks by OS</h3>
+      <div class="bar-chart">
+        <div class="bar-row" *ngFor="let o of analytics.stats.os">
+          <div class="bar-label">{{ o.name }}</div>
+          <div class="bar-track">
+            <div class="bar-fill" [style.width.%]="getPercent(o.count, analytics.stats.totalClicks)"></div>
+          </div>
+          <div class="bar-value">{{ o.count }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card table-card">
+    <h3>Recent Clicks</h3>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>IP Address</th>
+            <th>Browser</th>
+            <th>OS</th>
+            <th>Referer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let click of analytics.stats.recentClicks">
+            <td>{{ click.createdAt | date:'short' }}</td>
+            <td><code>{{ click.ipAddress || 'Unknown' }}</code></td>
+            <td>{{ click.browser }}</td>
+            <td>{{ click.os }}</td>
+            <td class="referer-cell" [title]="click.referer">{{ click.referer }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="loading-state" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Loading analytics...</p>
+</div>
+
+<div class="error-state" *ngIf="error">
+  <p>{{ error }}</p>
+  <button (click)="ngOnInit()">Retry</button>
+</div>

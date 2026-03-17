@@ -18,15 +18,32 @@ model User {
 }
 
 model Link {
-  id          Int       @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   originalUrl String
-  shortCode   String    @unique
+  shortCode   String      @unique
   password    String?
   expiresAt   DateTime?
-  isActive    Boolean   @default(true)
-  clicks      Int       @default(0)
+  isActive    Boolean     @default(true)
+  clicks      Int         @default(0)
   userId      Int
-  user        User      @relation(fields: [userId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  user        User        @relation(fields: [userId], references: [id])
+  clickEvents LinkClick[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model LinkClick {
+  id        Int      @id @default(autoincrement())
+  linkId    Int
+  link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  ipAddress String?
+  userAgent String?
+  browser   String?
+  os        String?
+  referer   String?
+  country   String?
+  createdAt DateTime @default(now())
+
+  @@index([linkId])
+  @@index([createdAt])
 }

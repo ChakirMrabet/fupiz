@@ -20,7 +20,7 @@ let AppController = class AppController {
     constructor(linksService) {
         this.linksService = linksService;
     }
-    async redirect(shortCode, res) {
+    async redirect(shortCode, res, req) {
         if (shortCode === 'api' || shortCode === 'favicon.ico') {
             return res.status(404).send('Not Found');
         }
@@ -34,16 +34,24 @@ let AppController = class AppController {
         if (link.password) {
             return res.redirect(`http://localhost:4200/unlock/${shortCode}`);
         }
-        await this.linksService.incrementClicks(link.id);
+        await this.linksService.recordClick(link.id, {
+            ip: req.ip || 'Unknown',
+            userAgent: req.headers['user-agent'] || '',
+            referer: req.headers['referer'] || '',
+        });
         return res.redirect(link.originalUrl);
     }
-    async verifyPassword(shortCode, body) {
+    async verifyPassword(shortCode, body, req) {
         const link = await this.linksService.findByShortCode(shortCode);
         if (!link || !link.isActive)
             throw new common_1.NotFoundException('Link not found');
         if (link.password !== body.password)
             throw new common_1.UnauthorizedException('Incorrect password');
-        await this.linksService.incrementClicks(link.id);
+        await this.linksService.recordClick(link.id, {
+            ip: req.ip || 'Unknown',
+            userAgent: req.headers['user-agent'] || '',
+            referer: req.headers['referer'] || '',
+        });
         return { url: link.originalUrl };
     }
 };
@@ -52,16 +60,18 @@ __decorate([
     (0, common_1.Get)('s/:shortCode'),
     __param(0, (0, common_1.Param)('shortCode')),
     __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "redirect", null);
 __decorate([
     (0, common_1.Post)('s/:shortCode/verify-password'),
     __param(0, (0, common_1.Param)('shortCode')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "verifyPassword", null);
 exports.AppController = AppController = __decorate([

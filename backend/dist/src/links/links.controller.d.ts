@@ -50,4 +50,21 @@ export declare class LinksController {
         createdAt: Date;
         updatedAt: Date;
     }>;
+    getAnalytics(req: any, id: string): Promise<{
+        link: any;
+        stats: {
+            totalClicks: number;
+            browsers: any;
+            os: {
+                name: any;
+                count: number;
+            }[];
+            referers: {
+                name: any;
+                count: number;
+            }[];
+            timeline: any;
+            recentClicks: any;
+        };
+    }>;
 }

@@ -1,13 +1,13 @@
-import { Controller, Get, Param, Res, Post, Body, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Param, Res, Post, Body, NotFoundException, UnauthorizedException, Req } from '@nestjs/common';
 import { LinksService } from './links/links.service';
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
 
 @Controller()
 export class AppController {
   constructor(private readonly linksService: LinksService) {}
 
   @Get('s/:shortCode')
-  async redirect(@Param('shortCode') shortCode: string, @Res() res: Response) {
+  async redirect(@Param('shortCode') shortCode: string, @Res() res: Response, @Req() req: Request) {
     if (shortCode === 'api' || shortCode === 'favicon.ico') {
       return res.status(404).send('Not Found');
     }
@@ -26,17 +26,27 @@ export class AppController {
       return res.redirect(`http://localhost:4200/unlock/${shortCode}`);
     }
 
-    await this.linksService.incrementClicks(link.id);
+    await this.linksService.recordClick(link.id, {
+      ip: req.ip || 'Unknown',
+      userAgent: req.headers['user-agent'] || '',
+      referer: req.headers['referer'] || '',
+    });
+
     return res.redirect(link.originalUrl);
   }
 
   @Post('s/:shortCode/verify-password')
-  async verifyPassword(@Param('shortCode') shortCode: string, @Body() body: any) {
+  async verifyPassword(@Param('shortCode') shortCode: string, @Body() body: any, @Req() req: Request) {
     const link = await this.linksService.findByShortCode(shortCode);
     if (!link || !link.isActive) throw new NotFoundException('Link not found');
     if (link.password !== body.password) throw new UnauthorizedException('Incorrect password');
     
-    await this.linksService.incrementClicks(link.id);
+    await this.linksService.recordClick(link.id, {
+      ip: req.ip || 'Unknown',
+      userAgent: req.headers['user-agent'] || '',
+      referer: req.headers['referer'] || '',
+    });
+
     return { url: link.originalUrl };
   }
 }

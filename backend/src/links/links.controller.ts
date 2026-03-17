@@ -26,4 +26,9 @@ export class LinksController {
   remove(@Request() req: any, @Param('id') id: string) {
     return this.linksService.remove(+id, req.user.userId);
   }
+
+  @Get(':id/analytics')
+  getAnalytics(@Request() req: any, @Param('id') id: string) {
+    return this.linksService.getAnalytics(+id, req.user.userId);
+  }
 }

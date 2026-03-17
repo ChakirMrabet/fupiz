@@ -60,11 +60,21 @@
             </div>
           </div>
           <div class="link-actions">
-            <button class="btn-secondary" (click)="showQrCode(link)">QR Code</button>
-            <button class="btn-secondary toggle-btn" (click)="toggleActive(link)">
-              {{ link.isActive ? 'Disable' : 'Enable' }}
+            <a [routerLink]="['/analytics', link.id]" class="action-btn" title="Analytics">
+              <span class="icon">📊</span>
+            </a>
+            <button (click)="showQrCode(link)" class="action-btn" title="QR Code">
+              <span class="icon">📱</span>
             </button>
-            <button class="btn-secondary delete-btn" (click)="deleteLink(link.id)">Delete</button>
+            <button (click)="copyLink(link.shortCode)" class="action-btn" title="Copy Link">
+              <span class="icon">📋</span>
+            </button>
+            <button (click)="toggleActive(link)" class="action-btn" [class.active]="link.isActive" title="Toggle Active">
+              <span class="icon">{{ link.isActive ? '🟢' : '⚪' }}</span>
+            </button>
+            <button (click)="deleteLink(link.id)" class="action-btn delete" title="Delete">
+              <span class="icon">🗑️</span>
+            </button>
           </div>
         </div>
         
