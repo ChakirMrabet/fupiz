@@ -8,6 +8,7 @@ export declare class UsersController {
         createdAt: Date;
         updatedAt: Date;
         email: string;
+        plan: string;
     }>;
     updateProfile(req: any, body: any): Promise<{
         name: string | null;
@@ -15,5 +16,6 @@ export declare class UsersController {
         createdAt: Date;
         updatedAt: Date;
         email: string;
+        plan: string;
     }>;
 }

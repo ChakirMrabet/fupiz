@@ -71,6 +71,9 @@ let UsersController = class UsersController {
         if (body.password) {
             updateData.password = await bcrypt.hash(body.password, 10);
         }
+        if (body.plan !== undefined) {
+            updateData.plan = body.plan;
+        }
         const user = await this.usersService.update(req.user.userId, updateData);
         const { password, ...result } = user;
         return result;

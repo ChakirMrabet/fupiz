@@ -38,9 +38,9 @@
             <button type="submit" class="btn-primary" [disabled]="isCreating">Shorten</button>
           </div>
           <div class="advanced-options">
-            <input type="text" class="input-field half" placeholder="Custom Code (optional)" [(ngModel)]="newLink.customCode" name="customCode">
-            <input type="password" class="input-field half" placeholder="Password (optional)" [(ngModel)]="newLink.password" name="password">
-            <input type="datetime-local" class="input-field half" [(ngModel)]="newLink.expiresAt" name="expiresAt" title="Expiration (optional)">
+            <input type="text" class="input-field half" [placeholder]="profile.plan === 'FREE' ? '👑 Custom Code (Pro Only)' : 'Custom Code (optional)'" [(ngModel)]="newLink.customCode" name="customCode" [disabled]="profile.plan === 'FREE'">
+            <input type="password" class="input-field half" [placeholder]="profile.plan === 'FREE' ? '👑 Password (Pro Only)' : 'Password (optional)'" [(ngModel)]="newLink.password" name="password" [disabled]="profile.plan === 'FREE'">
+            <input type="datetime-local" class="input-field half" [(ngModel)]="newLink.expiresAt" name="expiresAt" [title]="profile.plan === 'FREE' ? 'Expiration (Pro Only)' : 'Expiration (optional)'" [disabled]="profile.plan === 'FREE'">
           </div>
         </form>
       </div>
@@ -99,6 +99,28 @@
           </button>
           <p class="success-msg" *ngIf="profileMessage">{{ profileMessage }}</p>
         </form>
+      </div>
+
+      <div class="glass-card account-card" style="margin-top: 2rem;">
+        <h3>Billing & Plan</h3>
+        <div class="plan-status">
+          <p>Current Plan: <span class="badge" [class.badge-pro]="profile.plan === 'PRO'">{{ profile.plan }}</span></p>
+        </div>
+        
+        <div class="upgrade-simulation" *ngIf="profile.plan === 'FREE'">
+          <hr style="border: 1px solid var(--glass-border); margin: 1.5rem 0;">
+          <h4>Upgrade to PRO</h4>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Unlock Custom Codes, Link Passwords, Expiration Dates, and up to 500 links for just $5/month.</p>
+          <button class="btn-primary w-full" style="background: linear-gradient(135deg, #10b981, #059669);" (click)="upgradeToPro()" [disabled]="isUpgradingPlan">
+            {{ isUpgradingPlan ? 'Processing Payment...' : 'Simulate Pro Upgrade ($5.00)' }}
+          </button>
+        </div>
+
+        <div class="upgrade-simulation" *ngIf="profile.plan === 'PRO'">
+          <hr style="border: 1px solid var(--glass-border); margin: 1.5rem 0;">
+          <h4 style="color: var(--accent-primary);">👑 You are a Pro Member</h4>
+          <p style="color: var(--text-secondary);">Enjoy all unrestricted features and link capacities.</p>
+        </div>
       </div>
     </div>
 

@@ -15,7 +15,7 @@ export class UsersController {
       throw new BadRequestException('User not found');
     }
     const { password, ...result } = user;
-    return result;
+    return result; // Includes 'plan' implicitly
   }
 
   @Patch('me')
@@ -26,6 +26,9 @@ export class UsersController {
     }
     if (body.password) {
       updateData.password = await bcrypt.hash(body.password, 10);
+    }
+    if (body.plan !== undefined) {
+      updateData.plan = body.plan;
     }
     
     const user = await this.usersService.update(req.user.userId, updateData);

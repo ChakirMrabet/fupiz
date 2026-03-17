@@ -19,7 +19,7 @@ export class DashboardComponent implements OnInit {
   newLink = { originalUrl: '', customCode: '', password: '', expiresAt: '' };
   isCreating = false;
 
-  profile = { name: '', email: '' };
+  profile = { name: '', email: '', plan: 'FREE' };
   passwordUpdate = { newPassword: '' };
   isUpdatingProfile = false;
   profileMessage = '';
@@ -46,7 +46,7 @@ export class DashboardComponent implements OnInit {
   loadProfile() {
     this.authService.getProfile().subscribe({
       next: (data) => {
-        this.profile = { name: data.name || '', email: data.email };
+        this.profile = { name: data.name || '', email: data.email, plan: data.plan || 'FREE' };
       },
       error: (err) => console.error(err)
     });
@@ -71,6 +71,23 @@ export class DashboardComponent implements OnInit {
         console.error(err);
         this.profileMessage = 'Failed to update profile.';
         this.isUpdatingProfile = false;
+      }
+    });
+  }
+
+  isUpgradingPlan = false;
+  
+  upgradeToPro() {
+    this.isUpgradingPlan = true;
+    this.authService.updateProfile({ plan: 'PRO' }).subscribe({
+      next: (res) => {
+        this.profile.plan = 'PRO';
+        this.isUpgradingPlan = false;
+        alert('Payment simulated! You are now a PRO user. Enjoy all the features.');
+      },
+      error: (err) => {
+        console.error(err);
+        this.isUpgradingPlan = false;
       }
     });
   }
