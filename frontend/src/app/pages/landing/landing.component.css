@@ -53,6 +53,84 @@
   flex: 1;
 }
 
+/* Sponsors Carousel */
+.sponsors-section {
+  padding: 4rem 0 2rem;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.sponsors-section::before,
+.sponsors-section::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.sponsors-section::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-primary), transparent);
+}
+
+.sponsors-section::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-primary), transparent);
+}
+
+.sponsors-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 2rem;
+}
+
+.sponsors-track {
+  overflow: hidden;
+}
+
+.sponsors-slide {
+  display: flex;
+  width: max-content;
+  animation: scroll-logos 25s linear infinite;
+  gap: 4rem;
+}
+
+.sponsor-logo {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  opacity: 0.45;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.sponsor-logo:hover {
+  opacity: 0.8;
+}
+
+.sponsor-icon {
+  font-size: 1.8rem;
+}
+
+@keyframes scroll-logos {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 /* Features Section */
 .features-section {
   padding-top: 6rem;
