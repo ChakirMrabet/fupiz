@@ -88,6 +88,7 @@ Reasoning:
 - Added backend dependency `nodemailer` and matching type definitions.
 - Updated minimal backend and frontend test scaffolding to account for dependency injection changes.
 - Tightened duplicate-email handling so registration now rejects both active and inactive existing accounts instead of refreshing inactive users.
+- Explicitly loaded backend `.env` at application startup so mail configuration is available at runtime, not just to Prisma tooling.
 
 ## Environment Variables
 
