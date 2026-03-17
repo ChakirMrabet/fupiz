@@ -58,15 +58,13 @@ Reasoning:
 
 ### Duplicate unverified accounts
 
-- If a user registers again with an email tied to an inactive account, the existing record is updated with:
-  - the new password hash
-  - a new activation token
-  - a new expiration time
-- Active accounts still reject duplicate registration.
+- Registration now rejects any existing email.
+- If the email belongs to an inactive account, registration returns a specific conflict message indicating that activation is still pending.
+- If the email belongs to an active account, registration returns the standard duplicate-account conflict.
 
 Reasoning:
 
-- This doubles as a lightweight resend flow until a dedicated resend endpoint is added.
+- The signup form should perform an explicit existence check and never silently reuse an existing account record.
 
 ## Change Log
 
@@ -89,6 +87,7 @@ Reasoning:
 - Added frontend activation page and route for success and failure states.
 - Added backend dependency `nodemailer` and matching type definitions.
 - Updated minimal backend and frontend test scaffolding to account for dependency injection changes.
+- Tightened duplicate-email handling so registration now rejects both active and inactive existing accounts instead of refreshing inactive users.
 
 ## Environment Variables
 

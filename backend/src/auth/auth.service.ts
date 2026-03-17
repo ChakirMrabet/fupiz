@@ -46,32 +46,29 @@ export class AuthService {
       throw new BadRequestException('Email and password are required');
     }
 
+    const existingUser = await this.usersService.findOne(data.email);
+    if (existingUser) {
+      if (existingUser.isActive) {
+        throw new ConflictException('An account with this email already exists');
+      }
+
+      throw new ConflictException(
+        'An account with this email already exists and is awaiting activation',
+      );
+    }
+
     const hashedPassword = await bcrypt.hash(data.password, 10);
     const activationToken = randomBytes(32).toString('hex');
     const activationTokenExpiresAt = new Date(
       Date.now() + this.activationTtlHours * 60 * 60 * 1000,
     );
 
-    const existingUser = await this.usersService.findOne(data.email);
-
-    if (existingUser?.isActive) {
-      throw new ConflictException('An account with this email already exists');
-    }
-
-    const user = existingUser
-      ? await this.usersService.update(existingUser.id, {
-          password: hashedPassword,
-          activationToken,
-          activationTokenExpiresAt,
-          activatedAt: null,
-          isActive: false,
-        })
-      : await this.usersService.create({
-          email: data.email,
-          password: hashedPassword,
-          activationToken,
-          activationTokenExpiresAt,
-        });
+    const user = await this.usersService.create({
+      email: data.email,
+      password: hashedPassword,
+      activationToken,
+      activationTokenExpiresAt,
+    });
 
     try {
       await this.mailService.sendActivationEmail(user.email, activationToken);
