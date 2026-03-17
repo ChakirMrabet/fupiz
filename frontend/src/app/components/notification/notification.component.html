@@ -1,0 +1,36 @@
+<!-- Toast Notifications -->
+<div class="toast-container">
+  <div
+    *ngFor="let toast of toasts"
+    class="toast glass-card"
+    [class.toast-success]="toast.type === 'success'"
+    [class.toast-error]="toast.type === 'error'"
+    [class.toast-warning]="toast.type === 'warning'"
+    [class.toast-info]="toast.type === 'info'"
+    [class.toast-removing]="toast.removing"
+  >
+    <div class="toast-icon">
+      <span *ngIf="toast.type === 'success'">✅</span>
+      <span *ngIf="toast.type === 'error'">❌</span>
+      <span *ngIf="toast.type === 'warning'">⚠️</span>
+      <span *ngIf="toast.type === 'info'">ℹ️</span>
+    </div>
+    <div class="toast-body">
+      <strong class="toast-title">{{ toast.title }}</strong>
+      <p class="toast-message">{{ toast.message }}</p>
+    </div>
+    <button class="toast-close" (click)="dismissToast(toast.id)">&times;</button>
+  </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div class="confirm-overlay" *ngIf="confirmDialog" (click)="onCancel()">
+  <div class="confirm-dialog glass-card" (click)="$event.stopPropagation()">
+    <h3 class="confirm-title">{{ confirmDialog.title }}</h3>
+    <p class="confirm-message">{{ confirmDialog.message }}</p>
+    <div class="confirm-actions">
+      <button class="btn-secondary" (click)="onCancel()">{{ confirmDialog.cancelText }}</button>
+      <button class="btn-primary confirm-btn-danger" (click)="onConfirm()">{{ confirmDialog.confirmText }}</button>
+    </div>
+  </div>
+</div>

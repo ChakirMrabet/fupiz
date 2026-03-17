@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LinksService } from '../../services/links.service';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 import { Router, RouterLink } from '@angular/router';
 import { toDataURL } from 'qrcode';
 
@@ -27,6 +28,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     private linksService: LinksService,
     private authService: AuthService,
+    private notificationService: NotificationService,
     private router: Router
   ) {}
 
@@ -83,7 +85,7 @@ export class DashboardComponent implements OnInit {
       next: (res) => {
         this.profile.plan = 'PRO';
         this.isUpgradingPlan = false;
-        alert('Payment simulated! You are now a PRO user. Enjoy all the features.');
+        this.notificationService.success('You are now a PRO user. Enjoy all the features!', 'Payment Simulated');
       },
       error: (err) => {
         console.error(err);
@@ -133,7 +135,8 @@ export class DashboardComponent implements OnInit {
       error: (err) => {
         console.error(err);
         this.isCreating = false;
-        alert('Failed to create link. Custom code might be taken or URL is invalid.');
+        const msg = err?.error?.message || 'Custom code might be taken or URL is invalid.';
+        this.notificationService.error(msg, 'Link Creation Failed');
       }
     });
   }
@@ -144,10 +147,19 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  deleteLink(id: number) {
-    if (confirm('Are you sure you want to delete this link?')) {
+  async deleteLink(id: number) {
+    const confirmed = await this.notificationService.confirm(
+      'Delete Link',
+      'Are you sure you want to permanently delete this link? This action cannot be undone.',
+      'Delete',
+      'Cancel'
+    );
+    if (confirmed) {
       this.linksService.delete(id).subscribe({
-        next: () => this.loadLinks()
+        next: () => {
+          this.loadLinks();
+          this.notificationService.success('Link deleted successfully.');
+        }
       });
     }
   }
