@@ -81,19 +81,24 @@ export class DashboardComponent implements OnInit {
 
   isUpgradingPlan = false;
   
-  upgradeToPro() {
+  upgradePlan(plan: 'PRO' | 'BUSINESS') {
     this.isUpgradingPlan = true;
-    this.authService.updateProfile({ plan: 'PRO' }).subscribe({
-      next: (res) => {
-        this.profile.plan = 'PRO';
+    this.authService.updateProfile({ plan }).subscribe({
+      next: () => {
+        this.profile.plan = plan;
         this.isUpgradingPlan = false;
-        this.notificationService.success('You are now a PRO user. Enjoy all the features!', 'Payment Simulated');
+        const title = plan === 'BUSINESS' ? 'Business Upgrade Simulated' : 'Payment Simulated';
+        this.notificationService.success(`You are now on the ${plan} plan.`, title);
       },
       error: (err) => {
         console.error(err);
         this.isUpgradingPlan = false;
       }
     });
+  }
+
+  canUseAdvancedLinkControls() {
+    return this.profile.plan !== 'FREE';
   }
 
   loadLinks() {

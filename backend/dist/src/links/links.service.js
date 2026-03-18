@@ -35,8 +35,7 @@ let LinksService = class LinksService {
         if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
-        const userPlan = user.plan || 'FREE';
-        const planLimits = plans_config_1.PLAN_FEATURES[userPlan] || plans_config_1.PLAN_FEATURES['FREE'];
+        const planLimits = (0, plans_config_1.getPlanConfig)(user.plan);
         if (user._count.links >= planLimits.maxLinks) {
             throw new common_1.HttpException('Link limit reached for your current plan.', common_1.HttpStatus.PAYMENT_REQUIRED);
         }
@@ -75,8 +74,7 @@ let LinksService = class LinksService {
         const link = await this.prisma.link.findFirst({ where: { id, userId }, include: { user: true } });
         if (!link)
             throw new common_1.NotFoundException('Link not found or unauthorized');
-        const userPlan = link.user.plan || 'FREE';
-        const planLimits = plans_config_1.PLAN_FEATURES[userPlan] || plans_config_1.PLAN_FEATURES['FREE'];
+        const planLimits = (0, plans_config_1.getPlanConfig)(link.user.plan);
         if (data.password !== undefined && data.password !== link.password && !planLimits.canUsePassword) {
             throw new common_1.HttpException('Password protection is available on the PRO plan.', common_1.HttpStatus.FORBIDDEN);
         }

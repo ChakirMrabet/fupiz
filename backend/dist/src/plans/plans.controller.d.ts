@@ -8,6 +8,13 @@ export declare class PlansController {
         canUsePassword: boolean;
         canUseExpiration: boolean;
         canAccessStats: boolean;
-        id: string;
+        canEditDestination: boolean;
+        canUseClickLimit: boolean;
+        canUseSingleUseLinks: boolean;
+        canUseCustomLanding: boolean;
+        canUseBulkCreation: boolean;
+        canUseWebhooks: boolean;
+        canUseBrandedDomains: boolean;
+        id: "FREE" | "PRO" | "BUSINESS";
     }[];
 }

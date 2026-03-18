@@ -8,9 +8,10 @@
     <div
       class="glass-card pricing-card"
       *ngFor="let plan of plans"
-      [class.pricing-featured]="plan.id === 'PRO'"
+      [class.pricing-featured]="isFeatured(plan.id)"
+      [class.pricing-business]="plan.id === 'BUSINESS'"
     >
-      <div class="pricing-badge" *ngIf="plan.id === 'PRO'">Most Popular</div>
+      <div class="pricing-badge" *ngIf="getBadge(plan.id)">{{ getBadge(plan.id) }}</div>
       <h2 class="pricing-name">{{ plan.name }}</h2>
       <p class="pricing-price">{{ plan.price }}</p>
       <p class="pricing-desc">{{ plan.description }}</p>
@@ -36,10 +37,44 @@
           <span class="feature-check">{{ plan.canAccessStats ? '✓' : '✕' }}</span>
           Advanced analytics
         </li>
+        <li [class.feature-disabled]="!plan.canEditDestination">
+          <span class="feature-check">{{ plan.canEditDestination ? '✓' : '✕' }}</span>
+          Edit destination after creation
+        </li>
+        <li [class.feature-disabled]="!plan.canUseClickLimit">
+          <span class="feature-check">{{ plan.canUseClickLimit ? '✓' : '✕' }}</span>
+          Click-count expiration
+        </li>
+        <li [class.feature-disabled]="!plan.canUseSingleUseLinks">
+          <span class="feature-check">{{ plan.canUseSingleUseLinks ? '✓' : '✕' }}</span>
+          One-time links
+        </li>
+        <li [class.feature-disabled]="!plan.canUseCustomLanding">
+          <span class="feature-check">{{ plan.canUseCustomLanding ? '✓' : '✕' }}</span>
+          Custom landing pages
+        </li>
+        <li [class.feature-disabled]="!plan.canUseBulkCreation">
+          <span class="feature-check">{{ plan.canUseBulkCreation ? '✓' : '✕' }}</span>
+          Bulk link creation
+        </li>
+        <li [class.feature-disabled]="!plan.canUseWebhooks">
+          <span class="feature-check">{{ plan.canUseWebhooks ? '✓' : '✕' }}</span>
+          Webhooks
+        </li>
+        <li [class.feature-disabled]="!plan.canUseBrandedDomains">
+          <span class="feature-check">{{ plan.canUseBrandedDomains ? '✓' : '✕' }}</span>
+          Branded domains
+        </li>
       </ul>
 
-      <a routerLink="/register" class="btn-primary pricing-cta" *ngIf="plan.id === 'FREE'">Get Started Free</a>
-      <a routerLink="/register" class="btn-primary pricing-cta pricing-cta-pro" *ngIf="plan.id === 'PRO'">Upgrade to Pro</a>
+      <a
+        routerLink="/register"
+        class="btn-primary pricing-cta"
+        [class.pricing-cta-pro]="plan.id === 'PRO'"
+        [class.pricing-cta-business]="plan.id === 'BUSINESS'"
+      >
+        {{ getCtaLabel(plan.id) }}
+      </a>
     </div>
   </div>
 </div>

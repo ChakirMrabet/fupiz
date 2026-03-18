@@ -21,4 +21,20 @@ export class PricingComponent implements OnInit {
       error: (err) => console.error('Failed to fetch plans', err)
     });
   }
+
+  isFeatured(planId: string) {
+    return planId === 'PRO';
+  }
+
+  getBadge(planId: string) {
+    if (planId === 'PRO') return 'Most Popular';
+    if (planId === 'BUSINESS') return 'Scale & Brand';
+    return '';
+  }
+
+  getCtaLabel(planId: string) {
+    if (planId === 'FREE') return 'Get Started Free';
+    if (planId === 'PRO') return 'Upgrade to Pro';
+    return 'Start Business Plan';
+  }
 }

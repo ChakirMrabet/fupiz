@@ -50,6 +50,7 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("./users.service");
 const passport_1 = require("@nestjs/passport");
 const bcrypt = __importStar(require("bcrypt"));
+const plans_config_1 = require("../plans/plans.config");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
@@ -72,6 +73,9 @@ let UsersController = class UsersController {
             updateData.password = await bcrypt.hash(body.password, 10);
         }
         if (body.plan !== undefined) {
+            if (!(body.plan in plans_config_1.PLAN_FEATURES)) {
+                throw new common_1.BadRequestException('Invalid plan');
+            }
             updateData.plan = body.plan;
         }
         const user = await this.usersService.update(req.user.userId, updateData);

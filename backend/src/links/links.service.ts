@@ -4,7 +4,7 @@ import { Link, Prisma } from '@prisma/client';
 import { randomBytes } from 'crypto';
 import { UAParser } from 'ua-parser-js';
 
-import { PLAN_FEATURES } from '../plans/plans.config';
+import { getPlanConfig } from '../plans/plans.config';
 
 @Injectable()
 export class LinksService {
@@ -28,8 +28,7 @@ export class LinksService {
       throw new NotFoundException('User not found');
     }
 
-    const userPlan = (user as any).plan || 'FREE';
-    const planLimits = PLAN_FEATURES[userPlan] || PLAN_FEATURES['FREE'];
+    const planLimits = getPlanConfig((user as any).plan);
 
     if (user._count.links >= planLimits.maxLinks) {
       throw new HttpException('Link limit reached for your current plan.', HttpStatus.PAYMENT_REQUIRED);
@@ -76,8 +75,7 @@ export class LinksService {
     const link = await this.prisma.link.findFirst({ where: { id, userId }, include: { user: true } });
     if (!link) throw new NotFoundException('Link not found or unauthorized');
 
-    const userPlan = (link.user as any).plan || 'FREE';
-    const planLimits = PLAN_FEATURES[userPlan] || PLAN_FEATURES['FREE'];
+    const planLimits = getPlanConfig((link.user as any).plan);
 
     if (data.password !== undefined && data.password !== link.password && !planLimits.canUsePassword) {
        throw new HttpException('Password protection is available on the PRO plan.', HttpStatus.FORBIDDEN);

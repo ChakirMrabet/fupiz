@@ -41,9 +41,9 @@
             <button type="submit" class="btn-primary" [disabled]="isCreating">Shorten</button>
           </div>
           <div class="advanced-options">
-            <input type="text" class="input-field half" [placeholder]="profile.plan === 'FREE' ? '👑 Custom Code (Pro Only)' : 'Custom Code (optional)'" [(ngModel)]="newLink.customCode" name="customCode" [disabled]="profile.plan === 'FREE'">
-            <input type="password" class="input-field half" [placeholder]="profile.plan === 'FREE' ? '👑 Password (Pro Only)' : 'Password (optional)'" [(ngModel)]="newLink.password" name="password" [disabled]="profile.plan === 'FREE'">
-            <input type="datetime-local" class="input-field half" [(ngModel)]="newLink.expiresAt" name="expiresAt" [title]="profile.plan === 'FREE' ? 'Expiration (Pro Only)' : 'Expiration (optional)'" [disabled]="profile.plan === 'FREE'">
+            <input type="text" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Custom Code (optional)' : '👑 Custom Code (Paid Plans)'" [(ngModel)]="newLink.customCode" name="customCode" [disabled]="!canUseAdvancedLinkControls()">
+            <input type="password" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Password (optional)' : '👑 Password (Paid Plans)'" [(ngModel)]="newLink.password" name="password" [disabled]="!canUseAdvancedLinkControls()">
+            <input type="datetime-local" class="input-field half" [(ngModel)]="newLink.expiresAt" name="expiresAt" [title]="canUseAdvancedLinkControls() ? 'Expiration (optional)' : 'Expiration (Paid Plans)'" [disabled]="!canUseAdvancedLinkControls()">
           </div>
         </form>
       </div>
@@ -117,22 +117,34 @@
       <div class="glass-card account-card" style="margin-top: 2rem;">
         <h3>Billing & Plan</h3>
         <div class="plan-status">
-          <p>Current Plan: <span class="badge" [class.badge-pro]="profile.plan === 'PRO'">{{ profile.plan }}</span></p>
+          <p>Current Plan: <span class="badge" [class.badge-pro]="profile.plan === 'PRO'" [class.badge-business]="profile.plan === 'BUSINESS'">{{ profile.plan }}</span></p>
         </div>
         
         <div class="upgrade-simulation" *ngIf="profile.plan === 'FREE'">
           <hr style="border: 1px solid var(--glass-border); margin: 1.5rem 0;">
-          <h4>Upgrade to PRO</h4>
-          <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Unlock Custom Codes, Link Passwords, Expiration Dates, and up to 500 links for just $5/month.</p>
-          <button class="btn-primary w-full" style="background: linear-gradient(135deg, #10b981, #059669);" (click)="upgradeToPro()" [disabled]="isUpgradingPlan">
-            {{ isUpgradingPlan ? 'Processing Payment...' : 'Simulate Pro Upgrade ($5.00)' }}
+          <h4>Upgrade Your Plan</h4>
+          <p style="color: var(--text-secondary); margin-bottom: 1rem;">Choose the tier that matches how deeply you want to manage, automate, and brand your links.</p>
+          <button class="btn-primary w-full" style="background: linear-gradient(135deg, #10b981, #059669); margin-bottom: 0.75rem;" (click)="upgradePlan('PRO')" [disabled]="isUpgradingPlan">
+            {{ isUpgradingPlan ? 'Processing Payment...' : 'Simulate Pro Upgrade ($9.00)' }}
+          </button>
+          <button class="btn-primary w-full btn-business" (click)="upgradePlan('BUSINESS')" [disabled]="isUpgradingPlan">
+            {{ isUpgradingPlan ? 'Processing Payment...' : 'Simulate Business Upgrade ($29.00)' }}
           </button>
         </div>
 
         <div class="upgrade-simulation" *ngIf="profile.plan === 'PRO'">
           <hr style="border: 1px solid var(--glass-border); margin: 1.5rem 0;">
           <h4 style="color: var(--accent-primary);">👑 You are a Pro Member</h4>
-          <p style="color: var(--text-secondary);">Enjoy all unrestricted features and link capacities.</p>
+          <p style="color: var(--text-secondary); margin-bottom: 1rem;">You have advanced link controls. Move to Business when you need automation and brand-oriented features.</p>
+          <button class="btn-primary w-full btn-business" (click)="upgradePlan('BUSINESS')" [disabled]="isUpgradingPlan">
+            {{ isUpgradingPlan ? 'Processing Payment...' : 'Upgrade to Business ($29.00)' }}
+          </button>
+        </div>
+
+        <div class="upgrade-simulation" *ngIf="profile.plan === 'BUSINESS'">
+          <hr style="border: 1px solid var(--glass-border); margin: 1.5rem 0;">
+          <h4 style="color: #14b8a6;">You are on Business</h4>
+          <p style="color: var(--text-secondary);">You are on the highest current plan, ready for bulk workflows, branded domains, and webhook-based automation as those features land.</p>
         </div>
       </div>
     </div>

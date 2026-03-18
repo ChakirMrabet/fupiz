@@ -2,6 +2,7 @@ import { Controller, Get, Patch, Body, UseGuards, Request, BadRequestException }
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 import * as bcrypt from 'bcrypt';
+import { PLAN_FEATURES } from '../plans/plans.config';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('users')
@@ -28,6 +29,9 @@ export class UsersController {
       updateData.password = await bcrypt.hash(body.password, 10);
     }
     if (body.plan !== undefined) {
+      if (!(body.plan in PLAN_FEATURES)) {
+        throw new BadRequestException('Invalid plan');
+      }
       updateData.plan = body.plan;
     }
     

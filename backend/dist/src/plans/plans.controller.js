@@ -14,9 +14,9 @@ const common_1 = require("@nestjs/common");
 const plans_config_1 = require("./plans.config");
 let PlansController = class PlansController {
     getPlans() {
-        return Object.entries(plans_config_1.PLAN_FEATURES).map(([key, config]) => ({
-            id: key,
-            ...config,
+        return plans_config_1.PLAN_IDS.map((id) => ({
+            id,
+            ...plans_config_1.PLAN_FEATURES[id],
         }));
     }
 };
