@@ -66,6 +66,9 @@
             <a [routerLink]="['/analytics', link.id]" class="action-btn" title="Analytics">
               <span class="icon">📊</span>
             </a>
+            <button (click)="openEditModal(link)" class="action-btn" title="Edit Link">
+              <span class="icon">✏️</span>
+            </button>
             <button (click)="showQrCode(link)" class="action-btn" title="QR Code">
               <span class="icon">📱</span>
             </button>
@@ -163,6 +166,45 @@
     <div class="modal-actions">
       <a class="btn-primary" [href]="qrCodeUrl" [download]="'qrcode-' + qrCodeLink?.shortCode + '.png'">Download</a>
       <button class="btn-secondary" (click)="closeQrModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="editingLink" (click)="closeEditModal()">
+  <div class="modal-content glass-card edit-modal" (click)="$event.stopPropagation()">
+    <h3>Edit Link</h3>
+    <p>Update the destination URL and, on paid plans, the short code.</p>
+
+    <div class="edit-form">
+      <div class="form-group">
+        <label>Destination URL</label>
+        <input
+          type="url"
+          class="input-field"
+          [(ngModel)]="editLinkForm.originalUrl"
+          name="editOriginalUrl"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Short Code</label>
+        <input
+          type="text"
+          class="input-field"
+          [(ngModel)]="editLinkForm.shortCode"
+          name="editShortCode"
+          [disabled]="!canUseAdvancedLinkControls()"
+        >
+        <small class="help-text" *ngIf="!canUseAdvancedLinkControls()">Custom short-code edits are available on paid plans.</small>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-primary" (click)="saveLinkEdits()" [disabled]="isSavingLinkEdit">
+        {{ isSavingLinkEdit ? 'Saving...' : 'Save Changes' }}
+      </button>
+      <button class="btn-secondary" (click)="closeEditModal()">Cancel</button>
     </div>
   </div>
 </div>

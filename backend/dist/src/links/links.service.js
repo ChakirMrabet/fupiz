@@ -75,15 +75,40 @@ let LinksService = class LinksService {
         if (!link)
             throw new common_1.NotFoundException('Link not found or unauthorized');
         const planLimits = (0, plans_config_1.getPlanConfig)(link.user.plan);
+        const nextOriginalUrl = typeof data.originalUrl === 'string' ? data.originalUrl.trim() : undefined;
+        const requestedShortCodeRaw = typeof data.shortCode === 'string'
+            ? data.shortCode.trim()
+            : typeof data.customCode === 'string'
+                ? data.customCode.trim()
+                : undefined;
         if (data.password !== undefined && data.password !== link.password && !planLimits.canUsePassword) {
             throw new common_1.HttpException('Password protection is available on the PRO plan.', common_1.HttpStatus.FORBIDDEN);
         }
         if (data.expiresAt !== undefined && data.expiresAt !== link.expiresAt && !planLimits.canUseExpiration) {
             throw new common_1.HttpException('Link expiration requires the PRO plan.', common_1.HttpStatus.FORBIDDEN);
         }
+        if (nextOriginalUrl !== undefined && !nextOriginalUrl) {
+            throw new common_1.BadRequestException('Original URL cannot be empty');
+        }
+        if (requestedShortCodeRaw !== undefined && requestedShortCodeRaw !== link.shortCode) {
+            if (!requestedShortCodeRaw) {
+                throw new common_1.BadRequestException('Short code cannot be empty');
+            }
+            if (!planLimits.canUseCustomCode) {
+                throw new common_1.HttpException('Custom codes exist only on paid plans.', common_1.HttpStatus.FORBIDDEN);
+            }
+            const existingShortCode = await this.prisma.link.findUnique({
+                where: { shortCode: requestedShortCodeRaw },
+            });
+            if (existingShortCode && existingShortCode.id !== link.id) {
+                throw new common_1.ConflictException('This short code is already in use');
+            }
+        }
         return this.prisma.link.update({
             where: { id },
             data: {
+                originalUrl: nextOriginalUrl !== undefined ? nextOriginalUrl : link.originalUrl,
+                shortCode: requestedShortCodeRaw !== undefined ? requestedShortCodeRaw : link.shortCode,
                 isActive: data.isActive !== undefined ? data.isActive : link.isActive,
                 password: data.password !== undefined ? data.password : link.password,
                 expiresAt: data.expiresAt !== undefined ? (data.expiresAt ? new Date(data.expiresAt) : null) : link.expiresAt,

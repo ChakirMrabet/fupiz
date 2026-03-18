@@ -320,12 +320,29 @@
   margin: 0;
 }
 
+.edit-modal {
+  max-width: 560px;
+  text-align: left;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .qr-code-container {
   background: white; /* QR needs contrast */
   padding: 1rem;
   border-radius: 12px;
   display: inline-block;
   margin: 0 auto;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
 }
 
 .qr-code-container img {

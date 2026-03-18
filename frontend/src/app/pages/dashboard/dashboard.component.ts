@@ -20,6 +20,9 @@ export class DashboardComponent implements OnInit {
   links: any[] = [];
   newLink = { originalUrl: '', customCode: '', password: '', expiresAt: '' };
   isCreating = false;
+  editingLink: any = null;
+  editLinkForm = { originalUrl: '', shortCode: '' };
+  isSavingLinkEdit = false;
 
   profile = { name: '', email: '', plan: 'FREE' };
   passwordUpdate = { newPassword: '' };
@@ -145,6 +148,48 @@ export class DashboardComponent implements OnInit {
         this.isCreating = false;
         const msg = err?.error?.message || 'Custom code might be taken or URL is invalid.';
         this.notificationService.error(msg, 'Link Creation Failed');
+      }
+    });
+  }
+
+  openEditModal(link: any) {
+    this.editingLink = link;
+    this.editLinkForm = {
+      originalUrl: link.originalUrl,
+      shortCode: link.shortCode,
+    };
+  }
+
+  closeEditModal() {
+    this.editingLink = null;
+    this.editLinkForm = { originalUrl: '', shortCode: '' };
+    this.isSavingLinkEdit = false;
+  }
+
+  saveLinkEdits() {
+    if (!this.editingLink) return;
+
+    this.isSavingLinkEdit = true;
+    const payload: any = {
+      originalUrl: this.editLinkForm.originalUrl,
+    };
+
+    if (this.canUseAdvancedLinkControls()) {
+      payload.shortCode = this.editLinkForm.shortCode;
+    }
+
+    this.linksService.update(this.editingLink.id, payload).subscribe({
+      next: () => {
+        this.isSavingLinkEdit = false;
+        this.closeEditModal();
+        this.loadLinks();
+        this.notificationService.success('Link updated successfully.');
+      },
+      error: (err) => {
+        console.error(err);
+        this.isSavingLinkEdit = false;
+        const msg = err?.error?.message || 'Failed to update link.';
+        this.notificationService.error(msg, 'Link Update Failed');
       }
     });
   }

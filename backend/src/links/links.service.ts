@@ -1,4 +1,11 @@
-import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Link, Prisma } from '@prisma/client';
 import { randomBytes } from 'crypto';
@@ -76,6 +83,14 @@ export class LinksService {
     if (!link) throw new NotFoundException('Link not found or unauthorized');
 
     const planLimits = getPlanConfig((link.user as any).plan);
+    const nextOriginalUrl =
+      typeof data.originalUrl === 'string' ? data.originalUrl.trim() : undefined;
+    const requestedShortCodeRaw =
+      typeof data.shortCode === 'string'
+        ? data.shortCode.trim()
+        : typeof data.customCode === 'string'
+          ? data.customCode.trim()
+          : undefined;
 
     if (data.password !== undefined && data.password !== link.password && !planLimits.canUsePassword) {
        throw new HttpException('Password protection is available on the PRO plan.', HttpStatus.FORBIDDEN);
@@ -84,10 +99,35 @@ export class LinksService {
     if (data.expiresAt !== undefined && data.expiresAt !== link.expiresAt && !planLimits.canUseExpiration) {
        throw new HttpException('Link expiration requires the PRO plan.', HttpStatus.FORBIDDEN);
     }
+
+    if (nextOriginalUrl !== undefined && !nextOriginalUrl) {
+      throw new BadRequestException('Original URL cannot be empty');
+    }
+
+    if (requestedShortCodeRaw !== undefined && requestedShortCodeRaw !== link.shortCode) {
+      if (!requestedShortCodeRaw) {
+        throw new BadRequestException('Short code cannot be empty');
+      }
+
+      if (!planLimits.canUseCustomCode) {
+        throw new HttpException('Custom codes exist only on paid plans.', HttpStatus.FORBIDDEN);
+      }
+
+      const existingShortCode = await this.prisma.link.findUnique({
+        where: { shortCode: requestedShortCodeRaw },
+      });
+
+      if (existingShortCode && existingShortCode.id !== link.id) {
+        throw new ConflictException('This short code is already in use');
+      }
+    }
     
     return this.prisma.link.update({
       where: { id },
       data: {
+        originalUrl: nextOriginalUrl !== undefined ? nextOriginalUrl : link.originalUrl,
+        shortCode:
+          requestedShortCodeRaw !== undefined ? requestedShortCodeRaw : link.shortCode,
         isActive: data.isActive !== undefined ? data.isActive : link.isActive,
         password: data.password !== undefined ? data.password : link.password,
         expiresAt: data.expiresAt !== undefined ? (data.expiresAt ? new Date(data.expiresAt) : null) : link.expiresAt,
