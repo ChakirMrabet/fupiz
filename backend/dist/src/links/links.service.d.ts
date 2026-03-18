@@ -5,6 +5,15 @@ export declare class LinksService {
     constructor(prisma: PrismaService);
     generateShortCode(): string;
     private parseMaxClicks;
+    getEffectiveMaxClicks(link: {
+        maxClicks: number | null;
+        singleUse: boolean;
+    }): number | null;
+    hasReachedClickLimit(link: {
+        clicks: number;
+        maxClicks: number | null;
+        singleUse: boolean;
+    }): boolean;
     create(userId: number, data: any): Promise<Link>;
     findAll(userId: number): Promise<Link[]>;
     findByShortCode(shortCode: string): Promise<Link | null>;
@@ -21,6 +30,7 @@ export declare class LinksService {
         password: string | null;
         expiresAt: Date | null;
         maxClicks: number | null;
+        singleUse: boolean;
         isActive: boolean;
         clicks: number;
         userId: number;

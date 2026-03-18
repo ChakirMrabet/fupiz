@@ -9,6 +9,7 @@ export declare class LinksController {
         password: string | null;
         expiresAt: Date | null;
         maxClicks: number | null;
+        singleUse: boolean;
         isActive: boolean;
         clicks: number;
         userId: number;
@@ -22,6 +23,7 @@ export declare class LinksController {
         password: string | null;
         expiresAt: Date | null;
         maxClicks: number | null;
+        singleUse: boolean;
         isActive: boolean;
         clicks: number;
         userId: number;
@@ -35,6 +37,7 @@ export declare class LinksController {
         password: string | null;
         expiresAt: Date | null;
         maxClicks: number | null;
+        singleUse: boolean;
         isActive: boolean;
         clicks: number;
         userId: number;
@@ -48,6 +51,7 @@ export declare class LinksController {
         password: string | null;
         expiresAt: Date | null;
         maxClicks: number | null;
+        singleUse: boolean;
         isActive: boolean;
         clicks: number;
         userId: number;

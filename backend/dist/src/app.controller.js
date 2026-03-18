@@ -31,7 +31,7 @@ let AppController = class AppController {
         if (link.expiresAt && link.expiresAt < new Date()) {
             throw new common_1.NotFoundException('Link has expired.');
         }
-        if (link.maxClicks !== null && link.clicks >= link.maxClicks) {
+        if (this.linksService.hasReachedClickLimit(link)) {
             await this.linksService.update(link.id, link.userId, { isActive: false });
             throw new common_1.NotFoundException('Link has expired.');
         }
@@ -51,7 +51,7 @@ let AppController = class AppController {
             throw new common_1.NotFoundException('Link not found');
         if (link.expiresAt && link.expiresAt < new Date())
             throw new common_1.NotFoundException('Link has expired.');
-        if (link.maxClicks !== null && link.clicks >= link.maxClicks) {
+        if (this.linksService.hasReachedClickLimit(link)) {
             await this.linksService.update(link.id, link.userId, { isActive: false });
             throw new common_1.NotFoundException('Link has expired.');
         }

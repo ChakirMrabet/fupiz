@@ -33,6 +33,15 @@ export class LinksService {
     return parsedValue;
   }
 
+  getEffectiveMaxClicks(link: { maxClicks: number | null; singleUse: boolean }): number | null {
+    return link.singleUse ? 1 : link.maxClicks;
+  }
+
+  hasReachedClickLimit(link: { clicks: number; maxClicks: number | null; singleUse: boolean }) {
+    const effectiveMaxClicks = this.getEffectiveMaxClicks(link);
+    return effectiveMaxClicks !== null && link.clicks >= effectiveMaxClicks;
+  }
+
   async create(userId: number, data: any): Promise<Link> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -69,7 +78,12 @@ export class LinksService {
       throw new HttpException('Click limits are available on the PRO plan.', HttpStatus.FORBIDDEN);
     }
 
+    if (data.singleUse && !planLimits.canUseSingleUseLinks) {
+      throw new HttpException('One-time links are available on the PRO plan.', HttpStatus.FORBIDDEN);
+    }
+
     const maxClicks = this.parseMaxClicks(data.maxClicks);
+    const singleUse = Boolean(data.singleUse);
 
     let shortCode = data.customCode || this.generateShortCode();
     return this.prisma.link.create({
@@ -78,7 +92,8 @@ export class LinksService {
         shortCode,
         password: data.password || null,
         expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
-        maxClicks: maxClicks ?? null,
+        maxClicks: singleUse ? null : maxClicks ?? null,
+        singleUse,
         userId,
       },
     });
@@ -123,7 +138,12 @@ export class LinksService {
       throw new HttpException('Click limits are available on the PRO plan.', HttpStatus.FORBIDDEN);
     }
 
+    if (data.singleUse !== undefined && data.singleUse !== link.singleUse && !planLimits.canUseSingleUseLinks) {
+      throw new HttpException('One-time links are available on the PRO plan.', HttpStatus.FORBIDDEN);
+    }
+
     const maxClicks = this.parseMaxClicks(data.maxClicks);
+    const nextSingleUse = data.singleUse !== undefined ? Boolean(data.singleUse) : link.singleUse;
 
     if (nextOriginalUrl !== undefined && !nextOriginalUrl) {
       throw new BadRequestException('Original URL cannot be empty');
@@ -156,7 +176,12 @@ export class LinksService {
         isActive: data.isActive !== undefined ? data.isActive : link.isActive,
         password: data.password !== undefined ? data.password : link.password,
         expiresAt: data.expiresAt !== undefined ? (data.expiresAt ? new Date(data.expiresAt) : null) : link.expiresAt,
-        maxClicks: maxClicks !== undefined ? maxClicks : link.maxClicks,
+        maxClicks: nextSingleUse
+          ? null
+          : maxClicks !== undefined
+            ? maxClicks
+            : link.maxClicks,
+        singleUse: nextSingleUse,
       },
     });
   }
@@ -183,7 +208,7 @@ export class LinksService {
         throw new NotFoundException('Link not found');
       }
 
-      if (link.maxClicks !== null && link.clicks >= link.maxClicks) {
+      if (this.hasReachedClickLimit(link)) {
         if (link.isActive) {
           await tx.link.update({
             where: { id: linkId },
@@ -211,7 +236,7 @@ export class LinksService {
         },
       });
 
-      if (updatedLink.maxClicks !== null && updatedLink.clicks >= updatedLink.maxClicks) {
+      if (this.hasReachedClickLimit(updatedLink)) {
         await tx.link.update({
           where: { id: linkId },
           data: { isActive: false },

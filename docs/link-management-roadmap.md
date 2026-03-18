@@ -46,3 +46,14 @@ Expand the existing link CRUD flow with higher-value management features that ma
 - Updated redirect and password-unlock flows to stop working once the click limit is reached.
 - Added automatic link deactivation once the limit is exhausted.
 - Added dashboard create/edit inputs and link badges for click-limit usage.
+- Started implementation of `one-time links`.
+- Scope for this slice:
+  - add an explicit `singleUse` flag to links
+  - treat one-time links as a specialized click-limit rule
+  - allow paid plans to create and edit them
+  - show one-time status in the dashboard
+- Implemented `singleUse` on the `Link` model with a Prisma migration.
+- Implemented one-time links on top of the click-limit runtime so they expire after the first successful visit.
+- Added paid-plan gating for one-time link creation and editing.
+- Updated dashboard create/edit flows with a dedicated one-time toggle.
+- Added dashboard badges for one-time link status and `0 / 1` style usage visibility.

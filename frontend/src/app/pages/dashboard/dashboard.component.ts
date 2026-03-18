@@ -18,10 +18,10 @@ import { toDataURL } from 'qrcode';
 export class DashboardComponent implements OnInit {
   activeTab: 'links' | 'account' = 'links';
   links: any[] = [];
-  newLink = { originalUrl: '', customCode: '', password: '', expiresAt: '', maxClicks: '' };
+  newLink = { originalUrl: '', customCode: '', password: '', expiresAt: '', maxClicks: '', singleUse: false };
   isCreating = false;
   editingLink: any = null;
-  editLinkForm = { originalUrl: '', shortCode: '', maxClicks: '' };
+  editLinkForm = { originalUrl: '', shortCode: '', maxClicks: '', singleUse: false };
   isSavingLinkEdit = false;
 
   profile = { name: '', email: '', plan: 'FREE' };
@@ -105,6 +105,10 @@ export class DashboardComponent implements OnInit {
   }
 
   formatClickLimit(link: any) {
+    if (link.singleUse) {
+      return `${link.clicks} / 1 clicks`;
+    }
+
     if (link.maxClicks === null || link.maxClicks === undefined) {
       return '';
     }
@@ -144,10 +148,11 @@ export class DashboardComponent implements OnInit {
     if (this.newLink.password) data.password = this.newLink.password;
     if (this.newLink.expiresAt) data.expiresAt = this.newLink.expiresAt;
     if (this.newLink.maxClicks) data.maxClicks = this.newLink.maxClicks;
+    if (this.newLink.singleUse) data.singleUse = true;
 
     this.linksService.create(data).subscribe({
       next: () => {
-        this.newLink = { originalUrl: '', customCode: '', password: '', expiresAt: '', maxClicks: '' };
+        this.newLink = { originalUrl: '', customCode: '', password: '', expiresAt: '', maxClicks: '', singleUse: false };
         this.loadLinks();
         this.isCreating = false;
         this.notificationService.success('Link created successfully!');
@@ -167,12 +172,13 @@ export class DashboardComponent implements OnInit {
       originalUrl: link.originalUrl,
       shortCode: link.shortCode,
       maxClicks: link.maxClicks?.toString() || '',
+      singleUse: !!link.singleUse,
     };
   }
 
   closeEditModal() {
     this.editingLink = null;
-    this.editLinkForm = { originalUrl: '', shortCode: '', maxClicks: '' };
+    this.editLinkForm = { originalUrl: '', shortCode: '', maxClicks: '', singleUse: false };
     this.isSavingLinkEdit = false;
   }
 
@@ -187,6 +193,7 @@ export class DashboardComponent implements OnInit {
     if (this.canUseAdvancedLinkControls()) {
       payload.shortCode = this.editLinkForm.shortCode;
       payload.maxClicks = this.editLinkForm.maxClicks;
+      payload.singleUse = this.editLinkForm.singleUse;
     }
 
     this.linksService.update(this.editingLink.id, payload).subscribe({

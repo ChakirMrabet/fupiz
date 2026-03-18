@@ -22,7 +22,7 @@ export class AppController {
       throw new NotFoundException('Link has expired.');
     }
 
-    if (link.maxClicks !== null && link.clicks >= link.maxClicks) {
+    if (this.linksService.hasReachedClickLimit(link)) {
       await this.linksService.update(link.id, link.userId, { isActive: false });
       throw new NotFoundException('Link has expired.');
     }
@@ -45,7 +45,7 @@ export class AppController {
     const link = await this.linksService.findByShortCode(shortCode);
     if (!link || !link.isActive) throw new NotFoundException('Link not found');
     if (link.expiresAt && link.expiresAt < new Date()) throw new NotFoundException('Link has expired.');
-    if (link.maxClicks !== null && link.clicks >= link.maxClicks) {
+    if (this.linksService.hasReachedClickLimit(link)) {
       await this.linksService.update(link.id, link.userId, { isActive: false });
       throw new NotFoundException('Link has expired.');
     }

@@ -28,6 +28,7 @@ model Link {
   password    String?
   expiresAt   DateTime?
   maxClicks   Int?
+  singleUse   Boolean     @default(false)
   isActive    Boolean     @default(true)
   clicks      Int         @default(0)
   userId      Int

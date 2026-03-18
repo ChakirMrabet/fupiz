@@ -34,6 +34,13 @@ let LinksService = class LinksService {
         }
         return parsedValue;
     }
+    getEffectiveMaxClicks(link) {
+        return link.singleUse ? 1 : link.maxClicks;
+    }
+    hasReachedClickLimit(link) {
+        const effectiveMaxClicks = this.getEffectiveMaxClicks(link);
+        return effectiveMaxClicks !== null && link.clicks >= effectiveMaxClicks;
+    }
     async create(userId, data) {
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
@@ -62,7 +69,11 @@ let LinksService = class LinksService {
         if (data.maxClicks !== undefined && data.maxClicks !== null && !planLimits.canUseClickLimit) {
             throw new common_1.HttpException('Click limits are available on the PRO plan.', common_1.HttpStatus.FORBIDDEN);
         }
+        if (data.singleUse && !planLimits.canUseSingleUseLinks) {
+            throw new common_1.HttpException('One-time links are available on the PRO plan.', common_1.HttpStatus.FORBIDDEN);
+        }
         const maxClicks = this.parseMaxClicks(data.maxClicks);
+        const singleUse = Boolean(data.singleUse);
         let shortCode = data.customCode || this.generateShortCode();
         return this.prisma.link.create({
             data: {
@@ -70,7 +81,8 @@ let LinksService = class LinksService {
                 shortCode,
                 password: data.password || null,
                 expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
-                maxClicks: maxClicks ?? null,
+                maxClicks: singleUse ? null : maxClicks ?? null,
+                singleUse,
                 userId,
             },
         });
@@ -106,7 +118,11 @@ let LinksService = class LinksService {
         if (data.maxClicks !== undefined && data.maxClicks !== link.maxClicks && !planLimits.canUseClickLimit) {
             throw new common_1.HttpException('Click limits are available on the PRO plan.', common_1.HttpStatus.FORBIDDEN);
         }
+        if (data.singleUse !== undefined && data.singleUse !== link.singleUse && !planLimits.canUseSingleUseLinks) {
+            throw new common_1.HttpException('One-time links are available on the PRO plan.', common_1.HttpStatus.FORBIDDEN);
+        }
         const maxClicks = this.parseMaxClicks(data.maxClicks);
+        const nextSingleUse = data.singleUse !== undefined ? Boolean(data.singleUse) : link.singleUse;
         if (nextOriginalUrl !== undefined && !nextOriginalUrl) {
             throw new common_1.BadRequestException('Original URL cannot be empty');
         }
@@ -132,7 +148,12 @@ let LinksService = class LinksService {
                 isActive: data.isActive !== undefined ? data.isActive : link.isActive,
                 password: data.password !== undefined ? data.password : link.password,
                 expiresAt: data.expiresAt !== undefined ? (data.expiresAt ? new Date(data.expiresAt) : null) : link.expiresAt,
-                maxClicks: maxClicks !== undefined ? maxClicks : link.maxClicks,
+                maxClicks: nextSingleUse
+                    ? null
+                    : maxClicks !== undefined
+                        ? maxClicks
+                        : link.maxClicks,
+                singleUse: nextSingleUse,
             },
         });
     }
@@ -154,7 +175,7 @@ let LinksService = class LinksService {
             if (!link) {
                 throw new common_1.NotFoundException('Link not found');
             }
-            if (link.maxClicks !== null && link.clicks >= link.maxClicks) {
+            if (this.hasReachedClickLimit(link)) {
                 if (link.isActive) {
                     await tx.link.update({
                         where: { id: linkId },
@@ -179,7 +200,7 @@ let LinksService = class LinksService {
                     referer: metadata.referer || 'Direct',
                 },
             });
-            if (updatedLink.maxClicks !== null && updatedLink.clicks >= updatedLink.maxClicks) {
+            if (this.hasReachedClickLimit(updatedLink)) {
                 await tx.link.update({
                     where: { id: linkId },
                     data: { isActive: false },
