@@ -359,6 +359,37 @@
   resize: vertical;
 }
 
+.bulk-textarea {
+  min-height: 150px;
+}
+
+.bulk-help {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.bulk-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.bulk-summary {
+  margin-top: 1rem;
+  color: var(--text-secondary);
+}
+
+.bulk-errors-title {
+  margin: 0.75rem 0 0.35rem;
+  color: var(--text-primary);
+}
+
+.bulk-errors {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--danger);
+}
+
 .qr-code-container {
   background: white; /* QR needs contrast */
   padding: 1rem;

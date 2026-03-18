@@ -18,6 +18,9 @@ import { toDataURL } from 'qrcode';
 export class DashboardComponent implements OnInit {
   activeTab: 'links' | 'account' = 'links';
   links: any[] = [];
+  bulkLinkInput = '';
+  isBulkCreating = false;
+  bulkCreateSummary: null | { createdCount: number; failedCount: number; results: Array<{ index: number; success: boolean; error?: string }> } = null;
   newLink = {
     originalUrl: '',
     customCode: '',
@@ -122,6 +125,10 @@ export class DashboardComponent implements OnInit {
     return this.profile.plan !== 'FREE';
   }
 
+  canUseBulkCreation() {
+    return this.profile.plan === 'BUSINESS';
+  }
+
   hasLandingPage(link: any) {
     return !!(link.landingTitle || link.landingDescription || link.landingButtonLabel);
   }
@@ -197,6 +204,54 @@ export class DashboardComponent implements OnInit {
         this.isCreating = false;
         const msg = err?.error?.message || 'Custom code might be taken or URL is invalid.';
         this.notificationService.error(msg, 'Link Creation Failed');
+      }
+    });
+  }
+
+  private parseBulkEntries() {
+    return this.bulkLinkInput
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const [originalUrl, customCode] = line.split(',').map((part) => part.trim());
+        return {
+          originalUrl,
+          ...(customCode ? { customCode } : {}),
+        };
+      });
+  }
+
+  onBulkCreate() {
+    if (!this.canUseBulkCreation()) {
+      this.notificationService.error('Bulk creation is available on the Business plan.', 'Upgrade Required');
+      return;
+    }
+
+    const entries = this.parseBulkEntries();
+    if (entries.length === 0) {
+      this.notificationService.error('Enter at least one URL to create links in bulk.', 'Bulk Creation Failed');
+      return;
+    }
+
+    this.isBulkCreating = true;
+    this.bulkCreateSummary = null;
+
+    this.linksService.bulkCreate(entries).subscribe({
+      next: (response) => {
+        this.isBulkCreating = false;
+        this.bulkCreateSummary = response;
+        this.bulkLinkInput = '';
+        this.loadLinks();
+        this.notificationService.success(
+          `${response.createdCount} links created${response.failedCount ? `, ${response.failedCount} failed` : ''}.`,
+          'Bulk Creation Complete',
+        );
+      },
+      error: (err) => {
+        this.isBulkCreating = false;
+        const msg = err?.error?.message || 'Bulk creation failed.';
+        this.notificationService.error(msg, 'Bulk Creation Failed');
       }
     });
   }

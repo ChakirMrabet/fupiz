@@ -78,6 +78,34 @@
         </form>
       </div>
 
+      <div class="glass-card create-link-card">
+        <h3>Bulk Create Links</h3>
+        <p class="bulk-help">Paste one URL per line. You can optionally add a custom code after a comma, for example: <code>https://example.com/sale,summer-sale</code></p>
+        <textarea
+          class="input-field landing-textarea bulk-textarea"
+          [(ngModel)]="bulkLinkInput"
+          name="bulkLinkInput"
+          [disabled]="!canUseBulkCreation() || isBulkCreating"
+          [placeholder]="canUseBulkCreation() ? 'https://example.com/page-one\nhttps://example.com/page-two,launch-page' : '👑 Bulk creation is available on the Business plan'"
+        ></textarea>
+        <div class="bulk-actions">
+          <button class="btn-primary btn-business" (click)="onBulkCreate()" [disabled]="!canUseBulkCreation() || isBulkCreating">
+            {{ isBulkCreating ? 'Creating...' : 'Create Links in Bulk' }}
+          </button>
+        </div>
+        <div class="bulk-summary" *ngIf="bulkCreateSummary">
+          <p><strong>{{ bulkCreateSummary.createdCount }}</strong> created, <strong>{{ bulkCreateSummary.failedCount }}</strong> failed.</p>
+          <div *ngIf="bulkCreateSummary.failedCount > 0">
+            <p class="bulk-errors-title">Failed rows</p>
+            <ul class="bulk-errors">
+              <li *ngFor="let result of bulkCreateSummary.results">
+                <span *ngIf="!result.success">Line {{ result.index + 1 }}: {{ result.error }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       <div class="links-list">
         <div class="glass-card link-item" *ngFor="let link of links">
           <div class="link-details">

@@ -12,6 +12,11 @@ export class LinksController {
     return this.linksService.create(req.user.userId, body);
   }
 
+  @Post('bulk')
+  bulkCreate(@Request() req: any, @Body() body: any) {
+    return this.linksService.bulkCreate(req.user.userId, body.entries);
+  }
+
   @Get()
   findAll(@Request() req: any) {
     return this.linksService.findAll(req.user.userId);

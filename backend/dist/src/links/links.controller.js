@@ -24,6 +24,9 @@ let LinksController = class LinksController {
     create(req, body) {
         return this.linksService.create(req.user.userId, body);
     }
+    bulkCreate(req, body) {
+        return this.linksService.bulkCreate(req.user.userId, body.entries);
+    }
     findAll(req) {
         return this.linksService.findAll(req.user.userId);
     }
@@ -46,6 +49,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], LinksController.prototype, "create", null);
+__decorate([
+    (0, common_1.Post)('bulk'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], LinksController.prototype, "bulkCreate", null);
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Request)()),

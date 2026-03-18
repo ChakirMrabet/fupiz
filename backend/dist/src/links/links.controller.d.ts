@@ -19,6 +19,37 @@ export declare class LinksController {
         createdAt: Date;
         updatedAt: Date;
     }>;
+    bulkCreate(req: any, body: any): Promise<{
+        createdCount: number;
+        failedCount: number;
+        results: ({
+            index: number;
+            success: boolean;
+            link: {
+                id: number;
+                originalUrl: string;
+                shortCode: string;
+                password: string | null;
+                expiresAt: Date | null;
+                maxClicks: number | null;
+                singleUse: boolean;
+                landingTitle: string | null;
+                landingDescription: string | null;
+                landingButtonLabel: string | null;
+                isActive: boolean;
+                clicks: number;
+                userId: number;
+                createdAt: Date;
+                updatedAt: Date;
+            };
+            error?: undefined;
+        } | {
+            index: number;
+            success: boolean;
+            error: any;
+            link?: undefined;
+        })[];
+    }>;
     findAll(req: any): Promise<{
         id: number;
         originalUrl: string;

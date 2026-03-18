@@ -74,3 +74,17 @@ Expand the existing link CRUD flow with higher-value management features that ma
   - continuing from the landing page into unlock or redirect
 - Kept click recording tied to the final continue action rather than the landing-page view.
 - Added dashboard create/edit fields and link badges for landing-page configuration.
+- Started implementation of `bulk link creation`.
+- Scope for this first slice:
+  - add a business-plan bulk creation endpoint
+  - accept multiple entries in one request and return per-row results
+  - keep bulk creation intentionally narrow in the UI:
+    - one URL per line
+    - optional custom code as the second field
+  - reuse existing single-link validation and plan checks
+- Implemented a business-only bulk creation endpoint that returns per-row success and failure results.
+- Reused the existing single-link creation logic so plan limits and validation stay centralized.
+- Added a dashboard bulk-create panel that accepts pasted lines in the format:
+  - `https://example.com/page`
+  - `https://example.com/page,custom-code`
+- Added bulk-run summaries with failed-line feedback in the dashboard.

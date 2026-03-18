@@ -97,6 +97,44 @@ let LinksService = class LinksService {
             },
         });
     }
+    async bulkCreate(userId, entries) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        const planLimits = (0, plans_config_1.getPlanConfig)(user.plan);
+        if (!planLimits.canUseBulkCreation) {
+            throw new common_1.HttpException('Bulk link creation is available on the Business plan.', common_1.HttpStatus.FORBIDDEN);
+        }
+        if (!Array.isArray(entries) || entries.length === 0) {
+            throw new common_1.BadRequestException('At least one bulk entry is required');
+        }
+        const results = await Promise.all(entries.map(async (entry, index) => {
+            try {
+                const link = await this.create(userId, entry);
+                return {
+                    index,
+                    success: true,
+                    link,
+                };
+            }
+            catch (error) {
+                return {
+                    index,
+                    success: false,
+                    error: error?.message || 'Failed to create link',
+                };
+            }
+        }));
+        const createdCount = results.filter((result) => result.success).length;
+        return {
+            createdCount,
+            failedCount: results.length - createdCount,
+            results,
+        };
+    }
     async findAll(userId) {
         return this.prisma.link.findMany({
             where: { userId },

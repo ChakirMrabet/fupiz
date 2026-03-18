@@ -18,6 +18,14 @@ export class LinksService {
     return this.http.post(this.apiUrl, linkData, { headers: this.headers });
   }
 
+  bulkCreate(entries: any[]) {
+    return this.http.post<{
+      createdCount: number;
+      failedCount: number;
+      results: Array<{ index: number; success: boolean; link?: any; error?: string }>;
+    }>(`${this.apiUrl}/bulk`, { entries }, { headers: this.headers });
+  }
+
   getAll() {
     return this.http.get<any[]>(this.apiUrl, { headers: this.headers });
   }
