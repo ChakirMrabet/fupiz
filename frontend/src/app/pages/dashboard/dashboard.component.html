@@ -44,6 +44,7 @@
             <input type="text" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Custom Code (optional)' : '👑 Custom Code (Paid Plans)'" [(ngModel)]="newLink.customCode" name="customCode" [disabled]="!canUseAdvancedLinkControls()">
             <input type="password" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Password (optional)' : '👑 Password (Paid Plans)'" [(ngModel)]="newLink.password" name="password" [disabled]="!canUseAdvancedLinkControls()">
             <input type="datetime-local" class="input-field half" [(ngModel)]="newLink.expiresAt" name="expiresAt" [title]="canUseAdvancedLinkControls() ? 'Expiration (optional)' : 'Expiration (Paid Plans)'" [disabled]="!canUseAdvancedLinkControls()">
+            <input type="number" min="1" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Max Clicks (optional)' : '👑 Click Limit (Paid Plans)'" [(ngModel)]="newLink.maxClicks" name="maxClicks" [disabled]="!canUseAdvancedLinkControls()">
           </div>
         </form>
       </div>
@@ -57,6 +58,7 @@
               <span class="badge" *ngIf="link.password">🔒 Password Protected</span>
               <span class="badge" *ngIf="link.expiresAt">⏰ Expires: {{ link.expiresAt | date:'shortDate' }}</span>
               <span class="badge clicks">📈 Clicks: {{ link.clicks }}</span>
+              <span class="badge" *ngIf="link.maxClicks !== null && link.maxClicks !== undefined">🎯 {{ formatClickLimit(link) }}</span>
               <span class="badge status-badge" [class.active]="link.isActive" [class.inactive]="!link.isActive">
                 {{ link.isActive ? 'Active' : 'Disabled' }}
               </span>
@@ -197,6 +199,20 @@
           [disabled]="!canUseAdvancedLinkControls()"
         >
         <small class="help-text" *ngIf="!canUseAdvancedLinkControls()">Custom short-code edits are available on paid plans.</small>
+      </div>
+
+      <div class="form-group">
+        <label>Max Clicks</label>
+        <input
+          type="number"
+          min="1"
+          class="input-field"
+          [(ngModel)]="editLinkForm.maxClicks"
+          name="editMaxClicks"
+          [disabled]="!canUseAdvancedLinkControls()"
+        >
+        <small class="help-text" *ngIf="canUseAdvancedLinkControls()">Leave blank for unlimited clicks.</small>
+        <small class="help-text" *ngIf="!canUseAdvancedLinkControls()">Click limits are available on paid plans.</small>
       </div>
     </div>
 

@@ -8,6 +8,7 @@ export declare class LinksController {
         shortCode: string;
         password: string | null;
         expiresAt: Date | null;
+        maxClicks: number | null;
         isActive: boolean;
         clicks: number;
         userId: number;
@@ -20,6 +21,7 @@ export declare class LinksController {
         shortCode: string;
         password: string | null;
         expiresAt: Date | null;
+        maxClicks: number | null;
         isActive: boolean;
         clicks: number;
         userId: number;
@@ -32,6 +34,7 @@ export declare class LinksController {
         shortCode: string;
         password: string | null;
         expiresAt: Date | null;
+        maxClicks: number | null;
         isActive: boolean;
         clicks: number;
         userId: number;
@@ -44,6 +47,7 @@ export declare class LinksController {
         shortCode: string;
         password: string | null;
         expiresAt: Date | null;
+        maxClicks: number | null;
         isActive: boolean;
         clicks: number;
         userId: number;

@@ -4,6 +4,7 @@ export declare class LinksService {
     private prisma;
     constructor(prisma: PrismaService);
     generateShortCode(): string;
+    private parseMaxClicks;
     create(userId: number, data: any): Promise<Link>;
     findAll(userId: number): Promise<Link[]>;
     findByShortCode(shortCode: string): Promise<Link | null>;
@@ -13,7 +14,19 @@ export declare class LinksService {
         ip: string;
         userAgent: string;
         referer: string;
-    }): Promise<any>;
+    }): Promise<{
+        id: number;
+        originalUrl: string;
+        shortCode: string;
+        password: string | null;
+        expiresAt: Date | null;
+        maxClicks: number | null;
+        isActive: boolean;
+        clicks: number;
+        userId: number;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
     getAnalytics(id: number, userId: number): Promise<{
         link: any;
         stats: {

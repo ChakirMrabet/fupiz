@@ -21,6 +21,18 @@ export class LinksService {
     return randomBytes(4).toString('hex');
   }
 
+  private parseMaxClicks(value: unknown): number | null | undefined {
+    if (value === undefined) return undefined;
+    if (value === null || value === '') return null;
+
+    const parsedValue = Number(value);
+    if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
+      throw new BadRequestException('Max clicks must be a positive whole number');
+    }
+
+    return parsedValue;
+  }
+
   async create(userId: number, data: any): Promise<Link> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -53,6 +65,12 @@ export class LinksService {
       throw new HttpException('Link expiration requires the PRO plan.', HttpStatus.FORBIDDEN);
     }
 
+    if (data.maxClicks !== undefined && data.maxClicks !== null && !planLimits.canUseClickLimit) {
+      throw new HttpException('Click limits are available on the PRO plan.', HttpStatus.FORBIDDEN);
+    }
+
+    const maxClicks = this.parseMaxClicks(data.maxClicks);
+
     let shortCode = data.customCode || this.generateShortCode();
     return this.prisma.link.create({
       data: {
@@ -60,6 +78,7 @@ export class LinksService {
         shortCode,
         password: data.password || null,
         expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
+        maxClicks: maxClicks ?? null,
         userId,
       },
     });
@@ -100,6 +119,12 @@ export class LinksService {
        throw new HttpException('Link expiration requires the PRO plan.', HttpStatus.FORBIDDEN);
     }
 
+    if (data.maxClicks !== undefined && data.maxClicks !== link.maxClicks && !planLimits.canUseClickLimit) {
+      throw new HttpException('Click limits are available on the PRO plan.', HttpStatus.FORBIDDEN);
+    }
+
+    const maxClicks = this.parseMaxClicks(data.maxClicks);
+
     if (nextOriginalUrl !== undefined && !nextOriginalUrl) {
       throw new BadRequestException('Original URL cannot be empty');
     }
@@ -131,6 +156,7 @@ export class LinksService {
         isActive: data.isActive !== undefined ? data.isActive : link.isActive,
         password: data.password !== undefined ? data.password : link.password,
         expiresAt: data.expiresAt !== undefined ? (data.expiresAt ? new Date(data.expiresAt) : null) : link.expiresAt,
+        maxClicks: maxClicks !== undefined ? maxClicks : link.maxClicks,
       },
     });
   }
@@ -148,8 +174,33 @@ export class LinksService {
     const parser = new UAParser(metadata.userAgent);
     const result = parser.getResult();
 
-    return (this.prisma as any).$transaction([
-      (this.prisma as any).linkClick.create({
+    return this.prisma.$transaction(async (tx) => {
+      const link = await tx.link.findUnique({
+        where: { id: linkId },
+      });
+
+      if (!link) {
+        throw new NotFoundException('Link not found');
+      }
+
+      if (link.maxClicks !== null && link.clicks >= link.maxClicks) {
+        if (link.isActive) {
+          await tx.link.update({
+            where: { id: linkId },
+            data: { isActive: false },
+          });
+        }
+        throw new NotFoundException('Link has expired.');
+      }
+
+      const updatedLink = await tx.link.update({
+        where: { id: linkId },
+        data: {
+          clicks: { increment: 1 },
+        },
+      });
+
+      await tx.linkClick.create({
         data: {
           linkId,
           ipAddress: metadata.ip,
@@ -158,12 +209,17 @@ export class LinksService {
           os: result.os.name || 'Unknown',
           referer: metadata.referer || 'Direct',
         },
-      }),
-      this.prisma.link.update({
-        where: { id: linkId },
-        data: { clicks: { increment: 1 } },
-      }),
-    ]);
+      });
+
+      if (updatedLink.maxClicks !== null && updatedLink.clicks >= updatedLink.maxClicks) {
+        await tx.link.update({
+          where: { id: linkId },
+          data: { isActive: false },
+        });
+      }
+
+      return updatedLink;
+    });
   }
 
   async getAnalytics(id: number, userId: number) {

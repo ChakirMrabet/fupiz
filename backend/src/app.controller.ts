@@ -22,6 +22,11 @@ export class AppController {
       throw new NotFoundException('Link has expired.');
     }
 
+    if (link.maxClicks !== null && link.clicks >= link.maxClicks) {
+      await this.linksService.update(link.id, link.userId, { isActive: false });
+      throw new NotFoundException('Link has expired.');
+    }
+
     if (link.password) {
       return res.redirect(`http://localhost:4200/unlock/${shortCode}`);
     }
@@ -39,6 +44,11 @@ export class AppController {
   async verifyPassword(@Param('shortCode') shortCode: string, @Body() body: any, @Req() req: Request) {
     const link = await this.linksService.findByShortCode(shortCode);
     if (!link || !link.isActive) throw new NotFoundException('Link not found');
+    if (link.expiresAt && link.expiresAt < new Date()) throw new NotFoundException('Link has expired.');
+    if (link.maxClicks !== null && link.clicks >= link.maxClicks) {
+      await this.linksService.update(link.id, link.userId, { isActive: false });
+      throw new NotFoundException('Link has expired.');
+    }
     if (link.password !== body.password) throw new UnauthorizedException('Incorrect password');
     
     await this.linksService.recordClick(link.id, {

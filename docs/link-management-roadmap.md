@@ -33,3 +33,16 @@ Expand the existing link CRUD flow with higher-value management features that ma
   - change `shortCode` on paid plans
 - Added explicit short-code collision checks on update.
 - Added dashboard edit UI using a modal-based flow to keep the link list compact.
+- Started implementation of `expiration by click count`.
+- Scope for this slice:
+  - add `maxClicks` to links
+  - allow paid plans to set and edit a click limit
+  - stop redirecting once the click limit has been reached
+  - auto-mark links inactive when their click limit is exhausted
+  - show click usage in the dashboard
+- Implemented `maxClicks` on the `Link` model with a Prisma migration.
+- Added backend validation so click limits must be positive whole numbers.
+- Added paid-plan gating for click-limit creation and editing.
+- Updated redirect and password-unlock flows to stop working once the click limit is reached.
+- Added automatic link deactivation once the limit is exhausted.
+- Added dashboard create/edit inputs and link badges for click-limit usage.
