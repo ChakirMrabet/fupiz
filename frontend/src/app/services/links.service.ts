@@ -33,4 +33,22 @@ export class LinksService {
   verifyPassword(shortCode: string, password: string) {
     return this.http.post<{url: string}>(`http://localhost:3000/s/${shortCode}/verify-password`, { password });
   }
+
+  getLandingPage(shortCode: string) {
+    return this.http.get<{
+      shortCode: string;
+      landingTitle: string;
+      landingDescription: string;
+      landingButtonLabel: string;
+      requiresPassword: boolean;
+      hasLandingPage: boolean;
+    }>(`http://localhost:3000/api/public/links/${shortCode}/landing`);
+  }
+
+  continueFromLanding(shortCode: string) {
+    return this.http.post<{url?: string; requiresPassword?: boolean}>(
+      `http://localhost:3000/api/public/links/${shortCode}/visit`,
+      {},
+    );
+  }
 }

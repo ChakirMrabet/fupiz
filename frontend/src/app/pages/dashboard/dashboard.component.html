@@ -50,6 +50,31 @@
               <span>{{ canUseAdvancedLinkControls() ? 'One-Time Link' : '👑 One-Time Link (Paid Plans)' }}</span>
             </label>
           </div>
+          <div class="landing-options">
+            <input
+              type="text"
+              class="input-field"
+              [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Title (optional)' : '👑 Landing Title (Paid Plans)'"
+              [(ngModel)]="newLink.landingTitle"
+              name="landingTitle"
+              [disabled]="!canUseAdvancedLinkControls()"
+            >
+            <textarea
+              class="input-field landing-textarea"
+              [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Description (optional)' : '👑 Landing Description (Paid Plans)'"
+              [(ngModel)]="newLink.landingDescription"
+              name="landingDescription"
+              [disabled]="!canUseAdvancedLinkControls()"
+            ></textarea>
+            <input
+              type="text"
+              class="input-field"
+              [placeholder]="canUseAdvancedLinkControls() ? 'CTA Button Label (optional)' : '👑 CTA Label (Paid Plans)'"
+              [(ngModel)]="newLink.landingButtonLabel"
+              name="landingButtonLabel"
+              [disabled]="!canUseAdvancedLinkControls()"
+            >
+          </div>
         </form>
       </div>
 
@@ -64,6 +89,7 @@
               <span class="badge clicks">📈 Clicks: {{ link.clicks }}</span>
               <span class="badge" *ngIf="link.singleUse">⚡ One-Time Link</span>
               <span class="badge" *ngIf="link.singleUse || (link.maxClicks !== null && link.maxClicks !== undefined)">🎯 {{ formatClickLimit(link) }}</span>
+              <span class="badge" *ngIf="hasLandingPage(link)">🛬 Landing Page</span>
               <span class="badge status-badge" [class.active]="link.isActive" [class.inactive]="!link.isActive">
                 {{ link.isActive ? 'Active' : 'Disabled' }}
               </span>
@@ -232,6 +258,40 @@
         </label>
         <small class="help-text" *ngIf="canUseAdvancedLinkControls()">One-time links deactivate automatically after the first successful visit.</small>
         <small class="help-text" *ngIf="!canUseAdvancedLinkControls()">One-time links are available on paid plans.</small>
+      </div>
+
+      <div class="form-group">
+        <label>Landing Title</label>
+        <input
+          type="text"
+          class="input-field"
+          [(ngModel)]="editLinkForm.landingTitle"
+          name="editLandingTitle"
+          [disabled]="!canUseAdvancedLinkControls()"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Landing Description</label>
+        <textarea
+          class="input-field landing-textarea"
+          [(ngModel)]="editLinkForm.landingDescription"
+          name="editLandingDescription"
+          [disabled]="!canUseAdvancedLinkControls()"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>CTA Label</label>
+        <input
+          type="text"
+          class="input-field"
+          [(ngModel)]="editLinkForm.landingButtonLabel"
+          name="editLandingButtonLabel"
+          [disabled]="!canUseAdvancedLinkControls()"
+        >
+        <small class="help-text" *ngIf="canUseAdvancedLinkControls()">Leave landing fields blank to disable the custom landing page.</small>
+        <small class="help-text" *ngIf="!canUseAdvancedLinkControls()">Custom landing pages are available on paid plans.</small>
       </div>
     </div>
 

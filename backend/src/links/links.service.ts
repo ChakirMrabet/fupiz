@@ -42,6 +42,14 @@ export class LinksService {
     return effectiveMaxClicks !== null && link.clicks >= effectiveMaxClicks;
   }
 
+  hasLandingPage(link: {
+    landingTitle: string | null;
+    landingDescription: string | null;
+    landingButtonLabel: string | null;
+  }) {
+    return Boolean(link.landingTitle || link.landingDescription || link.landingButtonLabel);
+  }
+
   async create(userId: number, data: any): Promise<Link> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -82,6 +90,13 @@ export class LinksService {
       throw new HttpException('One-time links are available on the PRO plan.', HttpStatus.FORBIDDEN);
     }
 
+    if (
+      (data.landingTitle || data.landingDescription || data.landingButtonLabel) &&
+      !planLimits.canUseCustomLanding
+    ) {
+      throw new HttpException('Custom landing pages are available on the PRO plan.', HttpStatus.FORBIDDEN);
+    }
+
     const maxClicks = this.parseMaxClicks(data.maxClicks);
     const singleUse = Boolean(data.singleUse);
 
@@ -94,6 +109,9 @@ export class LinksService {
         expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
         maxClicks: singleUse ? null : maxClicks ?? null,
         singleUse,
+        landingTitle: data.landingTitle?.trim() || null,
+        landingDescription: data.landingDescription?.trim() || null,
+        landingButtonLabel: data.landingButtonLabel?.trim() || null,
         userId,
       },
     });
@@ -142,6 +160,15 @@ export class LinksService {
       throw new HttpException('One-time links are available on the PRO plan.', HttpStatus.FORBIDDEN);
     }
 
+    const landingPageChanged =
+      data.landingTitle !== undefined ||
+      data.landingDescription !== undefined ||
+      data.landingButtonLabel !== undefined;
+
+    if (landingPageChanged && !planLimits.canUseCustomLanding) {
+      throw new HttpException('Custom landing pages are available on the PRO plan.', HttpStatus.FORBIDDEN);
+    }
+
     const maxClicks = this.parseMaxClicks(data.maxClicks);
     const nextSingleUse = data.singleUse !== undefined ? Boolean(data.singleUse) : link.singleUse;
 
@@ -182,6 +209,16 @@ export class LinksService {
             ? maxClicks
             : link.maxClicks,
         singleUse: nextSingleUse,
+        landingTitle:
+          data.landingTitle !== undefined ? data.landingTitle?.trim() || null : link.landingTitle,
+        landingDescription:
+          data.landingDescription !== undefined
+            ? data.landingDescription?.trim() || null
+            : link.landingDescription,
+        landingButtonLabel:
+          data.landingButtonLabel !== undefined
+            ? data.landingButtonLabel?.trim() || null
+            : link.landingButtonLabel,
       },
     });
   }

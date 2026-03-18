@@ -18,10 +18,28 @@ import { toDataURL } from 'qrcode';
 export class DashboardComponent implements OnInit {
   activeTab: 'links' | 'account' = 'links';
   links: any[] = [];
-  newLink = { originalUrl: '', customCode: '', password: '', expiresAt: '', maxClicks: '', singleUse: false };
+  newLink = {
+    originalUrl: '',
+    customCode: '',
+    password: '',
+    expiresAt: '',
+    maxClicks: '',
+    singleUse: false,
+    landingTitle: '',
+    landingDescription: '',
+    landingButtonLabel: '',
+  };
   isCreating = false;
   editingLink: any = null;
-  editLinkForm = { originalUrl: '', shortCode: '', maxClicks: '', singleUse: false };
+  editLinkForm = {
+    originalUrl: '',
+    shortCode: '',
+    maxClicks: '',
+    singleUse: false,
+    landingTitle: '',
+    landingDescription: '',
+    landingButtonLabel: '',
+  };
   isSavingLinkEdit = false;
 
   profile = { name: '', email: '', plan: 'FREE' };
@@ -104,6 +122,10 @@ export class DashboardComponent implements OnInit {
     return this.profile.plan !== 'FREE';
   }
 
+  hasLandingPage(link: any) {
+    return !!(link.landingTitle || link.landingDescription || link.landingButtonLabel);
+  }
+
   formatClickLimit(link: any) {
     if (link.singleUse) {
       return `${link.clicks} / 1 clicks`;
@@ -149,10 +171,23 @@ export class DashboardComponent implements OnInit {
     if (this.newLink.expiresAt) data.expiresAt = this.newLink.expiresAt;
     if (this.newLink.maxClicks) data.maxClicks = this.newLink.maxClicks;
     if (this.newLink.singleUse) data.singleUse = true;
+    if (this.newLink.landingTitle) data.landingTitle = this.newLink.landingTitle;
+    if (this.newLink.landingDescription) data.landingDescription = this.newLink.landingDescription;
+    if (this.newLink.landingButtonLabel) data.landingButtonLabel = this.newLink.landingButtonLabel;
 
     this.linksService.create(data).subscribe({
       next: () => {
-        this.newLink = { originalUrl: '', customCode: '', password: '', expiresAt: '', maxClicks: '', singleUse: false };
+        this.newLink = {
+          originalUrl: '',
+          customCode: '',
+          password: '',
+          expiresAt: '',
+          maxClicks: '',
+          singleUse: false,
+          landingTitle: '',
+          landingDescription: '',
+          landingButtonLabel: '',
+        };
         this.loadLinks();
         this.isCreating = false;
         this.notificationService.success('Link created successfully!');
@@ -173,12 +208,23 @@ export class DashboardComponent implements OnInit {
       shortCode: link.shortCode,
       maxClicks: link.maxClicks?.toString() || '',
       singleUse: !!link.singleUse,
+      landingTitle: link.landingTitle || '',
+      landingDescription: link.landingDescription || '',
+      landingButtonLabel: link.landingButtonLabel || '',
     };
   }
 
   closeEditModal() {
     this.editingLink = null;
-    this.editLinkForm = { originalUrl: '', shortCode: '', maxClicks: '', singleUse: false };
+    this.editLinkForm = {
+      originalUrl: '',
+      shortCode: '',
+      maxClicks: '',
+      singleUse: false,
+      landingTitle: '',
+      landingDescription: '',
+      landingButtonLabel: '',
+    };
     this.isSavingLinkEdit = false;
   }
 
@@ -194,6 +240,9 @@ export class DashboardComponent implements OnInit {
       payload.shortCode = this.editLinkForm.shortCode;
       payload.maxClicks = this.editLinkForm.maxClicks;
       payload.singleUse = this.editLinkForm.singleUse;
+      payload.landingTitle = this.editLinkForm.landingTitle;
+      payload.landingDescription = this.editLinkForm.landingDescription;
+      payload.landingButtonLabel = this.editLinkForm.landingButtonLabel;
     }
 
     this.linksService.update(this.editingLink.id, payload).subscribe({

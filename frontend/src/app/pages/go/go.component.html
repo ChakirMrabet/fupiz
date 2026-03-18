@@ -1,0 +1,18 @@
+<div class="go-page">
+  <div class="go-shell glass-card">
+    <p class="go-eyebrow" *ngIf="!isLoading && !errorMsg">Fupiz Link</p>
+    <h1 class="go-title gradient-text">
+      {{ isLoading ? 'Loading...' : landingTitle || 'You are about to open a link' }}
+    </h1>
+    <p class="go-description" *ngIf="!isLoading && !errorMsg">
+      {{ landingDescription || 'Continue when you are ready.' }}
+    </p>
+    <p class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</p>
+
+    <div class="go-actions" *ngIf="!errorMsg">
+      <button class="btn-primary" (click)="continueVisit()" [disabled]="isLoading || isContinuing">
+        {{ isContinuing ? 'Continuing...' : landingButtonLabel }}
+      </button>
+    </div>
+  </div>
+</div>

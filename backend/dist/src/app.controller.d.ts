@@ -7,4 +7,19 @@ export declare class AppController {
     verifyPassword(shortCode: string, body: any, req: Request): Promise<{
         url: string;
     }>;
+    getLandingPage(shortCode: string): Promise<{
+        shortCode: string;
+        landingTitle: string;
+        landingDescription: string;
+        landingButtonLabel: string;
+        requiresPassword: boolean;
+        hasLandingPage: boolean;
+    }>;
+    continueFromLanding(shortCode: string, req: Request): Promise<{
+        requiresPassword: boolean;
+        url?: undefined;
+    } | {
+        url: string;
+        requiresPassword?: undefined;
+    }>;
 }

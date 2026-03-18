@@ -27,6 +27,10 @@ export class AppController {
       throw new NotFoundException('Link has expired.');
     }
 
+    if (this.linksService.hasLandingPage(link)) {
+      return res.redirect(`http://localhost:4200/go/${shortCode}`);
+    }
+
     if (link.password) {
       return res.redirect(`http://localhost:4200/unlock/${shortCode}`);
     }
@@ -51,6 +55,61 @@ export class AppController {
     }
     if (link.password !== body.password) throw new UnauthorizedException('Incorrect password');
     
+    await this.linksService.recordClick(link.id, {
+      ip: req.ip || 'Unknown',
+      userAgent: req.headers['user-agent'] || '',
+      referer: req.headers['referer'] || '',
+    });
+
+    return { url: link.originalUrl };
+  }
+
+  @Get('public/links/:shortCode/landing')
+  async getLandingPage(@Param('shortCode') shortCode: string) {
+    const link = await this.linksService.findByShortCode(shortCode);
+    if (!link || !link.isActive) {
+      throw new NotFoundException('Link not found');
+    }
+
+    if (link.expiresAt && link.expiresAt < new Date()) {
+      throw new NotFoundException('Link has expired.');
+    }
+
+    if (this.linksService.hasReachedClickLimit(link)) {
+      await this.linksService.update(link.id, link.userId, { isActive: false });
+      throw new NotFoundException('Link has expired.');
+    }
+
+    return {
+      shortCode: link.shortCode,
+      landingTitle: link.landingTitle || 'You are about to open a link',
+      landingDescription: link.landingDescription || 'Continue when you are ready.',
+      landingButtonLabel: link.landingButtonLabel || (link.password ? 'Continue to Unlock' : 'Continue'),
+      requiresPassword: Boolean(link.password),
+      hasLandingPage: this.linksService.hasLandingPage(link),
+    };
+  }
+
+  @Post('public/links/:shortCode/visit')
+  async continueFromLanding(@Param('shortCode') shortCode: string, @Req() req: Request) {
+    const link = await this.linksService.findByShortCode(shortCode);
+    if (!link || !link.isActive) {
+      throw new NotFoundException('Link not found');
+    }
+
+    if (link.expiresAt && link.expiresAt < new Date()) {
+      throw new NotFoundException('Link has expired.');
+    }
+
+    if (this.linksService.hasReachedClickLimit(link)) {
+      await this.linksService.update(link.id, link.userId, { isActive: false });
+      throw new NotFoundException('Link has expired.');
+    }
+
+    if (link.password) {
+      return { requiresPassword: true };
+    }
+
     await this.linksService.recordClick(link.id, {
       ip: req.ip || 'Unknown',
       userAgent: req.headers['user-agent'] || '',

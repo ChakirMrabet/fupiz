@@ -10,6 +10,9 @@ export declare class LinksController {
         expiresAt: Date | null;
         maxClicks: number | null;
         singleUse: boolean;
+        landingTitle: string | null;
+        landingDescription: string | null;
+        landingButtonLabel: string | null;
         isActive: boolean;
         clicks: number;
         userId: number;
@@ -24,6 +27,9 @@ export declare class LinksController {
         expiresAt: Date | null;
         maxClicks: number | null;
         singleUse: boolean;
+        landingTitle: string | null;
+        landingDescription: string | null;
+        landingButtonLabel: string | null;
         isActive: boolean;
         clicks: number;
         userId: number;
@@ -38,6 +44,9 @@ export declare class LinksController {
         expiresAt: Date | null;
         maxClicks: number | null;
         singleUse: boolean;
+        landingTitle: string | null;
+        landingDescription: string | null;
+        landingButtonLabel: string | null;
         isActive: boolean;
         clicks: number;
         userId: number;
@@ -52,6 +61,9 @@ export declare class LinksController {
         expiresAt: Date | null;
         maxClicks: number | null;
         singleUse: boolean;
+        landingTitle: string | null;
+        landingDescription: string | null;
+        landingButtonLabel: string | null;
         isActive: boolean;
         clicks: number;
         userId: number;

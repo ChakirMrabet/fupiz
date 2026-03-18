@@ -14,6 +14,11 @@ export declare class LinksService {
         maxClicks: number | null;
         singleUse: boolean;
     }): boolean;
+    hasLandingPage(link: {
+        landingTitle: string | null;
+        landingDescription: string | null;
+        landingButtonLabel: string | null;
+    }): boolean;
     create(userId: number, data: any): Promise<Link>;
     findAll(userId: number): Promise<Link[]>;
     findByShortCode(shortCode: string): Promise<Link | null>;
@@ -31,6 +36,9 @@ export declare class LinksService {
         expiresAt: Date | null;
         maxClicks: number | null;
         singleUse: boolean;
+        landingTitle: string | null;
+        landingDescription: string | null;
+        landingButtonLabel: string | null;
         isActive: boolean;
         clicks: number;
         userId: number;

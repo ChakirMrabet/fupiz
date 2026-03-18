@@ -5,6 +5,7 @@ import { RegisterComponent } from './pages/register/register.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { UnlockComponent } from './pages/unlock/unlock.component';
 import { ActivateAccountComponent } from './pages/activate-account/activate-account.component';
+import { GoComponent } from './pages/go/go.component';
 
 import { TermsComponent } from './pages/terms/terms.component';
 import { PrivacyComponent } from './pages/privacy/privacy.component';
@@ -24,6 +25,7 @@ export const routes: Routes = [
   { path: 'terms', component: TermsComponent },
   { path: 'privacy', component: PrivacyComponent },
   { path: 'faq', component: FaqComponent },
+  { path: 'go/:shortCode', component: GoComponent },
   { path: 'unlock/:shortCode', component: UnlockComponent },
   { path: '**', redirectTo: '' }
 ];

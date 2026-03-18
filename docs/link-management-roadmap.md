@@ -57,3 +57,20 @@ Expand the existing link CRUD flow with higher-value management features that ma
 - Added paid-plan gating for one-time link creation and editing.
 - Updated dashboard create/edit flows with a dedicated one-time toggle.
 - Added dashboard badges for one-time link status and `0 / 1` style usage visibility.
+- Started implementation of `custom landing pages`.
+- Scope for this slice:
+  - add simple landing-page fields to links
+  - route short links to a frontend landing page when configured
+  - let the CTA continue to unlock or redirect depending on link protection
+  - keep click recording tied to the final continue action, not page view
+- Implemented landing-page fields on links with a Prisma migration:
+  - `landingTitle`
+  - `landingDescription`
+  - `landingButtonLabel`
+- Added paid-plan gating for custom landing page creation and editing.
+- Updated short-link resolution so configured links route to a frontend landing page at `/go/:shortCode`.
+- Added public backend endpoints for:
+  - fetching landing-page content
+  - continuing from the landing page into unlock or redirect
+- Kept click recording tied to the final continue action rather than the landing-page view.
+- Added dashboard create/edit fields and link badges for landing-page configuration.

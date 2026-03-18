@@ -35,6 +35,9 @@ let AppController = class AppController {
             await this.linksService.update(link.id, link.userId, { isActive: false });
             throw new common_1.NotFoundException('Link has expired.');
         }
+        if (this.linksService.hasLandingPage(link)) {
+            return res.redirect(`http://localhost:4200/go/${shortCode}`);
+        }
         if (link.password) {
             return res.redirect(`http://localhost:4200/unlock/${shortCode}`);
         }
@@ -64,6 +67,49 @@ let AppController = class AppController {
         });
         return { url: link.originalUrl };
     }
+    async getLandingPage(shortCode) {
+        const link = await this.linksService.findByShortCode(shortCode);
+        if (!link || !link.isActive) {
+            throw new common_1.NotFoundException('Link not found');
+        }
+        if (link.expiresAt && link.expiresAt < new Date()) {
+            throw new common_1.NotFoundException('Link has expired.');
+        }
+        if (this.linksService.hasReachedClickLimit(link)) {
+            await this.linksService.update(link.id, link.userId, { isActive: false });
+            throw new common_1.NotFoundException('Link has expired.');
+        }
+        return {
+            shortCode: link.shortCode,
+            landingTitle: link.landingTitle || 'You are about to open a link',
+            landingDescription: link.landingDescription || 'Continue when you are ready.',
+            landingButtonLabel: link.landingButtonLabel || (link.password ? 'Continue to Unlock' : 'Continue'),
+            requiresPassword: Boolean(link.password),
+            hasLandingPage: this.linksService.hasLandingPage(link),
+        };
+    }
+    async continueFromLanding(shortCode, req) {
+        const link = await this.linksService.findByShortCode(shortCode);
+        if (!link || !link.isActive) {
+            throw new common_1.NotFoundException('Link not found');
+        }
+        if (link.expiresAt && link.expiresAt < new Date()) {
+            throw new common_1.NotFoundException('Link has expired.');
+        }
+        if (this.linksService.hasReachedClickLimit(link)) {
+            await this.linksService.update(link.id, link.userId, { isActive: false });
+            throw new common_1.NotFoundException('Link has expired.');
+        }
+        if (link.password) {
+            return { requiresPassword: true };
+        }
+        await this.linksService.recordClick(link.id, {
+            ip: req.ip || 'Unknown',
+            userAgent: req.headers['user-agent'] || '',
+            referer: req.headers['referer'] || '',
+        });
+        return { url: link.originalUrl };
+    }
 };
 exports.AppController = AppController;
 __decorate([
@@ -84,6 +130,21 @@ __decorate([
     __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "verifyPassword", null);
+__decorate([
+    (0, common_1.Get)('public/links/:shortCode/landing'),
+    __param(0, (0, common_1.Param)('shortCode')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "getLandingPage", null);
+__decorate([
+    (0, common_1.Post)('public/links/:shortCode/visit'),
+    __param(0, (0, common_1.Param)('shortCode')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "continueFromLanding", null);
 exports.AppController = AppController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [links_service_1.LinksService])

@@ -22,20 +22,23 @@ model User {
 }
 
 model Link {
-  id          Int         @id @default(autoincrement())
-  originalUrl String
-  shortCode   String      @unique
-  password    String?
-  expiresAt   DateTime?
-  maxClicks   Int?
-  singleUse   Boolean     @default(false)
-  isActive    Boolean     @default(true)
-  clicks      Int         @default(0)
-  userId      Int
-  user        User        @relation(fields: [userId], references: [id])
-  clickEvents LinkClick[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id                 Int         @id @default(autoincrement())
+  originalUrl        String
+  shortCode          String      @unique
+  password           String?
+  expiresAt          DateTime?
+  maxClicks          Int?
+  singleUse          Boolean     @default(false)
+  landingTitle       String?
+  landingDescription String?
+  landingButtonLabel String?
+  isActive           Boolean     @default(true)
+  clicks             Int         @default(0)
+  userId             Int
+  user               User        @relation(fields: [userId], references: [id])
+  clickEvents        LinkClick[]
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
 }
 
 model LinkClick {
