@@ -12,10 +12,14 @@ import { randomBytes } from 'crypto';
 import { UAParser } from 'ua-parser-js';
 
 import { getPlanConfig } from '../plans/plans.config';
+import { WebhooksService } from '../webhooks/webhooks.service';
 
 @Injectable()
 export class LinksService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private webhooksService: WebhooksService,
+  ) {}
 
   generateShortCode(): string {
     return randomBytes(4).toString('hex');
@@ -101,7 +105,7 @@ export class LinksService {
     const singleUse = Boolean(data.singleUse);
 
     let shortCode = data.customCode || this.generateShortCode();
-    return this.prisma.link.create({
+    const link = await this.prisma.link.create({
       data: {
         originalUrl: data.originalUrl,
         shortCode,
@@ -115,6 +119,14 @@ export class LinksService {
         userId,
       },
     });
+
+    void this.webhooksService.dispatchEvent(userId, 'link.created', {
+      linkId: link.id,
+      shortCode: link.shortCode,
+      originalUrl: link.originalUrl,
+    });
+
+    return link;
   }
 
   async bulkCreate(userId: number, entries: any[]) {
@@ -240,7 +252,7 @@ export class LinksService {
       }
     }
     
-    return this.prisma.link.update({
+    const updatedLink = await this.prisma.link.update({
       where: { id },
       data: {
         originalUrl: nextOriginalUrl !== undefined ? nextOriginalUrl : link.originalUrl,
@@ -267,6 +279,15 @@ export class LinksService {
             : link.landingButtonLabel,
       },
     });
+
+    void this.webhooksService.dispatchEvent(userId, 'link.updated', {
+      linkId: updatedLink.id,
+      shortCode: updatedLink.shortCode,
+      originalUrl: updatedLink.originalUrl,
+      isActive: updatedLink.isActive,
+    });
+
+    return updatedLink;
   }
 
   async remove(id: number, userId: number): Promise<Link> {
@@ -282,7 +303,7 @@ export class LinksService {
     const parser = new UAParser(metadata.userAgent);
     const result = parser.getResult();
 
-    return this.prisma.$transaction(async (tx) => {
+    const updatedLink = await this.prisma.$transaction(async (tx) => {
       const link = await tx.link.findUnique({
         where: { id: linkId },
       });
@@ -328,6 +349,15 @@ export class LinksService {
 
       return updatedLink;
     });
+
+    void this.webhooksService.dispatchEvent(updatedLink.userId, 'link.clicked', {
+      linkId: updatedLink.id,
+      shortCode: updatedLink.shortCode,
+      originalUrl: updatedLink.originalUrl,
+      clicks: updatedLink.clicks,
+    });
+
+    return updatedLink;
   }
 
   async getAnalytics(id: number, userId: number) {

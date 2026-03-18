@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LinksService } from './links.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { WebhooksService } from '../webhooks/webhooks.service';
 
 describe('LinksService', () => {
   let service: LinksService;
@@ -11,6 +12,10 @@ describe('LinksService', () => {
         LinksService,
         {
           provide: PrismaService,
+          useValue: {},
+        },
+        {
+          provide: WebhooksService,
           useValue: {},
         },
       ],

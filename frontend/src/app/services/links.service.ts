@@ -38,6 +38,22 @@ export class LinksService {
     return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.headers });
   }
 
+  getWebhooks() {
+    return this.http.get<any[]>('http://localhost:3000/api/webhooks', { headers: this.headers });
+  }
+
+  createWebhook(data: any) {
+    return this.http.post<any>('http://localhost:3000/api/webhooks', data, { headers: this.headers });
+  }
+
+  updateWebhook(id: number, data: any) {
+    return this.http.patch<any>(`http://localhost:3000/api/webhooks/${id}`, data, { headers: this.headers });
+  }
+
+  deleteWebhook(id: number) {
+    return this.http.delete(`http://localhost:3000/api/webhooks/${id}`, { headers: this.headers });
+  }
+
   verifyPassword(shortCode: string, password: string) {
     return this.http.post<{url: string}>(`http://localhost:3000/s/${shortCode}/verify-password`, { password });
   }

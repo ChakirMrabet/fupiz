@@ -15,10 +15,13 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const crypto_1 = require("crypto");
 const ua_parser_js_1 = require("ua-parser-js");
 const plans_config_1 = require("../plans/plans.config");
+const webhooks_service_1 = require("../webhooks/webhooks.service");
 let LinksService = class LinksService {
     prisma;
-    constructor(prisma) {
+    webhooksService;
+    constructor(prisma, webhooksService) {
         this.prisma = prisma;
+        this.webhooksService = webhooksService;
     }
     generateShortCode() {
         return (0, crypto_1.randomBytes)(4).toString('hex');
@@ -82,7 +85,7 @@ let LinksService = class LinksService {
         const maxClicks = this.parseMaxClicks(data.maxClicks);
         const singleUse = Boolean(data.singleUse);
         let shortCode = data.customCode || this.generateShortCode();
-        return this.prisma.link.create({
+        const link = await this.prisma.link.create({
             data: {
                 originalUrl: data.originalUrl,
                 shortCode,
@@ -96,6 +99,12 @@ let LinksService = class LinksService {
                 userId,
             },
         });
+        void this.webhooksService.dispatchEvent(userId, 'link.created', {
+            linkId: link.id,
+            shortCode: link.shortCode,
+            originalUrl: link.originalUrl,
+        });
+        return link;
     }
     async bulkCreate(userId, entries) {
         const user = await this.prisma.user.findUnique({
@@ -194,7 +203,7 @@ let LinksService = class LinksService {
                 throw new common_1.ConflictException('This short code is already in use');
             }
         }
-        return this.prisma.link.update({
+        const updatedLink = await this.prisma.link.update({
             where: { id },
             data: {
                 originalUrl: nextOriginalUrl !== undefined ? nextOriginalUrl : link.originalUrl,
@@ -217,6 +226,13 @@ let LinksService = class LinksService {
                     : link.landingButtonLabel,
             },
         });
+        void this.webhooksService.dispatchEvent(userId, 'link.updated', {
+            linkId: updatedLink.id,
+            shortCode: updatedLink.shortCode,
+            originalUrl: updatedLink.originalUrl,
+            isActive: updatedLink.isActive,
+        });
+        return updatedLink;
     }
     async remove(id, userId) {
         const link = await this.prisma.link.findFirst({ where: { id, userId } });
@@ -229,7 +245,7 @@ let LinksService = class LinksService {
     async recordClick(linkId, metadata) {
         const parser = new ua_parser_js_1.UAParser(metadata.userAgent);
         const result = parser.getResult();
-        return this.prisma.$transaction(async (tx) => {
+        const updatedLink = await this.prisma.$transaction(async (tx) => {
             const link = await tx.link.findUnique({
                 where: { id: linkId },
             });
@@ -269,6 +285,13 @@ let LinksService = class LinksService {
             }
             return updatedLink;
         });
+        void this.webhooksService.dispatchEvent(updatedLink.userId, 'link.clicked', {
+            linkId: updatedLink.id,
+            shortCode: updatedLink.shortCode,
+            originalUrl: updatedLink.originalUrl,
+            clicks: updatedLink.clicks,
+        });
+        return updatedLink;
     }
     async getAnalytics(id, userId) {
         const link = await this.prisma.link.findFirst({
@@ -335,6 +358,7 @@ let LinksService = class LinksService {
 exports.LinksService = LinksService;
 exports.LinksService = LinksService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        webhooks_service_1.WebhooksService])
 ], LinksService);
 //# sourceMappingURL=links.service.js.map

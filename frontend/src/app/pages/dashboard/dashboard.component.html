@@ -211,6 +211,69 @@
           <p style="color: var(--text-secondary);">You are on the highest current plan, ready for bulk workflows, branded domains, and webhook-based automation as those features land.</p>
         </div>
       </div>
+
+      <div class="glass-card account-card" style="margin-top: 2rem;">
+        <h3>Webhooks</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Register outbound HTTP callbacks for link lifecycle events.</p>
+
+        <div *ngIf="canUseWebhooks(); else webhookUpgrade">
+          <form class="account-form" (ngSubmit)="onCreateWebhook()">
+            <div class="form-group">
+              <label>Endpoint URL</label>
+              <input type="url" class="input-field" [(ngModel)]="webhookForm.url" name="webhookUrl" placeholder="https://example.com/webhooks/fupiz" required>
+            </div>
+
+            <div class="form-group">
+              <label>Events</label>
+              <div class="webhook-events">
+                <label class="toggle-field">
+                  <input type="checkbox" [checked]="webhookForm.events.includes('link.created')" (change)="toggleWebhookEvent('link.created', $any($event.target).checked)">
+                  <span>link.created</span>
+                </label>
+                <label class="toggle-field">
+                  <input type="checkbox" [checked]="webhookForm.events.includes('link.updated')" (change)="toggleWebhookEvent('link.updated', $any($event.target).checked)">
+                  <span>link.updated</span>
+                </label>
+                <label class="toggle-field">
+                  <input type="checkbox" [checked]="webhookForm.events.includes('link.clicked')" (change)="toggleWebhookEvent('link.clicked', $any($event.target).checked)">
+                  <span>link.clicked</span>
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary w-full btn-business" [disabled]="isSavingWebhook">
+              {{ isSavingWebhook ? 'Saving...' : 'Create Webhook' }}
+            </button>
+          </form>
+
+          <div class="webhook-list" *ngIf="webhooks.length > 0; else emptyWebhooks">
+            <div class="glass-card webhook-item" *ngFor="let webhook of webhooks">
+              <div class="webhook-details">
+                <p class="webhook-url">{{ webhook.url }}</p>
+                <p class="webhook-meta">Events: {{ webhook.events.join(', ') }}</p>
+                <p class="webhook-meta">Secret: {{ webhook.secret }}</p>
+                <p class="webhook-meta" *ngIf="webhook.lastDeliveryStatus">Last delivery: {{ webhook.lastDeliveryStatus }}</p>
+              </div>
+              <div class="link-actions">
+                <button (click)="toggleWebhook(webhook)" class="action-btn" [class.active]="webhook.isActive" title="Toggle Webhook">
+                  <span class="icon">{{ webhook.isActive ? '🟢' : '⚪' }}</span>
+                </button>
+                <button (click)="deleteWebhook(webhook.id)" class="action-btn delete" title="Delete Webhook">
+                  <span class="icon">🗑️</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #emptyWebhooks>
+            <p class="help-text">No webhooks configured yet.</p>
+          </ng-template>
+        </div>
+
+        <ng-template #webhookUpgrade>
+          <p class="help-text">Webhooks are available on the Business plan.</p>
+        </ng-template>
+      </div>
     </div>
 
   </main>

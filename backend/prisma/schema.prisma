@@ -17,6 +17,7 @@ model User {
   activationTokenExpiresAt DateTime?
   activatedAt              DateTime?
   links                    Link[]
+  webhooks                 Webhook[]
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 }
@@ -55,4 +56,20 @@ model LinkClick {
 
   @@index([linkId])
   @@index([createdAt])
+}
+
+model Webhook {
+  id                 Int      @id @default(autoincrement())
+  userId             Int
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  url                String
+  secret             String
+  events             String
+  isActive           Boolean  @default(true)
+  lastDeliveryAt     DateTime?
+  lastDeliveryStatus String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([userId])
 }

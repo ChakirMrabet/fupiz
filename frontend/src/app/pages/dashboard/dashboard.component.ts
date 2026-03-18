@@ -21,6 +21,12 @@ export class DashboardComponent implements OnInit {
   bulkLinkInput = '';
   isBulkCreating = false;
   bulkCreateSummary: null | { createdCount: number; failedCount: number; results: Array<{ index: number; success: boolean; error?: string }> } = null;
+  webhooks: any[] = [];
+  webhookForm = {
+    url: '',
+    events: ['link.created', 'link.updated', 'link.clicked'],
+  };
+  isSavingWebhook = false;
   newLink = {
     originalUrl: '',
     customCode: '',
@@ -75,6 +81,11 @@ export class DashboardComponent implements OnInit {
     this.authService.getProfile().subscribe({
       next: (data) => {
         this.profile = { name: data.name || '', email: data.email, plan: data.plan || 'FREE' };
+        if (this.canUseWebhooks()) {
+          this.loadWebhooks();
+        } else {
+          this.webhooks = [];
+        }
       },
       error: (err) => console.error(err)
     });
@@ -113,6 +124,9 @@ export class DashboardComponent implements OnInit {
         this.isUpgradingPlan = false;
         const title = plan === 'BUSINESS' ? 'Business Upgrade Simulated' : 'Payment Simulated';
         this.notificationService.success(`You are now on the ${plan} plan.`, title);
+        if (plan === 'BUSINESS') {
+          this.loadWebhooks();
+        }
       },
       error: (err) => {
         console.error(err);
@@ -126,6 +140,10 @@ export class DashboardComponent implements OnInit {
   }
 
   canUseBulkCreation() {
+    return this.profile.plan === 'BUSINESS';
+  }
+
+  canUseWebhooks() {
     return this.profile.plan === 'BUSINESS';
   }
 
@@ -148,6 +166,17 @@ export class DashboardComponent implements OnInit {
   loadLinks() {
     this.linksService.getAll().subscribe({
       next: (data) => this.links = data,
+      error: (err) => console.error(err)
+    });
+  }
+
+  loadWebhooks() {
+    if (!this.canUseWebhooks()) return;
+
+    this.linksService.getWebhooks().subscribe({
+      next: (data) => {
+        this.webhooks = data;
+      },
       error: (err) => console.error(err)
     });
   }
@@ -252,6 +281,71 @@ export class DashboardComponent implements OnInit {
         this.isBulkCreating = false;
         const msg = err?.error?.message || 'Bulk creation failed.';
         this.notificationService.error(msg, 'Bulk Creation Failed');
+      }
+    });
+  }
+
+  onCreateWebhook() {
+    if (!this.canUseWebhooks()) {
+      this.notificationService.error('Webhooks are available on the Business plan.', 'Upgrade Required');
+      return;
+    }
+
+    this.isSavingWebhook = true;
+    this.linksService.createWebhook(this.webhookForm).subscribe({
+      next: () => {
+        this.isSavingWebhook = false;
+        this.webhookForm = {
+          url: '',
+          events: ['link.created', 'link.updated', 'link.clicked'],
+        };
+        this.loadWebhooks();
+        this.notificationService.success('Webhook created successfully.');
+      },
+      error: (err) => {
+        this.isSavingWebhook = false;
+        const msg = err?.error?.message || 'Failed to create webhook.';
+        this.notificationService.error(msg, 'Webhook Creation Failed');
+      }
+    });
+  }
+
+  toggleWebhookEvent(eventName: string, enabled: boolean) {
+    const nextEvents = enabled
+      ? [...this.webhookForm.events, eventName]
+      : this.webhookForm.events.filter((event) => event !== eventName);
+
+    this.webhookForm.events = Array.from(new Set(nextEvents));
+  }
+
+  toggleWebhook(webhook: any) {
+    this.linksService.updateWebhook(webhook.id, { isActive: !webhook.isActive }).subscribe({
+      next: () => this.loadWebhooks(),
+      error: (err) => {
+        const msg = err?.error?.message || 'Failed to update webhook.';
+        this.notificationService.error(msg, 'Webhook Update Failed');
+      }
+    });
+  }
+
+  async deleteWebhook(id: number) {
+    const confirmed = await this.notificationService.confirm(
+      'Delete Webhook',
+      'Are you sure you want to delete this webhook endpoint?',
+      'Delete',
+      'Cancel'
+    );
+
+    if (!confirmed) return;
+
+    this.linksService.deleteWebhook(id).subscribe({
+      next: () => {
+        this.loadWebhooks();
+        this.notificationService.success('Webhook deleted successfully.');
+      },
+      error: (err) => {
+        const msg = err?.error?.message || 'Failed to delete webhook.';
+        this.notificationService.error(msg, 'Webhook Delete Failed');
       }
     });
   }

@@ -7,9 +7,10 @@ import { AuthModule } from './auth/auth.module';
 import { LinksModule } from './links/links.module';
 import { PlansModule } from './plans/plans.module';
 import { MailModule } from './mail/mail.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, LinksModule, PlansModule, MailModule],
+  imports: [PrismaModule, UsersModule, AuthModule, LinksModule, PlansModule, MailModule, WebhooksModule],
   controllers: [AppController],
   providers: [AppService],
 })

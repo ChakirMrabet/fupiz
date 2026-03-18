@@ -16,12 +16,13 @@ const auth_module_1 = require("./auth/auth.module");
 const links_module_1 = require("./links/links.module");
 const plans_module_1 = require("./plans/plans.module");
 const mail_module_1 = require("./mail/mail.module");
+const webhooks_module_1 = require("./webhooks/webhooks.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, users_module_1.UsersModule, auth_module_1.AuthModule, links_module_1.LinksModule, plans_module_1.PlansModule, mail_module_1.MailModule],
+        imports: [prisma_module_1.PrismaModule, users_module_1.UsersModule, auth_module_1.AuthModule, links_module_1.LinksModule, plans_module_1.PlansModule, mail_module_1.MailModule, webhooks_module_1.WebhooksModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

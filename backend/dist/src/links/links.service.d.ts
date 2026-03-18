@@ -1,8 +1,10 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { Link } from '@prisma/client';
+import { WebhooksService } from '../webhooks/webhooks.service';
 export declare class LinksService {
     private prisma;
-    constructor(prisma: PrismaService);
+    private webhooksService;
+    constructor(prisma: PrismaService, webhooksService: WebhooksService);
     generateShortCode(): string;
     private parseMaxClicks;
     getEffectiveMaxClicks(link: {
@@ -28,20 +30,20 @@ export declare class LinksService {
             success: boolean;
             link: {
                 id: number;
+                password: string | null;
+                isActive: boolean;
+                createdAt: Date;
+                updatedAt: Date;
+                userId: number;
                 originalUrl: string;
                 shortCode: string;
-                password: string | null;
                 expiresAt: Date | null;
                 maxClicks: number | null;
                 singleUse: boolean;
                 landingTitle: string | null;
                 landingDescription: string | null;
                 landingButtonLabel: string | null;
-                isActive: boolean;
                 clicks: number;
-                userId: number;
-                createdAt: Date;
-                updatedAt: Date;
             };
             error?: undefined;
         } | {
@@ -61,20 +63,20 @@ export declare class LinksService {
         referer: string;
     }): Promise<{
         id: number;
+        password: string | null;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        userId: number;
         originalUrl: string;
         shortCode: string;
-        password: string | null;
         expiresAt: Date | null;
         maxClicks: number | null;
         singleUse: boolean;
         landingTitle: string | null;
         landingDescription: string | null;
         landingButtonLabel: string | null;
-        isActive: boolean;
         clicks: number;
-        userId: number;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     getAnalytics(id: number, userId: number): Promise<{
         link: any;

@@ -3,23 +3,23 @@ export declare class UsersController {
     private usersService;
     constructor(usersService: UsersService);
     getProfile(req: any): Promise<{
-        name: string | null;
         id: number;
+        email: string;
+        name: string | null;
+        plan: string;
         isActive: boolean;
+        activatedAt: Date | null;
         createdAt: Date;
         updatedAt: Date;
-        email: string;
-        plan: string;
-        activatedAt: Date | null;
     }>;
     updateProfile(req: any, body: any): Promise<{
-        name: string | null;
         id: number;
+        email: string;
+        name: string | null;
+        plan: string;
         isActive: boolean;
+        activatedAt: Date | null;
         createdAt: Date;
         updatedAt: Date;
-        email: string;
-        plan: string;
-        activatedAt: Date | null;
     }>;
 }

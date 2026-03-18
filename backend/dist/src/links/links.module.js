@@ -10,11 +10,13 @@ exports.LinksModule = void 0;
 const common_1 = require("@nestjs/common");
 const links_service_1 = require("./links.service");
 const links_controller_1 = require("./links.controller");
+const webhooks_module_1 = require("../webhooks/webhooks.module");
 let LinksModule = class LinksModule {
 };
 exports.LinksModule = LinksModule;
 exports.LinksModule = LinksModule = __decorate([
     (0, common_1.Module)({
+        imports: [webhooks_module_1.WebhooksModule],
         providers: [links_service_1.LinksService],
         controllers: [links_controller_1.LinksController],
         exports: [links_service_1.LinksService],

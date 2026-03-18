@@ -88,3 +88,21 @@ Expand the existing link CRUD flow with higher-value management features that ma
   - `https://example.com/page`
   - `https://example.com/page,custom-code`
 - Added bulk-run summaries with failed-line feedback in the dashboard.
+- Started implementation of `webhooks`.
+- Scope for this first slice:
+  - add business-only webhook registration
+  - support a small core event set
+  - sign outbound webhook payloads
+  - dispatch asynchronously so link operations do not block on webhook delivery
+- Implemented a `Webhook` model with stored endpoint URL, secret, subscribed events, active state, and last delivery status.
+- Added a business-only webhook management API for:
+  - listing webhooks
+  - creating webhooks
+  - toggling active state
+  - deleting webhooks
+- Implemented HMAC-signed outbound deliveries using the `x-fupiz-signature` header.
+- Implemented asynchronous delivery for the first core event set:
+  - `link.created`
+  - `link.updated`
+  - `link.clicked`
+- Added a dashboard webhook management panel in the account area for Business users.
