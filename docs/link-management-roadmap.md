@@ -157,3 +157,6 @@ Expand the existing link CRUD flow with higher-value management features that ma
 - Prevented anonymous creation from accepting advanced options such as custom codes, passwords, click limits, or landing-page content.
 - Updated the landing page to create an anonymous link in place instead of redirecting to registration.
 - Added a result state on the landing page with the generated short URL, a copy action, and a follow-up prompt to log in or register for advanced features.
+- Added a backend cron-based cleanup job for anonymous links so unpaid, unowned links do not accumulate indefinitely.
+- Implemented daily deletion of anonymous links older than 30 days using Nest's schedule module.
+- Kept the retention rule scoped only to links with `userId = null`, so account-owned links are unaffected.

@@ -8,9 +8,19 @@ import { LinksModule } from './links/links.module';
 import { PlansModule } from './plans/plans.module';
 import { MailModule } from './mail/mail.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, LinksModule, PlansModule, MailModule, WebhooksModule],
+  imports: [
+    ScheduleModule.forRoot(),
+    PrismaModule,
+    UsersModule,
+    AuthModule,
+    LinksModule,
+    PlansModule,
+    MailModule,
+    WebhooksModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
