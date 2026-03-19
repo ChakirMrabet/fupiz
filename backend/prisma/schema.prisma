@@ -12,6 +12,12 @@ model User {
   name                     String?
   password                 String
   plan                     String    @default("FREE")
+  stripeCustomerId         String?   @unique
+  stripeSubscriptionId     String?   @unique
+  stripePriceId            String?
+  stripeSubscriptionStatus String?
+  stripeCurrentPeriodEnd   DateTime?
+  cancelAtPeriodEnd        Boolean   @default(false)
   isActive                 Boolean   @default(false)
   activationToken          String?   @unique
   activationTokenExpiresAt DateTime?

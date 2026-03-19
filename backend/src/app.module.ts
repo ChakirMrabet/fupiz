@@ -9,6 +9,7 @@ import { PlansModule } from './plans/plans.module';
 import { MailModule } from './mail/mail.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { BillingModule } from './billing/billing.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     AuthModule,
     LinksModule,
     PlansModule,
+    BillingModule,
     MailModule,
     WebhooksModule,
   ],

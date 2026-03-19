@@ -7,6 +7,7 @@ import { NotificationService } from '../../services/notification.service';
 import { Router, RouterLink } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { toDataURL } from 'qrcode';
+import { BillingService } from '../../services/billing.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -61,10 +62,12 @@ export class DashboardComponent implements OnInit {
   passwordUpdate = { newPassword: '' };
   isUpdatingProfile = false;
   profileMessage = '';
+  isBillingActionPending = false;
 
   constructor(
     private linksService: LinksService,
     private authService: AuthService,
+    private billingService: BillingService,
     private notificationService: NotificationService,
     private router: Router,
     public themeService: ThemeService
@@ -124,24 +127,31 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  isUpgradingPlan = false;
-  
-  upgradePlan(plan: 'PRO' | 'BUSINESS') {
-    this.isUpgradingPlan = true;
-    this.authService.updateProfile({ plan }).subscribe({
-      next: () => {
-        this.profile.plan = plan;
-        this.isUpgradingPlan = false;
-        const title = plan === 'BUSINESS' ? 'Business Upgrade Simulated' : 'Payment Simulated';
-        this.notificationService.success(`You are now on the ${plan} plan.`, title);
-        if (plan === 'BUSINESS') {
-          this.loadWebhooks();
-        }
+  startCheckout(plan: 'PRO' | 'BUSINESS') {
+    this.isBillingActionPending = true;
+    this.billingService.createCheckoutSession(plan).subscribe({
+      next: ({ url }) => {
+        window.location.href = url;
       },
       error: (err) => {
         console.error(err);
-        this.isUpgradingPlan = false;
-      }
+        this.isBillingActionPending = false;
+        this.notificationService.error('Could not start checkout.', 'Billing Error');
+      },
+    });
+  }
+
+  openBillingPortal() {
+    this.isBillingActionPending = true;
+    this.billingService.createPortalSession().subscribe({
+      next: ({ url }) => {
+        window.location.href = url;
+      },
+      error: (err) => {
+        console.error(err);
+        this.isBillingActionPending = false;
+        this.notificationService.error('Could not open the billing portal.', 'Billing Error');
+      },
     });
   }
 

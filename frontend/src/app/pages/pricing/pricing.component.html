@@ -67,14 +67,16 @@
         </li>
       </ul>
 
-      <a
-        routerLink="/register"
+      <button
+        type="button"
         class="btn-primary pricing-cta"
         [class.pricing-cta-pro]="plan.id === 'PRO'"
         [class.pricing-cta-business]="plan.id === 'BUSINESS'"
+        [disabled]="isStartingCheckout || (isLoggedIn && currentPlan === 'FREE' && plan.id === 'FREE')"
+        (click)="selectPlan(plan.id)"
       >
         {{ getCtaLabel(plan.id) }}
-      </a>
+      </button>
     </div>
   </div>
 </div>

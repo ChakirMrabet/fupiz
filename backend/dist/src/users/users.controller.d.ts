@@ -5,8 +5,14 @@ export declare class UsersController {
     getProfile(req: any): Promise<{
         id: number;
         email: string;
+        stripeCustomerId: string | null;
+        stripeSubscriptionId: string | null;
         name: string | null;
         plan: string;
+        stripePriceId: string | null;
+        stripeSubscriptionStatus: string | null;
+        stripeCurrentPeriodEnd: Date | null;
+        cancelAtPeriodEnd: boolean;
         isActive: boolean;
         activatedAt: Date | null;
         createdAt: Date;
@@ -15,8 +21,14 @@ export declare class UsersController {
     updateProfile(req: any, body: any): Promise<{
         id: number;
         email: string;
+        stripeCustomerId: string | null;
+        stripeSubscriptionId: string | null;
         name: string | null;
         plan: string;
+        stripePriceId: string | null;
+        stripeSubscriptionStatus: string | null;
+        stripeCurrentPeriodEnd: Date | null;
+        cancelAtPeriodEnd: boolean;
         isActive: boolean;
         activatedAt: Date | null;
         createdAt: Date;

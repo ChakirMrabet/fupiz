@@ -150,27 +150,30 @@
           <hr style="border: 1px solid var(--glass-border); margin: 1.5rem 0;">
           <h4>Upgrade Your Plan</h4>
           <p style="color: var(--text-secondary); margin-bottom: 1rem;">Choose the tier that matches how deeply you want to manage, automate, and brand your links.</p>
-          <button class="btn-primary w-full" style="background: linear-gradient(135deg, #10b981, #059669); margin-bottom: 0.75rem;" (click)="upgradePlan('PRO')" [disabled]="isUpgradingPlan">
-            {{ isUpgradingPlan ? 'Processing Payment...' : 'Simulate Pro Upgrade ($9.00)' }}
+          <button class="btn-primary w-full" style="background: linear-gradient(135deg, #10b981, #059669); margin-bottom: 0.75rem;" (click)="startCheckout('PRO')" [disabled]="isBillingActionPending">
+            {{ isBillingActionPending ? 'Redirecting...' : 'Upgrade to Pro ($9.00)' }}
           </button>
-          <button class="btn-primary w-full btn-business" (click)="upgradePlan('BUSINESS')" [disabled]="isUpgradingPlan">
-            {{ isUpgradingPlan ? 'Processing Payment...' : 'Simulate Business Upgrade ($29.00)' }}
+          <button class="btn-primary w-full btn-business" (click)="startCheckout('BUSINESS')" [disabled]="isBillingActionPending">
+            {{ isBillingActionPending ? 'Redirecting...' : 'Upgrade to Business ($29.00)' }}
           </button>
         </div>
 
         <div class="upgrade-simulation" *ngIf="profile.plan === 'PRO'">
           <hr style="border: 1px solid var(--glass-border); margin: 1.5rem 0;">
           <h4 style="color: var(--accent-primary);">👑 You are a Pro Member</h4>
-          <p style="color: var(--text-secondary); margin-bottom: 1rem;">You have advanced link controls. Move to Business when you need automation and brand-oriented features.</p>
-          <button class="btn-primary w-full btn-business" (click)="upgradePlan('BUSINESS')" [disabled]="isUpgradingPlan">
-            {{ isUpgradingPlan ? 'Processing Payment...' : 'Upgrade to Business ($29.00)' }}
+          <p style="color: var(--text-secondary); margin-bottom: 1rem;">Manage upgrades, payment methods, and cancellation in the Stripe billing portal.</p>
+          <button class="btn-primary w-full btn-business" (click)="openBillingPortal()" [disabled]="isBillingActionPending">
+            {{ isBillingActionPending ? 'Redirecting...' : 'Manage Billing' }}
           </button>
         </div>
 
         <div class="upgrade-simulation" *ngIf="profile.plan === 'BUSINESS'">
           <hr style="border: 1px solid var(--glass-border); margin: 1.5rem 0;">
           <h4 style="color: #14b8a6;">You are on Business</h4>
-          <p style="color: var(--text-secondary);">You are on the highest current plan, ready for bulk workflows, branded domains, and webhook-based automation as those features land.</p>
+          <p style="color: var(--text-secondary); margin-bottom: 1rem;">You are on the highest current plan. Use the billing portal to manage payment details or cancellation.</p>
+          <button class="btn-primary w-full btn-business" (click)="openBillingPortal()" [disabled]="isBillingActionPending">
+            {{ isBillingActionPending ? 'Redirecting...' : 'Manage Billing' }}
+          </button>
         </div>
       </div>
 
