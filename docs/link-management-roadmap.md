@@ -106,3 +106,31 @@ Expand the existing link CRUD flow with higher-value management features that ma
   - `link.updated`
   - `link.clicked`
 - Added a dashboard webhook management panel in the account area for Business users.
+- Started dashboard reorganization to reduce layout bloat as advanced features accumulated.
+- Scope for this slice:
+  - make `Links` the primary workspace
+  - move single-link creation into a modal
+  - move bulk creation into a separate modal
+  - replace `My Account` with `Settings`
+  - split settings into:
+    - profile
+    - billing
+    - integrations
+- Reorganized the dashboard into two top-level work areas:
+  - `Links`
+  - `Settings`
+- Moved single-link creation into a dedicated modal triggered from the header and links workspace.
+- Moved bulk creation into a dedicated modal so batch workflows no longer stretch the main page vertically.
+- Replaced the old `My Account` page with settings sections for:
+  - profile
+  - billing
+  - integrations
+- Moved webhook management under `Settings > Integrations` instead of mixing it with profile and billing forms.
+- Started a dashboard polish pass focused on:
+  - reducing visual density
+  - improving header and settings hierarchy
+  - simplifying card and modal styling
+  - trimming CSS duplication where possible
+- Reworked dashboard styling around a lighter workspace layout instead of stacked feature cards.
+- Tightened header hierarchy, settings tabs, list density, and modal presentation.
+- Replaced the previous dashboard stylesheet with a slimmer consolidated version to reduce CSS sprawl.

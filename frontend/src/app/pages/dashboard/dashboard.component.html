@@ -1,6 +1,8 @@
 <nav class="navbar container">
   <div class="logo gradient-text" routerLink="/">Fuipiz</div>
   <div class="nav-links">
+    <button class="btn-primary header-cta" (click)="openCreateModal()">New Link</button>
+    <button class="btn-secondary" *ngIf="canUseBulkCreation()" (click)="openBulkModal()">Bulk Create</button>
     <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
       {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
     </button>
@@ -16,10 +18,10 @@
     </div>
     <ul class="sidebar-nav">
       <li [class.active]="activeTab === 'links'" (click)="setTab('links')">
-        <span>🔗 My Links</span>
+        <span>🔗 Links</span>
       </li>
-      <li [class.active]="activeTab === 'account'" (click)="setTab('account')">
-        <span>👤 My Account</span>
+      <li [class.active]="activeTab === 'settings'" (click)="setTab('settings')">
+        <span>⚙️ Settings</span>
       </li>
     </ul>
   </aside>
@@ -30,79 +32,13 @@
     <!-- MY LINKS TAB -->
     <div *ngIf="activeTab === 'links'">
       <div class="dashboard-header">
-        <h2 class="hero-title dashboard-title">Your <span class="gradient-text">Links</span></h2>
-      </div>
-
-      <div class="glass-card create-link-card">
-        <h3>Create New Link</h3>
-        <form (ngSubmit)="onCreateLink()" class="create-form">
-          <div class="form-row">
-            <input type="url" class="input-field" placeholder="Original URL (https://...)" [(ngModel)]="newLink.originalUrl" name="url" required>
-            <button type="submit" class="btn-primary" [disabled]="isCreating">Shorten</button>
-          </div>
-          <div class="advanced-options">
-            <input type="text" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Custom Code (optional)' : '👑 Custom Code (Paid Plans)'" [(ngModel)]="newLink.customCode" name="customCode" [disabled]="!canUseAdvancedLinkControls()">
-            <input type="password" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Password (optional)' : '👑 Password (Paid Plans)'" [(ngModel)]="newLink.password" name="password" [disabled]="!canUseAdvancedLinkControls()">
-            <input type="datetime-local" class="input-field half" [(ngModel)]="newLink.expiresAt" name="expiresAt" [title]="canUseAdvancedLinkControls() ? 'Expiration (optional)' : 'Expiration (Paid Plans)'" [disabled]="!canUseAdvancedLinkControls()">
-            <input type="number" min="1" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Max Clicks (optional)' : '👑 Click Limit (Paid Plans)'" [(ngModel)]="newLink.maxClicks" name="maxClicks" [disabled]="!canUseAdvancedLinkControls() || newLink.singleUse">
-            <label class="toggle-field">
-              <input type="checkbox" [(ngModel)]="newLink.singleUse" name="singleUse" [disabled]="!canUseAdvancedLinkControls()">
-              <span>{{ canUseAdvancedLinkControls() ? 'One-Time Link' : '👑 One-Time Link (Paid Plans)' }}</span>
-            </label>
-          </div>
-          <div class="landing-options">
-            <input
-              type="text"
-              class="input-field"
-              [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Title (optional)' : '👑 Landing Title (Paid Plans)'"
-              [(ngModel)]="newLink.landingTitle"
-              name="landingTitle"
-              [disabled]="!canUseAdvancedLinkControls()"
-            >
-            <textarea
-              class="input-field landing-textarea"
-              [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Description (optional)' : '👑 Landing Description (Paid Plans)'"
-              [(ngModel)]="newLink.landingDescription"
-              name="landingDescription"
-              [disabled]="!canUseAdvancedLinkControls()"
-            ></textarea>
-            <input
-              type="text"
-              class="input-field"
-              [placeholder]="canUseAdvancedLinkControls() ? 'CTA Button Label (optional)' : '👑 CTA Label (Paid Plans)'"
-              [(ngModel)]="newLink.landingButtonLabel"
-              name="landingButtonLabel"
-              [disabled]="!canUseAdvancedLinkControls()"
-            >
-          </div>
-        </form>
-      </div>
-
-      <div class="glass-card create-link-card">
-        <h3>Bulk Create Links</h3>
-        <p class="bulk-help">Paste one URL per line. You can optionally add a custom code after a comma, for example: <code>https://example.com/sale,summer-sale</code></p>
-        <textarea
-          class="input-field landing-textarea bulk-textarea"
-          [(ngModel)]="bulkLinkInput"
-          name="bulkLinkInput"
-          [disabled]="!canUseBulkCreation() || isBulkCreating"
-          [placeholder]="canUseBulkCreation() ? 'https://example.com/page-one\nhttps://example.com/page-two,launch-page' : '👑 Bulk creation is available on the Business plan'"
-        ></textarea>
-        <div class="bulk-actions">
-          <button class="btn-primary btn-business" (click)="onBulkCreate()" [disabled]="!canUseBulkCreation() || isBulkCreating">
-            {{ isBulkCreating ? 'Creating...' : 'Create Links in Bulk' }}
-          </button>
+        <div>
+          <h2 class="hero-title dashboard-title">Your <span class="gradient-text">Links</span></h2>
+          <p class="dashboard-subtitle">Manage, analyze, and act on your existing short links.</p>
         </div>
-        <div class="bulk-summary" *ngIf="bulkCreateSummary">
-          <p><strong>{{ bulkCreateSummary.createdCount }}</strong> created, <strong>{{ bulkCreateSummary.failedCount }}</strong> failed.</p>
-          <div *ngIf="bulkCreateSummary.failedCount > 0">
-            <p class="bulk-errors-title">Failed rows</p>
-            <ul class="bulk-errors">
-              <li *ngFor="let result of bulkCreateSummary.results">
-                <span *ngIf="!result.success">Line {{ result.index + 1 }}: {{ result.error }}</span>
-              </li>
-            </ul>
-          </div>
+        <div class="workspace-actions">
+          <button class="btn-primary" (click)="openCreateModal()">New Link</button>
+          <button class="btn-secondary" *ngIf="canUseBulkCreation()" (click)="openBulkModal()">Bulk Create</button>
         </div>
       </div>
 
@@ -151,13 +87,21 @@
       </div>
     </div>
 
-    <!-- MY ACCOUNT TAB -->
-    <div *ngIf="activeTab === 'account'">
+    <div *ngIf="activeTab === 'settings'">
       <div class="dashboard-header">
-        <h2 class="hero-title dashboard-title">My <span class="gradient-text">Account</span></h2>
+        <div>
+          <h2 class="hero-title dashboard-title">Workspace <span class="gradient-text">Settings</span></h2>
+          <p class="dashboard-subtitle">Profile, billing, and integrations live here instead of inside the links workspace.</p>
+        </div>
       </div>
 
-      <div class="glass-card account-card">
+      <div class="settings-tabs">
+        <button class="settings-tab" [class.active]="settingsSection === 'profile'" (click)="setSettingsSection('profile')">Profile</button>
+        <button class="settings-tab" [class.active]="settingsSection === 'billing'" (click)="setSettingsSection('billing')">Billing</button>
+        <button class="settings-tab" [class.active]="settingsSection === 'integrations'" (click)="setSettingsSection('integrations')">Integrations</button>
+      </div>
+
+      <div class="glass-card account-card" *ngIf="settingsSection === 'profile'">
         <h3>Account Settings</h3>
         <p class="account-email">Signed in as: <strong>{{ profile.email }}</strong></p>
         
@@ -178,7 +122,7 @@
         </form>
       </div>
 
-      <div class="glass-card account-card" style="margin-top: 2rem;">
+      <div class="glass-card account-card" style="margin-top: 2rem;" *ngIf="settingsSection === 'billing'">
         <h3>Billing & Plan</h3>
         <div class="plan-status">
           <p>Current Plan: <span class="badge" [class.badge-pro]="profile.plan === 'PRO'" [class.badge-business]="profile.plan === 'BUSINESS'">{{ profile.plan }}</span></p>
@@ -212,7 +156,7 @@
         </div>
       </div>
 
-      <div class="glass-card account-card" style="margin-top: 2rem;">
+      <div class="glass-card account-card" style="margin-top: 2rem;" *ngIf="settingsSection === 'integrations'">
         <h3>Webhooks</h3>
         <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Register outbound HTTP callbacks for link lifecycle events.</p>
 
@@ -277,6 +221,88 @@
     </div>
 
   </main>
+</div>
+
+<div class="modal-overlay" *ngIf="isCreateModalOpen" (click)="closeCreateModal()">
+  <div class="modal-content glass-card create-modal" (click)="$event.stopPropagation()">
+    <h3>Create New Link</h3>
+    <p>Use a focused creation flow instead of crowding the main links workspace.</p>
+    <form (ngSubmit)="onCreateLink()" class="create-form">
+      <div class="form-row">
+        <input type="url" class="input-field" placeholder="Original URL (https://...)" [(ngModel)]="newLink.originalUrl" name="url" required>
+      </div>
+      <div class="advanced-options">
+        <input type="text" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Custom Code (optional)' : '👑 Custom Code (Paid Plans)'" [(ngModel)]="newLink.customCode" name="customCode" [disabled]="!canUseAdvancedLinkControls()">
+        <input type="password" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Password (optional)' : '👑 Password (Paid Plans)'" [(ngModel)]="newLink.password" name="password" [disabled]="!canUseAdvancedLinkControls()">
+        <input type="datetime-local" class="input-field half" [(ngModel)]="newLink.expiresAt" name="expiresAt" [title]="canUseAdvancedLinkControls() ? 'Expiration (optional)' : 'Expiration (Paid Plans)'" [disabled]="!canUseAdvancedLinkControls()">
+        <input type="number" min="1" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Max Clicks (optional)' : '👑 Click Limit (Paid Plans)'" [(ngModel)]="newLink.maxClicks" name="maxClicks" [disabled]="!canUseAdvancedLinkControls() || newLink.singleUse">
+        <label class="toggle-field">
+          <input type="checkbox" [(ngModel)]="newLink.singleUse" name="singleUse" [disabled]="!canUseAdvancedLinkControls()">
+          <span>{{ canUseAdvancedLinkControls() ? 'One-Time Link' : '👑 One-Time Link (Paid Plans)' }}</span>
+        </label>
+      </div>
+      <div class="landing-options">
+        <input
+          type="text"
+          class="input-field"
+          [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Title (optional)' : '👑 Landing Title (Paid Plans)'"
+          [(ngModel)]="newLink.landingTitle"
+          name="landingTitle"
+          [disabled]="!canUseAdvancedLinkControls()"
+        >
+        <textarea
+          class="input-field landing-textarea"
+          [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Description (optional)' : '👑 Landing Description (Paid Plans)'"
+          [(ngModel)]="newLink.landingDescription"
+          name="landingDescription"
+          [disabled]="!canUseAdvancedLinkControls()"
+        ></textarea>
+        <input
+          type="text"
+          class="input-field"
+          [placeholder]="canUseAdvancedLinkControls() ? 'CTA Button Label (optional)' : '👑 CTA Label (Paid Plans)'"
+          [(ngModel)]="newLink.landingButtonLabel"
+          name="landingButtonLabel"
+          [disabled]="!canUseAdvancedLinkControls()"
+        >
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary" [disabled]="isCreating">{{ isCreating ? 'Creating...' : 'Create Link' }}</button>
+        <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="isBulkModalOpen" (click)="closeBulkModal()">
+  <div class="modal-content glass-card bulk-modal" (click)="$event.stopPropagation()">
+    <h3>Bulk Create Links</h3>
+    <p class="bulk-help">Paste one URL per line. You can optionally add a custom code after a comma, for example: <code>https://example.com/sale,summer-sale</code></p>
+    <textarea
+      class="input-field landing-textarea bulk-textarea"
+      [(ngModel)]="bulkLinkInput"
+      name="bulkLinkInput"
+      [disabled]="!canUseBulkCreation() || isBulkCreating"
+      [placeholder]="canUseBulkCreation() ? 'https://example.com/page-one\nhttps://example.com/page-two,launch-page' : '👑 Bulk creation is available on the Business plan'"
+    ></textarea>
+    <div class="bulk-actions">
+      <button class="btn-primary btn-business" (click)="onBulkCreate()" [disabled]="!canUseBulkCreation() || isBulkCreating">
+        {{ isBulkCreating ? 'Creating...' : 'Create Links in Bulk' }}
+      </button>
+      <button class="btn-secondary" (click)="closeBulkModal()">Close</button>
+    </div>
+    <div class="bulk-summary" *ngIf="bulkCreateSummary">
+      <p><strong>{{ bulkCreateSummary.createdCount }}</strong> created, <strong>{{ bulkCreateSummary.failedCount }}</strong> failed.</p>
+      <div *ngIf="bulkCreateSummary.failedCount > 0">
+        <p class="bulk-errors-title">Failed rows</p>
+        <ul class="bulk-errors">
+          <li *ngFor="let result of bulkCreateSummary.results">
+            <span *ngIf="!result.success">Line {{ result.index + 1 }}: {{ result.error }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- QR Code Modal -->

@@ -16,7 +16,8 @@ import { toDataURL } from 'qrcode';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  activeTab: 'links' | 'account' = 'links';
+  activeTab: 'links' | 'settings' = 'links';
+  settingsSection: 'profile' | 'billing' | 'integrations' = 'profile';
   links: any[] = [];
   bulkLinkInput = '';
   isBulkCreating = false;
@@ -39,6 +40,8 @@ export class DashboardComponent implements OnInit {
     landingButtonLabel: '',
   };
   isCreating = false;
+  isCreateModalOpen = false;
+  isBulkModalOpen = false;
   editingLink: any = null;
   editLinkForm = {
     originalUrl: '',
@@ -73,8 +76,12 @@ export class DashboardComponent implements OnInit {
     this.loadProfile();
   }
 
-  setTab(tab: 'links' | 'account') {
+  setTab(tab: 'links' | 'settings') {
     this.activeTab = tab;
+  }
+
+  setSettingsSection(section: 'profile' | 'billing' | 'integrations') {
+    this.settingsSection = section;
   }
 
   loadProfile() {
@@ -199,6 +206,24 @@ export class DashboardComponent implements OnInit {
     this.qrCodeLink = null;
   }
 
+  openCreateModal() {
+    this.isCreateModalOpen = true;
+  }
+
+  closeCreateModal() {
+    this.isCreateModalOpen = false;
+    this.isCreating = false;
+  }
+
+  openBulkModal() {
+    this.isBulkModalOpen = true;
+  }
+
+  closeBulkModal() {
+    this.isBulkModalOpen = false;
+    this.isBulkCreating = false;
+  }
+
   onCreateLink() {
     this.isCreating = true;
     const data: any = { originalUrl: this.newLink.originalUrl };
@@ -226,6 +251,7 @@ export class DashboardComponent implements OnInit {
         };
         this.loadLinks();
         this.isCreating = false;
+        this.closeCreateModal();
         this.notificationService.success('Link created successfully!');
       },
       error: (err) => {
@@ -272,6 +298,7 @@ export class DashboardComponent implements OnInit {
         this.bulkCreateSummary = response;
         this.bulkLinkInput = '';
         this.loadLinks();
+        this.closeBulkModal();
         this.notificationService.success(
           `${response.createdCount} links created${response.failedCount ? `, ${response.failedCount} failed` : ''}.`,
           'Bulk Creation Complete',
