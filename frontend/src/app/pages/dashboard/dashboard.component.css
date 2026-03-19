@@ -95,6 +95,26 @@
   align-items: center;
 }
 
+.links-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.links-search {
+  max-width: 420px;
+  flex: 1 1 320px;
+}
+
+.links-count,
+.pagination-label {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
 .header-cta {
   white-space: nowrap;
 }
@@ -351,6 +371,15 @@
 
 .bulk-summary {
   margin-top: 0.25rem;
+}
+
+.pagination-bar {
+  margin-top: 1.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
 }
 
 .bulk-errors-title {

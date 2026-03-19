@@ -19,6 +19,9 @@ export class DashboardComponent implements OnInit {
   activeTab: 'links' | 'settings' = 'links';
   settingsSection: 'profile' | 'billing' | 'integrations' = 'profile';
   links: any[] = [];
+  linkSearch = '';
+  currentPage = 1;
+  readonly pageSize = 8;
   bulkLinkInput = '';
   isBulkCreating = false;
   bulkCreateSummary: null | { createdCount: number; failedCount: number; results: Array<{ index: number; success: boolean; error?: string }> } = null;
@@ -158,6 +161,41 @@ export class DashboardComponent implements OnInit {
     return !!(link.landingTitle || link.landingDescription || link.landingButtonLabel);
   }
 
+  get filteredLinks() {
+    const query = this.linkSearch.trim().toLowerCase();
+    if (!query) {
+      return this.links;
+    }
+
+    return this.links.filter((link) =>
+      [
+        link.shortCode,
+        link.originalUrl,
+        link.landingTitle,
+        link.landingDescription,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query)),
+    );
+  }
+
+  get totalPages() {
+    return Math.max(1, Math.ceil(this.filteredLinks.length / this.pageSize));
+  }
+
+  get paginatedLinks() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredLinks.slice(start, start + this.pageSize);
+  }
+
+  onSearchChange() {
+    this.currentPage = 1;
+  }
+
+  goToPage(page: number) {
+    this.currentPage = Math.min(Math.max(1, page), this.totalPages);
+  }
+
   formatClickLimit(link: any) {
     if (link.singleUse) {
       return `${link.clicks} / 1 clicks`;
@@ -172,7 +210,10 @@ export class DashboardComponent implements OnInit {
 
   loadLinks() {
     this.linksService.getAll().subscribe({
-      next: (data) => this.links = data,
+      next: (data) => {
+        this.links = data;
+        this.currentPage = Math.min(this.currentPage, this.totalPages);
+      },
       error: (err) => console.error(err)
     });
   }

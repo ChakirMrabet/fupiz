@@ -134,3 +134,10 @@ Expand the existing link CRUD flow with higher-value management features that ma
 - Reworked dashboard styling around a lighter workspace layout instead of stacked feature cards.
 - Tightened header hierarchy, settings tabs, list density, and modal presentation.
 - Replaced the previous dashboard stylesheet with a slimmer consolidated version to reduce CSS sprawl.
+- Started link-list management improvements for growth:
+  - client-side search filtering
+  - client-side pagination
+  - toolbar controls in the links workspace
+- Added a links toolbar with a local search box in the main workspace.
+- Implemented client-side filtering across short code, destination URL, and landing content.
+- Implemented client-side pagination for the link list to keep the workspace usable as the list grows.

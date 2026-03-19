@@ -42,8 +42,20 @@
         </div>
       </div>
 
+      <div class="links-toolbar">
+        <input
+          type="text"
+          class="input-field links-search"
+          [(ngModel)]="linkSearch"
+          (ngModelChange)="onSearchChange()"
+          name="linkSearch"
+          placeholder="Search by short code, destination, or landing content"
+        >
+        <p class="links-count">{{ filteredLinks.length }} results</p>
+      </div>
+
       <div class="links-list">
-        <div class="glass-card link-item" *ngFor="let link of links">
+        <div class="glass-card link-item" *ngFor="let link of paginatedLinks">
           <div class="link-details">
             <h4><a [href]="'http://localhost:3000/s/' + link.shortCode" target="_blank" class="short-link">http://localhost:3000/s/{{ link.shortCode }}</a></h4>
             <p class="original-link">{{ link.originalUrl }}</p>
@@ -81,9 +93,15 @@
           </div>
         </div>
         
-        <div *ngIf="links.length === 0" class="empty-state">
+        <div *ngIf="filteredLinks.length === 0" class="empty-state">
           <p>You haven't created any links yet.</p>
         </div>
+      </div>
+
+      <div class="pagination-bar" *ngIf="filteredLinks.length > pageSize">
+        <button class="btn-secondary" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+        <span class="pagination-label">Page {{ currentPage }} of {{ totalPages }}</span>
+        <button class="btn-secondary" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
       </div>
     </div>
 
