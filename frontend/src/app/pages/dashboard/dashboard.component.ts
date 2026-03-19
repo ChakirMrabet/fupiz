@@ -17,8 +17,7 @@ import { BillingService } from '../../services/billing.service';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  activeTab: 'links' | 'settings' = 'links';
-  settingsSection: 'profile' | 'billing' | 'integrations' = 'profile';
+  activeSection: 'links' | 'integrations' | 'profile' | 'billing' = 'links';
   links: any[] = [];
   linkSearch = '';
   currentPage = 1;
@@ -82,12 +81,8 @@ export class DashboardComponent implements OnInit {
     this.loadProfile();
   }
 
-  setTab(tab: 'links' | 'settings') {
-    this.activeTab = tab;
-  }
-
-  setSettingsSection(section: 'profile' | 'billing' | 'integrations') {
-    this.settingsSection = section;
+  setSection(section: 'links' | 'integrations' | 'profile' | 'billing') {
+    this.activeSection = section;
   }
 
   loadProfile() {

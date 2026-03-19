@@ -241,29 +241,6 @@
   border-style: dashed;
 }
 
-.settings-tabs {
-  display: flex;
-  gap: 0.65rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.25rem;
-}
-
-.settings-tab {
-  border: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-secondary);
-  padding: 0.72rem 1rem;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.settings-tab.active {
-  color: var(--text-primary);
-  border-color: rgba(20, 184, 166, 0.45);
-  background: rgba(20, 184, 166, 0.12);
-}
-
 .account-card {
   max-width: 720px;
 }

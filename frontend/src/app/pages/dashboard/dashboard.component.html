@@ -1,8 +1,8 @@
 <nav class="navbar container">
   <div class="logo gradient-text" routerLink="/">Fuipiz</div>
   <div class="nav-links">
-    <button class="btn-primary header-cta" (click)="openCreateModal()">New Link</button>
-    <button class="btn-secondary" *ngIf="canUseBulkCreation()" (click)="openBulkModal()">Bulk Create</button>
+    <button class="btn-primary header-cta" *ngIf="activeSection === 'links'" (click)="openCreateModal()">New Link</button>
+    <button class="btn-secondary" *ngIf="activeSection === 'links' && canUseBulkCreation()" (click)="openBulkModal()">Bulk Create</button>
     <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
       {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
     </button>
@@ -17,11 +17,17 @@
       <h3 class="gradient-text">Menu</h3>
     </div>
     <ul class="sidebar-nav">
-      <li [class.active]="activeTab === 'links'" (click)="setTab('links')">
+      <li [class.active]="activeSection === 'links'" (click)="setSection('links')">
         <span>🔗 Links</span>
       </li>
-      <li [class.active]="activeTab === 'settings'" (click)="setTab('settings')">
-        <span>⚙️ Settings</span>
+      <li [class.active]="activeSection === 'integrations'" (click)="setSection('integrations')">
+        <span>🪝 Integrations</span>
+      </li>
+      <li [class.active]="activeSection === 'profile'" (click)="setSection('profile')">
+        <span>👤 Profile</span>
+      </li>
+      <li [class.active]="activeSection === 'billing'" (click)="setSection('billing')">
+        <span>💳 Billing</span>
       </li>
     </ul>
   </aside>
@@ -30,7 +36,7 @@
   <main class="dashboard-content">
     
     <!-- MY LINKS TAB -->
-    <div *ngIf="activeTab === 'links'">
+    <div *ngIf="activeSection === 'links'">
       <div class="dashboard-header">
         <div>
           <h2 class="hero-title dashboard-title">Your <span class="gradient-text">Links</span></h2>
@@ -105,21 +111,15 @@
       </div>
     </div>
 
-    <div *ngIf="activeTab === 'settings'">
+    <div *ngIf="activeSection === 'profile'">
       <div class="dashboard-header">
         <div>
-          <h2 class="hero-title dashboard-title">Workspace <span class="gradient-text">Settings</span></h2>
-          <p class="dashboard-subtitle">Profile, billing, and integrations live here instead of inside the links workspace.</p>
+          <h2 class="hero-title dashboard-title">Your <span class="gradient-text">Profile</span></h2>
+          <p class="dashboard-subtitle">Update your account details and password without burying them under a general settings page.</p>
         </div>
       </div>
 
-      <div class="settings-tabs">
-        <button class="settings-tab" [class.active]="settingsSection === 'profile'" (click)="setSettingsSection('profile')">Profile</button>
-        <button class="settings-tab" [class.active]="settingsSection === 'billing'" (click)="setSettingsSection('billing')">Billing</button>
-        <button class="settings-tab" [class.active]="settingsSection === 'integrations'" (click)="setSettingsSection('integrations')">Integrations</button>
-      </div>
-
-      <div class="glass-card account-card" *ngIf="settingsSection === 'profile'">
+      <div class="glass-card account-card">
         <h3>Account Settings</h3>
         <p class="account-email">Signed in as: <strong>{{ profile.email }}</strong></p>
         
@@ -139,8 +139,17 @@
           <p class="success-msg" *ngIf="profileMessage">{{ profileMessage }}</p>
         </form>
       </div>
+    </div>
 
-      <div class="glass-card account-card" style="margin-top: 2rem;" *ngIf="settingsSection === 'billing'">
+    <div *ngIf="activeSection === 'billing'">
+      <div class="dashboard-header">
+        <div>
+          <h2 class="hero-title dashboard-title">Plan & <span class="gradient-text">Billing</span></h2>
+          <p class="dashboard-subtitle">Manage upgrades, subscriptions, and payment details from a section dedicated to billing.</p>
+        </div>
+      </div>
+
+      <div class="glass-card account-card">
         <h3>Billing & Plan</h3>
         <div class="plan-status">
           <p>Current Plan: <span class="badge" [class.badge-pro]="profile.plan === 'PRO'" [class.badge-business]="profile.plan === 'BUSINESS'">{{ profile.plan }}</span></p>
@@ -176,8 +185,17 @@
           </button>
         </div>
       </div>
+    </div>
 
-      <div class="glass-card account-card" style="margin-top: 2rem;" *ngIf="settingsSection === 'integrations'">
+    <div *ngIf="activeSection === 'integrations'">
+      <div class="dashboard-header">
+        <div>
+          <h2 class="hero-title dashboard-title">Your <span class="gradient-text">Integrations</span></h2>
+          <p class="dashboard-subtitle">Connect Fupiz to the rest of your stack through outbound webhook events.</p>
+        </div>
+      </div>
+
+      <div class="glass-card account-card">
         <h3>Webhooks</h3>
         <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Register outbound HTTP callbacks for link lifecycle events.</p>
 
@@ -240,7 +258,6 @@
         </ng-template>
       </div>
     </div>
-
   </main>
 </div>
 
