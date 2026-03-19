@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { LandingComponent } from './landing.component';
+import { LinksService } from '../../services/links.service';
 
 describe('LandingComponent', () => {
   let component: LandingComponent;
@@ -8,7 +10,18 @@ describe('LandingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LandingComponent]
+      imports: [LandingComponent],
+      providers: [
+        provideRouter([]),
+        {
+          provide: LinksService,
+          useValue: {
+            createAnonymous: () => ({
+              subscribe: () => undefined,
+            }),
+          },
+        },
+      ],
     })
     .compileComponents();
 

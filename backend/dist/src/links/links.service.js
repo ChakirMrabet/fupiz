@@ -26,6 +26,12 @@ let LinksService = class LinksService {
     generateShortCode() {
         return (0, crypto_1.randomBytes)(4).toString('hex');
     }
+    getNormalizedOriginalUrl(value) {
+        if (typeof value !== 'string' || !value.trim()) {
+            throw new common_1.BadRequestException('Original URL is required');
+        }
+        return value.trim();
+    }
     parseMaxClicks(value) {
         if (value === undefined)
             return undefined;
@@ -46,6 +52,21 @@ let LinksService = class LinksService {
     }
     hasLandingPage(link) {
         return Boolean(link.landingTitle || link.landingDescription || link.landingButtonLabel);
+    }
+    async createAnonymous(data) {
+        const hasAdvancedOptions = Boolean(data.customCode || data.password || data.expiresAt || data.singleUse) ||
+            data.maxClicks !== undefined ||
+            Boolean(data.landingTitle || data.landingDescription || data.landingButtonLabel);
+        if (hasAdvancedOptions) {
+            throw new common_1.BadRequestException('Anonymous link creation only supports a destination URL');
+        }
+        return this.prisma.link.create({
+            data: {
+                originalUrl: this.getNormalizedOriginalUrl(data.originalUrl),
+                shortCode: this.generateShortCode(),
+                userId: null,
+            },
+        });
     }
     async create(userId, data) {
         const user = await this.prisma.user.findUnique({
@@ -87,7 +108,7 @@ let LinksService = class LinksService {
         let shortCode = data.customCode || this.generateShortCode();
         const link = await this.prisma.link.create({
             data: {
-                originalUrl: data.originalUrl,
+                originalUrl: this.getNormalizedOriginalUrl(data.originalUrl),
                 shortCode,
                 password: data.password || null,
                 expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
@@ -153,6 +174,12 @@ let LinksService = class LinksService {
     async findByShortCode(shortCode) {
         return this.prisma.link.findUnique({
             where: { shortCode },
+        });
+    }
+    async deactivate(id) {
+        return this.prisma.link.update({
+            where: { id },
+            data: { isActive: false },
         });
     }
     async update(id, userId, data) {
@@ -285,12 +312,14 @@ let LinksService = class LinksService {
             }
             return updatedLink;
         });
-        void this.webhooksService.dispatchEvent(updatedLink.userId, 'link.clicked', {
-            linkId: updatedLink.id,
-            shortCode: updatedLink.shortCode,
-            originalUrl: updatedLink.originalUrl,
-            clicks: updatedLink.clicks,
-        });
+        if (updatedLink.userId) {
+            void this.webhooksService.dispatchEvent(updatedLink.userId, 'link.clicked', {
+                linkId: updatedLink.id,
+                shortCode: updatedLink.shortCode,
+                originalUrl: updatedLink.originalUrl,
+                clicks: updatedLink.clicks,
+            });
+        }
         return updatedLink;
     }
     async getAnalytics(id, userId) {

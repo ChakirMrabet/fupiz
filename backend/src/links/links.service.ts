@@ -25,6 +25,14 @@ export class LinksService {
     return randomBytes(4).toString('hex');
   }
 
+  private getNormalizedOriginalUrl(value: unknown): string {
+    if (typeof value !== 'string' || !value.trim()) {
+      throw new BadRequestException('Original URL is required');
+    }
+
+    return value.trim();
+  }
+
   private parseMaxClicks(value: unknown): number | null | undefined {
     if (value === undefined) return undefined;
     if (value === null || value === '') return null;
@@ -52,6 +60,27 @@ export class LinksService {
     landingButtonLabel: string | null;
   }) {
     return Boolean(link.landingTitle || link.landingDescription || link.landingButtonLabel);
+  }
+
+  async createAnonymous(data: any): Promise<Link> {
+    const hasAdvancedOptions =
+      Boolean(data.customCode || data.password || data.expiresAt || data.singleUse) ||
+      data.maxClicks !== undefined ||
+      Boolean(data.landingTitle || data.landingDescription || data.landingButtonLabel);
+
+    if (hasAdvancedOptions) {
+      throw new BadRequestException(
+        'Anonymous link creation only supports a destination URL',
+      );
+    }
+
+    return this.prisma.link.create({
+      data: {
+        originalUrl: this.getNormalizedOriginalUrl(data.originalUrl),
+        shortCode: this.generateShortCode(),
+        userId: null,
+      },
+    });
   }
 
   async create(userId: number, data: any): Promise<Link> {
@@ -107,7 +136,7 @@ export class LinksService {
     let shortCode = data.customCode || this.generateShortCode();
     const link = await this.prisma.link.create({
       data: {
-        originalUrl: data.originalUrl,
+        originalUrl: this.getNormalizedOriginalUrl(data.originalUrl),
         shortCode,
         password: data.password || null,
         expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
@@ -185,6 +214,13 @@ export class LinksService {
   async findByShortCode(shortCode: string): Promise<Link | null> {
     return this.prisma.link.findUnique({
       where: { shortCode },
+    });
+  }
+
+  async deactivate(id: number): Promise<Link> {
+    return this.prisma.link.update({
+      where: { id },
+      data: { isActive: false },
     });
   }
 
@@ -350,12 +386,14 @@ export class LinksService {
       return updatedLink;
     });
 
-    void this.webhooksService.dispatchEvent(updatedLink.userId, 'link.clicked', {
-      linkId: updatedLink.id,
-      shortCode: updatedLink.shortCode,
-      originalUrl: updatedLink.originalUrl,
-      clicks: updatedLink.clicks,
-    });
+    if (updatedLink.userId) {
+      void this.webhooksService.dispatchEvent(updatedLink.userId, 'link.clicked', {
+        linkId: updatedLink.id,
+        shortCode: updatedLink.shortCode,
+        originalUrl: updatedLink.originalUrl,
+        clicks: updatedLink.clicks,
+      });
+    }
 
     return updatedLink;
   }

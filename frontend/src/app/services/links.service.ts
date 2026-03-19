@@ -8,7 +8,8 @@ import { AuthService } from './auth.service';
 export class LinksService {
   private http = inject(HttpClient);
   private auth = inject(AuthService);
-  private apiUrl = 'http://localhost:3000/api/links';
+  private backendUrl = 'http://localhost:3000';
+  private apiUrl = `${this.backendUrl}/api/links`;
 
   private get headers() {
     return new HttpHeaders().set('Authorization', `Bearer ${this.auth.token}`);
@@ -16,6 +17,14 @@ export class LinksService {
 
   create(linkData: any) {
     return this.http.post(this.apiUrl, linkData, { headers: this.headers });
+  }
+
+  createAnonymous(linkData: { originalUrl: string }) {
+    return this.http.post<{
+      shortCode: string;
+      shortUrl: string;
+      originalUrl: string;
+    }>(`${this.backendUrl}/api/public/links`, linkData);
   }
 
   bulkCreate(entries: any[]) {
@@ -39,23 +48,23 @@ export class LinksService {
   }
 
   getWebhooks() {
-    return this.http.get<any[]>('http://localhost:3000/api/webhooks', { headers: this.headers });
+    return this.http.get<any[]>(`${this.backendUrl}/api/webhooks`, { headers: this.headers });
   }
 
   createWebhook(data: any) {
-    return this.http.post<any>('http://localhost:3000/api/webhooks', data, { headers: this.headers });
+    return this.http.post<any>(`${this.backendUrl}/api/webhooks`, data, { headers: this.headers });
   }
 
   updateWebhook(id: number, data: any) {
-    return this.http.patch<any>(`http://localhost:3000/api/webhooks/${id}`, data, { headers: this.headers });
+    return this.http.patch<any>(`${this.backendUrl}/api/webhooks/${id}`, data, { headers: this.headers });
   }
 
   deleteWebhook(id: number) {
-    return this.http.delete(`http://localhost:3000/api/webhooks/${id}`, { headers: this.headers });
+    return this.http.delete(`${this.backendUrl}/api/webhooks/${id}`, { headers: this.headers });
   }
 
   verifyPassword(shortCode: string, password: string) {
-    return this.http.post<{url: string}>(`http://localhost:3000/s/${shortCode}/verify-password`, { password });
+    return this.http.post<{url: string}>(`${this.backendUrl}/s/${shortCode}/verify-password`, { password });
   }
 
   getLandingPage(shortCode: string) {
@@ -66,12 +75,12 @@ export class LinksService {
       landingButtonLabel: string;
       requiresPassword: boolean;
       hasLandingPage: boolean;
-    }>(`http://localhost:3000/api/public/links/${shortCode}/landing`);
+    }>(`${this.backendUrl}/api/public/links/${shortCode}/landing`);
   }
 
   continueFromLanding(shortCode: string) {
     return this.http.post<{url?: string; requiresPassword?: boolean}>(
-      `http://localhost:3000/api/public/links/${shortCode}/visit`,
+      `${this.backendUrl}/api/public/links/${shortCode}/visit`,
       {},
     );
   }

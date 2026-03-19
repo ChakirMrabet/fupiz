@@ -15,8 +15,32 @@
     them, set expirations, and track your success.</p>
 
   <div class="quick-shorten glass-card">
-    <input type="url" class="input-field" placeholder="Paste your long URL here..." [(ngModel)]="urlToShorten">
-    <button class="btn-primary" (click)="onShorten()">Shorten Now</button>
+    <div class="quick-shorten-form">
+      <input
+        type="url"
+        class="input-field"
+        placeholder="Paste your long URL here..."
+        [(ngModel)]="urlToShorten"
+        [disabled]="isCreating"
+      >
+      <button class="btn-primary" (click)="onShorten()" [disabled]="isCreating || !urlToShorten.trim()">
+        {{ isCreating ? 'Shortening...' : 'Shorten Now' }}
+      </button>
+    </div>
+    <p class="quick-shorten-note">Create a basic short link instantly. No account required.</p>
+    <p class="quick-shorten-error" *ngIf="createError">{{ createError }}</p>
+    <div class="anonymous-result" *ngIf="createdLink">
+      <p class="result-label">Your short link is ready</p>
+      <div class="result-row">
+        <a [href]="createdLink.shortUrl" target="_blank" rel="noopener noreferrer">{{ createdLink.shortUrl }}</a>
+        <button class="btn-secondary" (click)="copyShortUrl()">{{ copied ? 'Copied' : 'Copy' }}</button>
+      </div>
+      <p class="result-note">
+        Want passwords, expiration rules, analytics, landing pages, and saved link history?
+        <a routerLink="/login">Log in</a> or
+        <a routerLink="/register">create an account</a>.
+      </p>
+    </div>
   </div>
 </main>
 

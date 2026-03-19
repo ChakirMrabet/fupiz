@@ -20,6 +20,14 @@ let AppController = class AppController {
     constructor(linksService) {
         this.linksService = linksService;
     }
+    async createAnonymousLink(body, req) {
+        const link = await this.linksService.createAnonymous(body);
+        return {
+            shortCode: link.shortCode,
+            shortUrl: `${req.protocol}://${req.get('host')}/s/${link.shortCode}`,
+            originalUrl: link.originalUrl,
+        };
+    }
     async redirect(shortCode, res, req) {
         if (shortCode === 'api' || shortCode === 'favicon.ico') {
             return res.status(404).send('Not Found');
@@ -32,7 +40,7 @@ let AppController = class AppController {
             throw new common_1.NotFoundException('Link has expired.');
         }
         if (this.linksService.hasReachedClickLimit(link)) {
-            await this.linksService.update(link.id, link.userId, { isActive: false });
+            await this.linksService.deactivate(link.id);
             throw new common_1.NotFoundException('Link has expired.');
         }
         if (this.linksService.hasLandingPage(link)) {
@@ -55,7 +63,7 @@ let AppController = class AppController {
         if (link.expiresAt && link.expiresAt < new Date())
             throw new common_1.NotFoundException('Link has expired.');
         if (this.linksService.hasReachedClickLimit(link)) {
-            await this.linksService.update(link.id, link.userId, { isActive: false });
+            await this.linksService.deactivate(link.id);
             throw new common_1.NotFoundException('Link has expired.');
         }
         if (link.password !== body.password)
@@ -76,7 +84,7 @@ let AppController = class AppController {
             throw new common_1.NotFoundException('Link has expired.');
         }
         if (this.linksService.hasReachedClickLimit(link)) {
-            await this.linksService.update(link.id, link.userId, { isActive: false });
+            await this.linksService.deactivate(link.id);
             throw new common_1.NotFoundException('Link has expired.');
         }
         return {
@@ -97,7 +105,7 @@ let AppController = class AppController {
             throw new common_1.NotFoundException('Link has expired.');
         }
         if (this.linksService.hasReachedClickLimit(link)) {
-            await this.linksService.update(link.id, link.userId, { isActive: false });
+            await this.linksService.deactivate(link.id);
             throw new common_1.NotFoundException('Link has expired.');
         }
         if (link.password) {
@@ -112,6 +120,14 @@ let AppController = class AppController {
     }
 };
 exports.AppController = AppController;
+__decorate([
+    (0, common_1.Post)('public/links'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "createAnonymousLink", null);
 __decorate([
     (0, common_1.Get)('s/:shortCode'),
     __param(0, (0, common_1.Param)('shortCode')),

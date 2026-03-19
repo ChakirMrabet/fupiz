@@ -43,14 +43,68 @@
 
 .quick-shorten {
   display: flex;
+  flex-direction: column;
   gap: 1rem;
   padding: 1.5rem;
   width: 100%;
   max-width: 600px;
 }
 
+.quick-shorten-form {
+  display: flex;
+  gap: 1rem;
+}
+
 .quick-shorten .input-field {
   flex: 1;
+}
+
+.quick-shorten-note,
+.quick-shorten-error,
+.result-label,
+.result-note {
+  margin: 0;
+}
+
+.quick-shorten-note,
+.result-note {
+  color: var(--text-secondary);
+}
+
+.quick-shorten-error {
+  color: #dc2626;
+}
+
+.anonymous-result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  text-align: left;
+}
+
+.result-label {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.result-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.result-row a {
+  flex: 1;
+  min-width: 0;
+  color: var(--accent-primary);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.result-note a {
+  color: var(--accent-primary);
 }
 
 /* Sponsors Carousel */
@@ -255,6 +309,12 @@
 
   .quick-shorten {
     flex-direction: column;
+  }
+
+  .quick-shorten-form,
+  .result-row {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .dashboard-features-grid {

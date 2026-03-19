@@ -8,7 +8,7 @@ export declare class LinksController {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        userId: number;
+        userId: number | null;
         originalUrl: string;
         shortCode: string;
         expiresAt: Date | null;
@@ -31,7 +31,7 @@ export declare class LinksController {
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                userId: number;
+                userId: number | null;
                 originalUrl: string;
                 shortCode: string;
                 expiresAt: Date | null;
@@ -56,7 +56,7 @@ export declare class LinksController {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        userId: number;
+        userId: number | null;
         originalUrl: string;
         shortCode: string;
         expiresAt: Date | null;
@@ -73,7 +73,7 @@ export declare class LinksController {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        userId: number;
+        userId: number | null;
         originalUrl: string;
         shortCode: string;
         expiresAt: Date | null;
@@ -90,7 +90,7 @@ export declare class LinksController {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        userId: number;
+        userId: number | null;
         originalUrl: string;
         shortCode: string;
         expiresAt: Date | null;

@@ -6,6 +6,17 @@ import type { Response, Request } from 'express';
 export class AppController {
   constructor(private readonly linksService: LinksService) {}
 
+  @Post('public/links')
+  async createAnonymousLink(@Body() body: any, @Req() req: Request) {
+    const link = await this.linksService.createAnonymous(body);
+
+    return {
+      shortCode: link.shortCode,
+      shortUrl: `${req.protocol}://${req.get('host')}/s/${link.shortCode}`,
+      originalUrl: link.originalUrl,
+    };
+  }
+
   @Get('s/:shortCode')
   async redirect(@Param('shortCode') shortCode: string, @Res() res: Response, @Req() req: Request) {
     if (shortCode === 'api' || shortCode === 'favicon.ico') {
@@ -23,7 +34,7 @@ export class AppController {
     }
 
     if (this.linksService.hasReachedClickLimit(link)) {
-      await this.linksService.update(link.id, link.userId, { isActive: false });
+      await this.linksService.deactivate(link.id);
       throw new NotFoundException('Link has expired.');
     }
 
@@ -50,7 +61,7 @@ export class AppController {
     if (!link || !link.isActive) throw new NotFoundException('Link not found');
     if (link.expiresAt && link.expiresAt < new Date()) throw new NotFoundException('Link has expired.');
     if (this.linksService.hasReachedClickLimit(link)) {
-      await this.linksService.update(link.id, link.userId, { isActive: false });
+      await this.linksService.deactivate(link.id);
       throw new NotFoundException('Link has expired.');
     }
     if (link.password !== body.password) throw new UnauthorizedException('Incorrect password');
@@ -76,7 +87,7 @@ export class AppController {
     }
 
     if (this.linksService.hasReachedClickLimit(link)) {
-      await this.linksService.update(link.id, link.userId, { isActive: false });
+      await this.linksService.deactivate(link.id);
       throw new NotFoundException('Link has expired.');
     }
 
@@ -102,7 +113,7 @@ export class AppController {
     }
 
     if (this.linksService.hasReachedClickLimit(link)) {
-      await this.linksService.update(link.id, link.userId, { isActive: false });
+      await this.linksService.deactivate(link.id);
       throw new NotFoundException('Link has expired.');
     }
 

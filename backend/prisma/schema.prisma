@@ -35,8 +35,8 @@ model Link {
   landingButtonLabel String?
   isActive           Boolean     @default(true)
   clicks             Int         @default(0)
-  userId             Int
-  user               User        @relation(fields: [userId], references: [id])
+  userId             Int?
+  user               User?       @relation(fields: [userId], references: [id])
   clickEvents        LinkClick[]
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt

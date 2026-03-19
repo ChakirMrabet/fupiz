@@ -141,3 +141,19 @@ Expand the existing link CRUD flow with higher-value management features that ma
 - Added a links toolbar with a local search box in the main workspace.
 - Implemented client-side filtering across short code, destination URL, and landing content.
 - Implemented client-side pagination for the link list to keep the workspace usable as the list grows.
+- Started implementation of anonymous basic link creation from the public landing page.
+- Scope for this slice:
+  - allow non-authenticated visitors to create a plain short link
+  - keep anonymous creation intentionally narrow:
+    - destination URL only
+    - generated short code only
+    - no advanced options
+    - no dashboard ownership
+  - show the created link directly on the landing page
+  - keep signup and login as an upsell after value is delivered
+- Implemented a public `POST /api/public/links` endpoint for anonymous link creation.
+- Updated the `Link` model so anonymous links can exist without a user owner.
+- Added a dedicated backend deactivation helper so public redirect flows can safely expire anonymous links.
+- Prevented anonymous creation from accepting advanced options such as custom codes, passwords, click limits, or landing-page content.
+- Updated the landing page to create an anonymous link in place instead of redirecting to registration.
+- Added a result state on the landing page with the generated short URL, a copy action, and a follow-up prompt to log in or register for advanced features.

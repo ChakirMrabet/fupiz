@@ -3,6 +3,11 @@ import type { Response, Request } from 'express';
 export declare class AppController {
     private readonly linksService;
     constructor(linksService: LinksService);
+    createAnonymousLink(body: any, req: Request): Promise<{
+        shortCode: string;
+        shortUrl: string;
+        originalUrl: string;
+    }>;
     redirect(shortCode: string, res: Response, req: Request): Promise<void | Response<any, Record<string, any>>>;
     verifyPassword(shortCode: string, body: any, req: Request): Promise<{
         url: string;

@@ -6,6 +6,7 @@ export declare class LinksService {
     private webhooksService;
     constructor(prisma: PrismaService, webhooksService: WebhooksService);
     generateShortCode(): string;
+    private getNormalizedOriginalUrl;
     private parseMaxClicks;
     getEffectiveMaxClicks(link: {
         maxClicks: number | null;
@@ -21,6 +22,7 @@ export declare class LinksService {
         landingDescription: string | null;
         landingButtonLabel: string | null;
     }): boolean;
+    createAnonymous(data: any): Promise<Link>;
     create(userId: number, data: any): Promise<Link>;
     bulkCreate(userId: number, entries: any[]): Promise<{
         createdCount: number;
@@ -34,7 +36,7 @@ export declare class LinksService {
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                userId: number;
+                userId: number | null;
                 originalUrl: string;
                 shortCode: string;
                 expiresAt: Date | null;
@@ -55,6 +57,7 @@ export declare class LinksService {
     }>;
     findAll(userId: number): Promise<Link[]>;
     findByShortCode(shortCode: string): Promise<Link | null>;
+    deactivate(id: number): Promise<Link>;
     update(id: number, userId: number, data: any): Promise<Link>;
     remove(id: number, userId: number): Promise<Link>;
     recordClick(linkId: number, metadata: {
@@ -67,7 +70,7 @@ export declare class LinksService {
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        userId: number;
+        userId: number | null;
         originalUrl: string;
         shortCode: string;
         expiresAt: Date | null;
