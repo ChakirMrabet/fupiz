@@ -8,6 +8,7 @@ export declare class UsersController {
         stripeCustomerId: string | null;
         stripeSubscriptionId: string | null;
         name: string | null;
+        role: string;
         plan: string;
         stripePriceId: string | null;
         stripeSubscriptionStatus: string | null;
@@ -24,6 +25,7 @@ export declare class UsersController {
         stripeCustomerId: string | null;
         stripeSubscriptionId: string | null;
         name: string | null;
+        role: string;
         plan: string;
         stripePriceId: string | null;
         stripeSubscriptionStatus: string | null;

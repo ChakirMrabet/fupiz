@@ -57,7 +57,7 @@ export class DashboardComponent implements OnInit {
   };
   isSavingLinkEdit = false;
 
-  profile = { name: '', email: '', plan: 'FREE' };
+  profile = { name: '', email: '', plan: 'FREE', role: 'USER' };
   passwordUpdate = { newPassword: '' };
   isUpdatingProfile = false;
   profileMessage = '';
@@ -88,7 +88,12 @@ export class DashboardComponent implements OnInit {
   loadProfile() {
     this.authService.getProfile().subscribe({
       next: (data) => {
-        this.profile = { name: data.name || '', email: data.email, plan: data.plan || 'FREE' };
+        this.profile = {
+          name: data.name || '',
+          email: data.email,
+          plan: data.plan || 'FREE',
+          role: data.role || 'USER',
+        };
         if (this.canUseWebhooks()) {
           this.loadWebhooks();
         } else {

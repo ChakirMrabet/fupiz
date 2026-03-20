@@ -19,6 +19,7 @@ const mail_module_1 = require("./mail/mail.module");
 const webhooks_module_1 = require("./webhooks/webhooks.module");
 const schedule_1 = require("@nestjs/schedule");
 const billing_module_1 = require("./billing/billing.module");
+const admin_module_1 = require("./admin/admin.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -32,6 +33,7 @@ exports.AppModule = AppModule = __decorate([
             links_module_1.LinksModule,
             plans_module_1.PlansModule,
             billing_module_1.BillingModule,
+            admin_module_1.AdminModule,
             mail_module_1.MailModule,
             webhooks_module_1.WebhooksModule,
         ],

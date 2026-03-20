@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { MailService } from '../mail/mail.service';
+import { getEffectiveRole } from './admin-emails.util';
 
 @Injectable()
 export class AuthService {
@@ -29,13 +30,14 @@ export class AuthService {
       }
 
       const { password, activationToken, activationTokenExpiresAt, ...result } = user;
+      (result as any).role = getEffectiveRole(user);
       return result;
     }
     return null;
   }
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, sub: user.id, role: user.role || 'USER' };
     return {
       access_token: this.jwtService.sign(payload),
     };

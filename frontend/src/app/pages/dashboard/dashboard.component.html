@@ -1,6 +1,7 @@
 <nav class="navbar container">
   <div class="logo gradient-text" routerLink="/">Fuipiz</div>
   <div class="nav-links">
+    <a class="btn-secondary" *ngIf="profile.role === 'ADMIN'" routerLink="/admin/users">Admin</a>
     <button class="btn-primary header-cta" *ngIf="activeSection === 'links'" (click)="openCreateModal()">New Link</button>
     <button class="btn-secondary" *ngIf="activeSection === 'links' && canUseBulkCreation()" (click)="openBulkModal()">Bulk Create</button>
     <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">

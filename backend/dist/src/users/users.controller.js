@@ -50,6 +50,7 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("./users.service");
 const passport_1 = require("@nestjs/passport");
 const bcrypt = __importStar(require("bcrypt"));
+const admin_emails_util_1 = require("../auth/admin-emails.util");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
@@ -61,6 +62,7 @@ let UsersController = class UsersController {
             throw new common_1.BadRequestException('User not found');
         }
         const { password, activationToken, activationTokenExpiresAt, ...result } = user;
+        result.role = (0, admin_emails_util_1.getEffectiveRole)(user);
         return result;
     }
     async updateProfile(req, body) {
@@ -76,6 +78,7 @@ let UsersController = class UsersController {
         }
         const user = await this.usersService.update(req.user.userId, updateData);
         const { password, activationToken, activationTokenExpiresAt, ...result } = user;
+        result.role = (0, admin_emails_util_1.getEffectiveRole)(user);
         return result;
     }
 };

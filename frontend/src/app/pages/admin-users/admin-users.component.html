@@ -1,0 +1,70 @@
+<nav class="navbar container">
+  <div class="logo gradient-text" routerLink="/">Fuipiz Admin</div>
+  <div class="nav-links">
+    <a class="btn-secondary" routerLink="/dashboard">User App</a>
+    <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
+      {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
+    </button>
+    <button class="btn-secondary" (click)="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="container admin-shell">
+  <aside class="admin-sidebar glass-card">
+    <h3>Admin</h3>
+    <a class="admin-nav-item active" routerLink="/admin/users">Users</a>
+  </aside>
+
+  <main class="admin-content">
+    <div class="admin-header">
+      <div>
+        <h1 class="hero-title admin-title">Admin <span class="gradient-text">Users</span></h1>
+        <p class="admin-subtitle">Search subscribers, inspect their profile and billing state, and drill into their links.</p>
+      </div>
+    </div>
+
+    <div class="glass-card admin-search-card">
+      <div class="admin-search-row">
+        <input
+          type="text"
+          class="input-field"
+          [(ngModel)]="search"
+          name="adminUserSearch"
+          placeholder="Search by email or name"
+        >
+        <button class="btn-primary" (click)="loadUsers()" [disabled]="isLoading">
+          {{ isLoading ? 'Loading...' : 'Search' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="admin-list">
+      <div class="glass-card admin-user-card" *ngFor="let user of users">
+        <div class="admin-user-topline">
+          <div>
+            <h3>{{ user.name || 'Unnamed user' }}</h3>
+            <p class="muted-text">{{ user.email }}</p>
+          </div>
+          <div class="admin-badges">
+            <span class="badge">{{ user.role }}</span>
+            <span class="badge" [class.badge-pro]="user.plan === 'PRO'" [class.badge-business]="user.plan === 'BUSINESS'">{{ user.plan }}</span>
+            <span class="badge status-badge" [class.active]="user.isActive" [class.inactive]="!user.isActive">
+              {{ user.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+        </div>
+        <div class="admin-user-meta">
+          <p>Links: {{ user._count.links }}</p>
+          <p>Subscription: {{ user.stripeSubscriptionStatus || 'none' }}</p>
+          <p>Joined: {{ user.createdAt | date:'mediumDate' }}</p>
+        </div>
+        <div class="admin-actions">
+          <a class="btn-primary" [routerLink]="['/admin/users', user.id]">Open User</a>
+        </div>
+      </div>
+      <div class="glass-card empty-state" *ngIf="users.length === 0 && !isLoading">
+        <p>No users found.</p>
+      </div>
+    </div>
+  </main>
+</div>

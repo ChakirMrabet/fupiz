@@ -1,0 +1,66 @@
+.admin-detail-shell {
+  padding-bottom: 3rem;
+}
+
+.admin-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.muted-text,
+.admin-metadata {
+  color: var(--text-secondary);
+}
+
+.admin-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 1.5rem;
+}
+
+.admin-panel {
+  padding: 1.25rem;
+}
+
+.admin-form,
+.admin-links-list,
+.admin-link-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-metadata {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-link-item {
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.admin-link-topline,
+.admin-link-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .admin-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

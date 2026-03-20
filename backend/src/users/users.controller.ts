@@ -2,6 +2,7 @@ import { Controller, Get, Patch, Body, UseGuards, Request, BadRequestException }
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 import * as bcrypt from 'bcrypt';
+import { getEffectiveRole } from '../auth/admin-emails.util';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('users')
@@ -15,6 +16,7 @@ export class UsersController {
       throw new BadRequestException('User not found');
     }
     const { password, activationToken, activationTokenExpiresAt, ...result } = user;
+    (result as any).role = getEffectiveRole(user);
     return result; // Includes 'plan' implicitly
   }
 
@@ -33,6 +35,7 @@ export class UsersController {
     
     const user = await this.usersService.update(req.user.userId, updateData);
     const { password, activationToken, activationTokenExpiresAt, ...result } = user;
+    (result as any).role = getEffectiveRole(user);
     return result;
   }
 }

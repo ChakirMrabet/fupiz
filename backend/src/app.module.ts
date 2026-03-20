@@ -10,6 +10,7 @@ import { MailModule } from './mail/mail.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BillingModule } from './billing/billing.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { BillingModule } from './billing/billing.module';
     LinksModule,
     PlansModule,
     BillingModule,
+    AdminModule,
     MailModule,
     WebhooksModule,
   ],

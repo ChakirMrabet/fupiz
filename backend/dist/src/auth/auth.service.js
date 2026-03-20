@@ -49,6 +49,7 @@ const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
 const crypto_1 = require("crypto");
 const mail_service_1 = require("../mail/mail.service");
+const admin_emails_util_1 = require("./admin-emails.util");
 let AuthService = class AuthService {
     usersService;
     jwtService;
@@ -66,12 +67,13 @@ let AuthService = class AuthService {
                 throw new common_1.UnauthorizedException('Account not activated. Check your email.');
             }
             const { password, activationToken, activationTokenExpiresAt, ...result } = user;
+            result.role = (0, admin_emails_util_1.getEffectiveRole)(user);
             return result;
         }
         return null;
     }
     async login(user) {
-        const payload = { email: user.email, sub: user.id };
+        const payload = { email: user.email, sub: user.id, role: user.role || 'USER' };
         return {
             access_token: this.jwtService.sign(payload),
         };

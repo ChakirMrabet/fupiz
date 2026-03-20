@@ -1,0 +1,97 @@
+<nav class="navbar container">
+  <div class="logo gradient-text" routerLink="/">Fuipiz Admin</div>
+  <div class="nav-links">
+    <a class="btn-secondary" routerLink="/admin/users">All Users</a>
+    <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
+      {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
+    </button>
+    <button class="btn-secondary" (click)="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="container admin-detail-shell" *ngIf="user">
+  <div class="admin-detail-header">
+    <div>
+      <h1 class="hero-title admin-title">{{ user.name || 'Unnamed user' }} <span class="gradient-text">Admin View</span></h1>
+      <p class="muted-text">{{ user.email }}</p>
+    </div>
+    <a class="btn-secondary" routerLink="/admin/users">Back to Users</a>
+  </div>
+
+  <div class="admin-detail-grid">
+    <section class="glass-card admin-panel">
+      <h3>Profile & Subscription</h3>
+      <form class="admin-form" (ngSubmit)="saveUser()">
+        <div class="form-group">
+          <label>Name</label>
+          <input class="input-field" [(ngModel)]="userForm.name" name="name">
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select class="input-field" [(ngModel)]="userForm.role" name="role">
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Plan</label>
+          <select class="input-field" [(ngModel)]="userForm.plan" name="plan">
+            <option value="FREE">FREE</option>
+            <option value="PRO">PRO</option>
+            <option value="BUSINESS">BUSINESS</option>
+          </select>
+        </div>
+        <label class="toggle-field">
+          <input type="checkbox" [(ngModel)]="userForm.isActive" name="isActive">
+          <span>Account active</span>
+        </label>
+        <div class="admin-metadata">
+          <p>Stripe status: {{ user.stripeSubscriptionStatus || 'none' }}</p>
+          <p>Period end: {{ user.stripeCurrentPeriodEnd ? (user.stripeCurrentPeriodEnd | date:'medium') : 'n/a' }}</p>
+          <p>Cancel at period end: {{ user.cancelAtPeriodEnd ? 'Yes' : 'No' }}</p>
+          <p>Links: {{ user._count.links }}</p>
+        </div>
+        <button class="btn-primary" type="submit" [disabled]="isSavingUser">
+          {{ isSavingUser ? 'Saving...' : 'Save User' }}
+        </button>
+      </form>
+    </section>
+
+    <section class="glass-card admin-panel">
+      <h3>User Links</h3>
+      <div class="admin-links-list">
+        <div class="admin-link-item" *ngFor="let link of links">
+          <div *ngIf="editingLinkId !== link.id">
+            <div class="admin-link-topline">
+              <strong>{{ link.shortCode }}</strong>
+              <span class="badge status-badge" [class.active]="link.isActive" [class.inactive]="!link.isActive">{{ link.isActive ? 'Active' : 'Disabled' }}</span>
+            </div>
+            <p class="muted-text">{{ link.originalUrl }}</p>
+            <p class="muted-text">Clicks: {{ link.clicks }} | Expires: {{ link.expiresAt ? (link.expiresAt | date:'short') : 'Never' }}</p>
+            <button class="btn-secondary" (click)="editLink(link)">Edit Link</button>
+          </div>
+
+          <form *ngIf="editingLinkId === link.id" class="admin-form admin-link-form" (ngSubmit)="saveLink(link.id)">
+            <input class="input-field" [(ngModel)]="linkForm.originalUrl" name="originalUrl" placeholder="Destination URL">
+            <input class="input-field" [(ngModel)]="linkForm.shortCode" name="shortCode" placeholder="Short code">
+            <input class="input-field" type="datetime-local" [(ngModel)]="linkForm.expiresAt" name="expiresAt">
+            <input class="input-field" type="number" min="1" [(ngModel)]="linkForm.maxClicks" name="maxClicks" placeholder="Max clicks">
+            <label class="toggle-field">
+              <input type="checkbox" [(ngModel)]="linkForm.singleUse" name="singleUse">
+              <span>One-time link</span>
+            </label>
+            <label class="toggle-field">
+              <input type="checkbox" [(ngModel)]="linkForm.isActive" name="isActive">
+              <span>Link active</span>
+            </label>
+            <div class="admin-link-actions">
+              <button class="btn-primary" type="submit">Save Link</button>
+              <button class="btn-secondary" type="button" (click)="cancelLinkEdit()">Cancel</button>
+            </div>
+          </form>
+        </div>
+        <p class="muted-text" *ngIf="links.length === 0">This user has no saved links.</p>
+      </div>
+    </section>
+  </div>
+</div>
