@@ -25,6 +25,7 @@ model User {
   activatedAt              DateTime?
   links                    Link[]
   webhooks                 Webhook[]
+  adminAuditLogs           AdminAuditLog[] @relation("AdminActorAuditLogs")
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 }
@@ -79,4 +80,22 @@ model Webhook {
   updatedAt          DateTime @updatedAt
 
   @@index([userId])
+}
+
+model AdminAuditLog {
+  id           Int      @id @default(autoincrement())
+  actorUserId  Int
+  actorUser    User     @relation("AdminActorAuditLogs", fields: [actorUserId], references: [id], onDelete: Cascade)
+  action       String
+  targetType   String
+  targetId     Int
+  targetLabel  String?
+  changes      String?
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([actorUserId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
 }

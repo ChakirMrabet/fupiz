@@ -2,6 +2,12 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../prisma/prisma.service';
 import { PLAN_IDS, isPlanId } from '../plans/plans.config';
 
+type AdminAuditContext = {
+  actorUserId: number;
+  ipAddress?: string;
+  userAgent?: string;
+};
+
 @Injectable()
 export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
@@ -84,7 +90,7 @@ export class AdminService {
     return result;
   }
 
-  async updateUser(userId: number, data: any) {
+  async updateUser(userId: number, data: any, auditContext: AdminAuditContext) {
     const existingUser = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -120,6 +126,15 @@ export class AdminService {
     const user = await this.prisma.user.update({
       where: { id: userId },
       data: updateData,
+    });
+
+    await this.logAdminAudit({
+      ...auditContext,
+      action: 'user.updated',
+      targetType: 'user',
+      targetId: user.id,
+      targetLabel: user.email,
+      changes: this.buildUserAuditChanges(existingUser, user),
     });
 
     const { password, activationToken, activationTokenExpiresAt, ...result } = user;
@@ -215,7 +230,61 @@ export class AdminService {
     };
   }
 
-  async updateLink(linkId: number, data: any) {
+  async listAuditLogs(params: {
+    search?: string;
+    action?: string;
+    targetType?: string;
+    page?: string;
+    pageSize?: string;
+  }) {
+    const { search, action, targetType, page, pageSize } = params;
+    const normalizedSearch = search?.trim();
+    const currentPage = this.parsePositiveInt(page, 1);
+    const currentPageSize = this.parseBoundedPageSize(pageSize, 20);
+    const where: any = {
+      ...(normalizedSearch
+        ? {
+            OR: [
+              { targetLabel: { contains: normalizedSearch } },
+              { action: { contains: normalizedSearch } },
+              { actorUser: { email: { contains: normalizedSearch } } },
+              { actorUser: { name: { contains: normalizedSearch } } },
+            ],
+          }
+        : {}),
+      ...(action && action !== 'ALL' ? { action } : {}),
+      ...(targetType && targetType !== 'ALL' ? { targetType } : {}),
+    };
+
+    const [logs, totalItems] = await this.prisma.$transaction([
+      this.prisma.adminAuditLog.findMany({
+        where,
+        include: {
+          actorUser: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: (currentPage - 1) * currentPageSize,
+        take: currentPageSize,
+      }),
+      this.prisma.adminAuditLog.count({ where }),
+    ]);
+
+    return {
+      items: logs,
+      totalItems,
+      page: currentPage,
+      pageSize: currentPageSize,
+      totalPages: Math.max(1, Math.ceil(totalItems / currentPageSize)),
+    };
+  }
+
+  async updateLink(linkId: number, data: any, auditContext: AdminAuditContext) {
     const link = await this.prisma.link.findUnique({
       where: { id: linkId },
     });
@@ -259,7 +328,7 @@ export class AdminService {
       throw new BadRequestException('Max clicks must be a positive whole number');
     }
 
-    return this.prisma.link.update({
+    const updatedLink = await this.prisma.link.update({
       where: { id: linkId },
       data: {
         originalUrl:
@@ -282,21 +351,61 @@ export class AdminService {
         isActive: data.isActive !== undefined ? Boolean(data.isActive) : undefined,
       },
     });
+
+    await this.logAdminAudit({
+      ...auditContext,
+      action: 'link.updated',
+      targetType: 'link',
+      targetId: updatedLink.id,
+      targetLabel: updatedLink.shortCode,
+      changes: this.buildLinkAuditChanges(link, updatedLink),
+    });
+
+    return updatedLink;
   }
 
-  async removeLink(linkId: number) {
+  async removeLink(linkId: number, auditContext: AdminAuditContext) {
     const link = await this.prisma.link.findUnique({
       where: { id: linkId },
-      select: { id: true },
+      include: {
+        user: {
+          select: {
+            email: true,
+          },
+        },
+      },
     });
 
     if (!link) {
       throw new NotFoundException('Link not found');
     }
 
-    return this.prisma.link.delete({
+    const deletedLink = await this.prisma.link.delete({
       where: { id: linkId },
     });
+
+    await this.logAdminAudit({
+      ...auditContext,
+      action: 'link.deleted',
+      targetType: 'link',
+      targetId: link.id,
+      targetLabel: link.shortCode,
+      changes: JSON.stringify({
+        deleted: {
+          shortCode: link.shortCode,
+          originalUrl: link.originalUrl,
+          ownerEmail: link.user?.email ?? null,
+          isActive: link.isActive,
+          maxClicks: link.maxClicks,
+          singleUse: link.singleUse,
+          expiresAt: this.serializeValue(link.expiresAt),
+          passwordProtected: Boolean(link.password),
+          hasLandingPage: this.hasLandingPage(link),
+        },
+      }),
+    });
+
+    return deletedLink;
   }
 
   private async ensureUserExists(userId: number) {
@@ -318,5 +427,113 @@ export class AdminService {
   private parseBoundedPageSize(value: string | undefined, fallback: number) {
     const parsedValue = this.parsePositiveInt(value, fallback);
     return Math.min(parsedValue, 100);
+  }
+
+  private async logAdminAudit(entry: {
+    actorUserId: number;
+    action: string;
+    targetType: string;
+    targetId: number;
+    targetLabel?: string;
+    changes?: string | null;
+    ipAddress?: string;
+    userAgent?: string;
+  }) {
+    await this.prisma.adminAuditLog.create({
+      data: {
+        actorUserId: entry.actorUserId,
+        action: entry.action,
+        targetType: entry.targetType,
+        targetId: entry.targetId,
+        targetLabel: entry.targetLabel,
+        changes: entry.changes,
+        ipAddress: entry.ipAddress,
+        userAgent: entry.userAgent,
+      },
+    });
+  }
+
+  private buildUserAuditChanges(before: any, after: any) {
+    return this.stringifyChanges(
+      this.pickChangedFields(
+        {
+          name: before.name,
+          role: before.role,
+          plan: before.plan,
+          isActive: before.isActive,
+        },
+        {
+          name: after.name,
+          role: after.role,
+          plan: after.plan,
+          isActive: after.isActive,
+        },
+      ),
+    );
+  }
+
+  private buildLinkAuditChanges(before: any, after: any) {
+    return this.stringifyChanges(
+      this.pickChangedFields(
+        {
+          originalUrl: before.originalUrl,
+          shortCode: before.shortCode,
+          expiresAt: before.expiresAt,
+          maxClicks: before.maxClicks,
+          singleUse: before.singleUse,
+          landingTitle: before.landingTitle,
+          landingDescription: before.landingDescription,
+          landingButtonLabel: before.landingButtonLabel,
+          isActive: before.isActive,
+          passwordProtected: Boolean(before.password),
+        },
+        {
+          originalUrl: after.originalUrl,
+          shortCode: after.shortCode,
+          expiresAt: after.expiresAt,
+          maxClicks: after.maxClicks,
+          singleUse: after.singleUse,
+          landingTitle: after.landingTitle,
+          landingDescription: after.landingDescription,
+          landingButtonLabel: after.landingButtonLabel,
+          isActive: after.isActive,
+          passwordProtected: Boolean(after.password),
+        },
+      ),
+    );
+  }
+
+  private pickChangedFields(before: Record<string, unknown>, after: Record<string, unknown>) {
+    const changes: Record<string, { before: unknown; after: unknown }> = {};
+
+    for (const key of Object.keys(after)) {
+      const previousValue = this.serializeValue(before[key]);
+      const nextValue = this.serializeValue(after[key]);
+
+      if (JSON.stringify(previousValue) !== JSON.stringify(nextValue)) {
+        changes[key] = {
+          before: previousValue,
+          after: nextValue,
+        };
+      }
+    }
+
+    return changes;
+  }
+
+  private stringifyChanges(changes: Record<string, unknown>) {
+    return Object.keys(changes).length > 0 ? JSON.stringify(changes) : null;
+  }
+
+  private serializeValue(value: unknown) {
+    return value instanceof Date ? value.toISOString() : value;
+  }
+
+  private hasLandingPage(link: {
+    landingTitle?: string | null;
+    landingDescription?: string | null;
+    landingButtonLabel?: string | null;
+  }) {
+    return Boolean(link.landingTitle || link.landingDescription || link.landingButtonLabel);
   }
 }

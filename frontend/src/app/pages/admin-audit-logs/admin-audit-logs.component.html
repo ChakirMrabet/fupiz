@@ -1,0 +1,111 @@
+<nav class="navbar container">
+  <div class="logo gradient-text" routerLink="/">Fuipiz Admin</div>
+  <div class="nav-links">
+    <a class="btn-secondary" routerLink="/dashboard">User App</a>
+    <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
+      {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
+    </button>
+    <button class="btn-secondary" (click)="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="container admin-shell">
+  <aside class="admin-sidebar glass-card">
+    <h3>Admin</h3>
+    <a class="admin-nav-item" routerLink="/admin/users" routerLinkActive="active">Users</a>
+    <a class="admin-nav-item" routerLink="/admin/links" routerLinkActive="active">Links</a>
+    <a class="admin-nav-item" routerLink="/admin/audit-logs" routerLinkActive="active">Audit</a>
+  </aside>
+
+  <main class="admin-content">
+    <div class="admin-header">
+      <div>
+        <h1 class="hero-title admin-title">Admin <span class="gradient-text">Audit Log</span></h1>
+        <p class="admin-subtitle">Review admin-side changes to users and links, including who made them and what changed.</p>
+      </div>
+    </div>
+
+    <div class="glass-card admin-search-card">
+      <div class="admin-search-row">
+        <input
+          type="text"
+          class="input-field"
+          [(ngModel)]="search"
+          name="adminAuditSearch"
+          placeholder="Search by action, target, or admin email"
+        >
+        <select class="input-field admin-select" [(ngModel)]="action" name="adminAuditAction">
+          <option value="ALL">All actions</option>
+          <option value="user.updated">User updated</option>
+          <option value="link.updated">Link updated</option>
+          <option value="link.deleted">Link deleted</option>
+        </select>
+        <select class="input-field admin-select" [(ngModel)]="targetType" name="adminAuditTargetType">
+          <option value="ALL">All targets</option>
+          <option value="user">Users</option>
+          <option value="link">Links</option>
+        </select>
+        <select class="input-field admin-select admin-page-size" [(ngModel)]="pageSize" name="adminAuditPageSize">
+          <option [ngValue]="20">20 / page</option>
+          <option [ngValue]="50">50 / page</option>
+          <option [ngValue]="100">100 / page</option>
+        </select>
+        <button class="btn-primary" (click)="applyFilters()" [disabled]="isLoading">
+          {{ isLoading ? 'Loading...' : 'Search' }}
+        </button>
+        <button class="btn-secondary" (click)="resetFilters()" [disabled]="isLoading">Reset</button>
+      </div>
+    </div>
+
+    <div class="admin-results-bar" *ngIf="!isLoading">
+      <p class="muted-text">{{ totalItems }} log entries found</p>
+      <p class="muted-text">Page {{ page }} of {{ totalPages }}</p>
+    </div>
+
+    <div class="admin-list">
+      <div class="glass-card admin-log-card" *ngFor="let log of logs">
+        <div class="admin-log-topline">
+          <div>
+            <h3>{{ formatAction(log.action) | titlecase }}</h3>
+            <p class="muted-text">
+              Admin: {{ log.actorUser?.email || 'Unknown admin' }}
+              <span *ngIf="log.actorUser?.name">({{ log.actorUser.name }})</span>
+            </p>
+          </div>
+          <div class="admin-badges">
+            <span class="badge">{{ log.targetType }}</span>
+            <span class="badge">{{ log.targetLabel || ('ID ' + log.targetId) }}</span>
+          </div>
+        </div>
+
+        <div class="admin-log-meta">
+          <p>Target ID: {{ log.targetId }}</p>
+          <p>When: {{ log.createdAt | date:'medium' }}</p>
+          <p *ngIf="log.ipAddress">IP: {{ log.ipAddress }}</p>
+        </div>
+
+        <div class="admin-log-changes" *ngIf="getChangeEntries(log).length > 0">
+          <div class="admin-log-change-row" *ngFor="let change of getChangeEntries(log)">
+            <strong>{{ change[0] }}</strong>
+            <p class="muted-text" *ngIf="$any(change[1]).before !== undefined || $any(change[1]).after !== undefined">
+              {{ $any(change[1]).before ?? 'empty' }} → {{ $any(change[1]).after ?? 'empty' }}
+            </p>
+            <p class="muted-text" *ngIf="$any(change[1]).deleted !== undefined">
+              {{ $any(change[1]).deleted | json }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card empty-state" *ngIf="logs.length === 0 && !isLoading">
+        <p>No audit log entries found.</p>
+      </div>
+    </div>
+
+    <div class="pagination-bar" *ngIf="totalPages > 1">
+      <button class="btn-secondary" (click)="changePage(page - 1)" [disabled]="page === 1 || isLoading">Previous</button>
+      <span class="pagination-label">Page {{ page }} of {{ totalPages }}</span>
+      <button class="btn-secondary" (click)="changePage(page + 1)" [disabled]="page === totalPages || isLoading">Next</button>
+    </div>
+  </main>
+</div>

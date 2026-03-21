@@ -41,7 +41,11 @@ export class AdminController {
     if (Number(id) === req.user.userId && body.role === 'USER') {
       delete body.role;
     }
-    return this.adminService.updateUser(Number(id), body);
+    return this.adminService.updateUser(Number(id), body, {
+      actorUserId: req.user.userId,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
   }
 
   @Get('users/:id/links')
@@ -70,13 +74,38 @@ export class AdminController {
     });
   }
 
+  @Get('audit-logs')
+  listAuditLogs(
+    @Query('search') search?: string,
+    @Query('action') action?: string,
+    @Query('targetType') targetType?: string,
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    return this.adminService.listAuditLogs({
+      search,
+      action,
+      targetType,
+      page,
+      pageSize,
+    });
+  }
+
   @Patch('links/:id')
-  updateLink(@Param('id') id: string, @Body() body: any) {
-    return this.adminService.updateLink(Number(id), body);
+  updateLink(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+    return this.adminService.updateLink(Number(id), body, {
+      actorUserId: req.user.userId,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
   }
 
   @Delete('links/:id')
-  removeLink(@Param('id') id: string) {
-    return this.adminService.removeLink(Number(id));
+  removeLink(@Param('id') id: string, @Request() req: any) {
+    return this.adminService.removeLink(Number(id), {
+      actorUserId: req.user.userId,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
   }
 }

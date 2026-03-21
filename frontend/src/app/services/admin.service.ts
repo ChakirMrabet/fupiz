@@ -46,6 +46,13 @@ export class AdminService {
     });
   }
 
+  getAuditLogs(params: Record<string, string | number>) {
+    return this.http.get<any>(`${this.apiUrl}/audit-logs`, {
+      headers: this.headers,
+      params: this.buildParams(params),
+    });
+  }
+
   updateLink(linkId: number, data: any) {
     return this.http.patch<any>(`${this.apiUrl}/links/${linkId}`, data, {
       headers: this.headers,
