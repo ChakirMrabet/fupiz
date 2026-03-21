@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Query, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Query, UseGuards, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AdminService } from './admin.service';
 import { Roles } from './roles.decorator';
@@ -33,8 +33,18 @@ export class AdminController {
     return this.adminService.getUserLinks(Number(id));
   }
 
+  @Get('links')
+  listLinks(@Query('search') search?: string) {
+    return this.adminService.listLinks(search);
+  }
+
   @Patch('links/:id')
   updateLink(@Param('id') id: string, @Body() body: any) {
     return this.adminService.updateLink(Number(id), body);
+  }
+
+  @Delete('links/:id')
+  removeLink(@Param('id') id: string) {
+    return this.adminService.removeLink(Number(id));
   }
 }

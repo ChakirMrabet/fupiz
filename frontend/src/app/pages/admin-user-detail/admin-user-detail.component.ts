@@ -20,6 +20,7 @@ export class AdminUserDetailComponent implements OnInit {
   links: any[] = [];
   isLoading = false;
   isSavingUser = false;
+  deletingLinkId: number | null = null;
   editingLinkId: number | null = null;
   linkForm: any = null;
 
@@ -110,6 +111,32 @@ export class AdminUserDetailComponent implements OnInit {
         this.notificationService.success('Link updated successfully.', 'Admin');
       },
       error: () => undefined,
+    });
+  }
+
+  async deleteLink(link: any) {
+    const confirmed = await this.notificationService.confirm(
+      'Delete Link',
+      `Delete ${link.shortCode}? This cannot be undone.`,
+      'Delete',
+      'Cancel',
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.deletingLinkId = link.id;
+    this.adminService.deleteLink(link.id).subscribe({
+      next: () => {
+        this.links = this.links.filter((entry) => entry.id !== link.id);
+        this.deletingLinkId = null;
+        this.notificationService.success('Link deleted successfully.', 'Admin');
+      },
+      error: () => {
+        this.deletingLinkId = null;
+        this.notificationService.error('Failed to delete link.', 'Admin');
+      },
     });
   }
 

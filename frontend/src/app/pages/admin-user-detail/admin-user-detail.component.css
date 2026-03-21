@@ -22,12 +22,13 @@
 
 .admin-detail-grid {
   display: grid;
-  grid-template-columns: minmax(280px, 360px) 1fr;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
   gap: 1.5rem;
 }
 
 .admin-panel {
   padding: 1.25rem;
+  min-width: 0;
 }
 
 .admin-form,
@@ -48,6 +49,7 @@
   border: 1px solid var(--glass-border);
   border-radius: 14px;
   padding: 1rem;
+  min-width: 0;
 }
 
 .admin-link-topline,
@@ -55,8 +57,21 @@
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
+}
+
+.admin-link-item p,
+.admin-link-item strong,
+.admin-link-item button,
+.admin-link-item label,
+.admin-link-item span {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #f97316, #ef4444);
 }
 
 @media (max-width: 900px) {

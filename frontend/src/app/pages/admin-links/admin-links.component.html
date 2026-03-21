@@ -1,0 +1,91 @@
+<nav class="navbar container">
+  <div class="logo gradient-text" routerLink="/">Fuipiz Admin</div>
+  <div class="nav-links">
+    <a class="btn-secondary" routerLink="/dashboard">User App</a>
+    <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
+      {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
+    </button>
+    <button class="btn-secondary" (click)="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="container admin-shell">
+  <aside class="admin-sidebar glass-card">
+    <h3>Admin</h3>
+    <a class="admin-nav-item" routerLink="/admin/users" routerLinkActive="active">Users</a>
+    <a class="admin-nav-item" routerLink="/admin/links" routerLinkActive="active">Links</a>
+  </aside>
+
+  <main class="admin-content">
+    <div class="admin-header">
+      <div>
+        <h1 class="hero-title admin-title">Admin <span class="gradient-text">Links</span></h1>
+        <p class="admin-subtitle">Search every link in the system, inspect its owner, and remove broken or unwanted entries.</p>
+      </div>
+    </div>
+
+    <div class="glass-card admin-search-card">
+      <div class="admin-search-row">
+        <input
+          type="text"
+          class="input-field"
+          [(ngModel)]="search"
+          name="adminLinkSearch"
+          placeholder="Search by short code, destination, owner email, or owner name"
+        >
+        <button class="btn-primary" (click)="loadLinks()" [disabled]="isLoading">
+          {{ isLoading ? 'Loading...' : 'Search' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="admin-list">
+      <div class="glass-card admin-link-card" *ngFor="let link of links">
+        <div class="admin-link-topline">
+          <div>
+            <h3>{{ link.shortCode }}</h3>
+            <p class="muted-text">{{ link.originalUrl }}</p>
+          </div>
+          <div class="admin-badges">
+            <span class="badge status-badge" [class.active]="link.isActive" [class.inactive]="!link.isActive">
+              {{ link.isActive ? 'Active' : 'Disabled' }}
+            </span>
+            <span class="badge">{{ link.user ? 'Account' : 'Anonymous' }}</span>
+            <span class="badge" *ngIf="link.user" [class.badge-pro]="link.user.plan === 'PRO'" [class.badge-business]="link.user.plan === 'BUSINESS'">
+              {{ link.user.plan }}
+            </span>
+          </div>
+        </div>
+
+        <div class="admin-link-meta">
+          <p>Owner: {{ link.user?.email || 'Anonymous creator' }}</p>
+          <p *ngIf="link.user?.name">Owner name: {{ link.user.name }}</p>
+          <p>Clicks: {{ link.clicks }}</p>
+          <p>Created: {{ link.createdAt | date:'mediumDate' }}</p>
+          <p>Subscription: {{ link.user?.stripeSubscriptionStatus || 'none' }}</p>
+        </div>
+
+        <div class="admin-actions">
+          <a
+            *ngIf="link.user"
+            class="btn-secondary"
+            [routerLink]="['/admin/users', link.user.id]"
+          >
+            Open Owner
+          </a>
+          <button
+            class="btn-primary btn-danger"
+            (click)="deleteLink(link)"
+            [disabled]="deletingLinkId === link.id"
+          >
+            {{ deletingLinkId === link.id ? 'Deleting...' : 'Delete Link' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-card empty-state" *ngIf="links.length === 0 && !isLoading">
+        <p>No links found.</p>
+      </div>
+    </div>
+  </main>
+</div>

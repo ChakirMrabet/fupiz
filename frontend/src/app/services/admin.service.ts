@@ -39,8 +39,21 @@ export class AdminService {
     });
   }
 
+  getLinks(search = '') {
+    return this.http.get<any[]>(`${this.apiUrl}/links`, {
+      headers: this.headers,
+      params: search ? { search } : {},
+    });
+  }
+
   updateLink(linkId: number, data: any) {
     return this.http.patch<any>(`${this.apiUrl}/links/${linkId}`, data, {
+      headers: this.headers,
+    });
+  }
+
+  deleteLink(linkId: number) {
+    return this.http.delete<any>(`${this.apiUrl}/links/${linkId}`, {
       headers: this.headers,
     });
   }

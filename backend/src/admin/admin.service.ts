@@ -97,6 +97,46 @@ export class AdminService {
 
     return this.prisma.link.findMany({
       where: { userId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            plan: true,
+            stripeSubscriptionStatus: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async listLinks(search?: string) {
+    const normalizedSearch = search?.trim();
+
+    return this.prisma.link.findMany({
+      where: normalizedSearch
+        ? {
+            OR: [
+              { shortCode: { contains: normalizedSearch } },
+              { originalUrl: { contains: normalizedSearch } },
+              { user: { email: { contains: normalizedSearch } } },
+              { user: { name: { contains: normalizedSearch } } },
+            ],
+          }
+        : undefined,
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            plan: true,
+            stripeSubscriptionStatus: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -167,6 +207,21 @@ export class AdminService {
             : undefined,
         isActive: data.isActive !== undefined ? Boolean(data.isActive) : undefined,
       },
+    });
+  }
+
+  async removeLink(linkId: number) {
+    const link = await this.prisma.link.findUnique({
+      where: { id: linkId },
+      select: { id: true },
+    });
+
+    if (!link) {
+      throw new NotFoundException('Link not found');
+    }
+
+    return this.prisma.link.delete({
+      where: { id: linkId },
     });
   }
 

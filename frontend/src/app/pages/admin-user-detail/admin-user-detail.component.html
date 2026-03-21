@@ -2,6 +2,7 @@
   <div class="logo gradient-text" routerLink="/">Fuipiz Admin</div>
   <div class="nav-links">
     <a class="btn-secondary" routerLink="/admin/users">All Users</a>
+    <a class="btn-secondary" routerLink="/admin/links">All Links</a>
     <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
       {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
     </button>
@@ -68,7 +69,16 @@
             </div>
             <p class="muted-text">{{ link.originalUrl }}</p>
             <p class="muted-text">Clicks: {{ link.clicks }} | Expires: {{ link.expiresAt ? (link.expiresAt | date:'short') : 'Never' }}</p>
-            <button class="btn-secondary" (click)="editLink(link)">Edit Link</button>
+            <div class="admin-link-actions">
+              <button class="btn-secondary" (click)="editLink(link)">Edit Link</button>
+              <button
+                class="btn-primary btn-danger"
+                (click)="deleteLink(link)"
+                [disabled]="deletingLinkId === link.id"
+              >
+                {{ deletingLinkId === link.id ? 'Deleting...' : 'Delete Link' }}
+              </button>
+            </div>
           </div>
 
           <form *ngIf="editingLinkId === link.id" class="admin-form admin-link-form" (ngSubmit)="saveLink(link.id)">
