@@ -60,3 +60,6 @@ FRONTEND_URL=http://localhost:4200
 - The current flow intentionally uses checkout only for new paid subscriptions.
 - Existing paid users are sent to the billing portal for upgrades, downgrades, payment-method changes, and cancellation.
 - The Stripe customer portal must be configured in Stripe to allow the subscription changes you want users to self-serve.
+- The admin area currently allows direct manual edits to `user.plan` for operational use.
+- That means Stripe webhooks remain the long-term source of truth for subscriber sync, but manual admin overrides are still possible today.
+- The exact conflict-resolution policy between admin plan edits and subsequent Stripe webhook events is still an open follow-up item.
