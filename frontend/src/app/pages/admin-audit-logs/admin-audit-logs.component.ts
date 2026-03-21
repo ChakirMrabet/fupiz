@@ -90,7 +90,10 @@ export class AdminAuditLogsComponent implements OnInit {
 
     try {
       const parsedChanges = JSON.parse(log.changes);
-      return Object.entries(parsedChanges);
+      return Object.entries(parsedChanges).map(([field, value]) => ({
+        field,
+        value: value as any,
+      }));
     } catch {
       return [];
     }
@@ -98,6 +101,37 @@ export class AdminAuditLogsComponent implements OnInit {
 
   formatAction(action: string) {
     return action.replace(/\./g, ' ');
+  }
+
+  formatFieldName(field: string) {
+    return field
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, (value) => value.toUpperCase());
+  }
+
+  formatValue(value: unknown) {
+    if (value === null || value === undefined || value === '') {
+      return 'empty';
+    }
+
+    if (typeof value === 'boolean') {
+      return value ? 'Yes' : 'No';
+    }
+
+    return String(value);
+  }
+
+  getDeletedSummary(log: any) {
+    const deletedEntry = this.getChangeEntries(log).find((entry) => entry.field === 'deleted');
+    return deletedEntry?.value ?? null;
+  }
+
+  getTargetRoute(log: any) {
+    if (log.targetType === 'user') {
+      return ['/admin/users', log.targetId];
+    }
+
+    return null;
   }
 
   logout() {

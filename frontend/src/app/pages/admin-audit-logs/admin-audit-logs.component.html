@@ -74,7 +74,16 @@
           </div>
           <div class="admin-badges">
             <span class="badge">{{ log.targetType }}</span>
-            <span class="badge">{{ log.targetLabel || ('ID ' + log.targetId) }}</span>
+            <a
+              *ngIf="getTargetRoute(log); else staticTargetBadge"
+              class="badge badge-link"
+              [routerLink]="getTargetRoute(log)"
+            >
+              {{ log.targetLabel || ('ID ' + log.targetId) }}
+            </a>
+            <ng-template #staticTargetBadge>
+              <span class="badge">{{ log.targetLabel || ('ID ' + log.targetId) }}</span>
+            </ng-template>
           </div>
         </div>
 
@@ -86,13 +95,19 @@
 
         <div class="admin-log-changes" *ngIf="getChangeEntries(log).length > 0">
           <div class="admin-log-change-row" *ngFor="let change of getChangeEntries(log)">
-            <strong>{{ change[0] }}</strong>
-            <p class="muted-text" *ngIf="$any(change[1]).before !== undefined || $any(change[1]).after !== undefined">
-              {{ $any(change[1]).before ?? 'empty' }} → {{ $any(change[1]).after ?? 'empty' }}
+            <strong>{{ formatFieldName(change.field) }}</strong>
+            <p class="muted-text" *ngIf="change.value.before !== undefined || change.value.after !== undefined">
+              {{ formatValue(change.value.before) }} → {{ formatValue(change.value.after) }}
             </p>
-            <p class="muted-text" *ngIf="$any(change[1]).deleted !== undefined">
-              {{ $any(change[1]).deleted | json }}
-            </p>
+            <div class="admin-deleted-summary" *ngIf="change.field === 'deleted' && getDeletedSummary(log) as deleted">
+              <p class="muted-text">Short code: {{ deleted.shortCode }}</p>
+              <p class="muted-text">Destination: {{ deleted.originalUrl }}</p>
+              <p class="muted-text">Owner: {{ deleted.ownerEmail || 'Anonymous' }}</p>
+              <p class="muted-text">Status: {{ deleted.isActive ? 'Active' : 'Disabled' }}</p>
+              <p class="muted-text">Click limit: {{ deleted.singleUse ? '1 click' : (deleted.maxClicks ?? 'none') }}</p>
+              <p class="muted-text">Password protected: {{ deleted.passwordProtected ? 'Yes' : 'No' }}</p>
+              <p class="muted-text">Landing page: {{ deleted.hasLandingPage ? 'Yes' : 'No' }}</p>
+            </div>
           </div>
         </div>
       </div>

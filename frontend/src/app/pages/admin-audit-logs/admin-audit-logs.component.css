@@ -109,6 +109,22 @@
   padding-top: 0.75rem;
 }
 
+.admin-deleted-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.5rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.badge-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.badge-link:hover {
+  border-color: var(--accent-primary);
+}
+
 .pagination-label {
   color: var(--text-secondary);
 }
