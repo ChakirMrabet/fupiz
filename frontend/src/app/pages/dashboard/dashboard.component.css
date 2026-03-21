@@ -1,3 +1,10 @@
+.disabled-link {
+  color: #aaa !important;
+  pointer-events: none;
+  cursor: not-allowed;
+  text-decoration: line-through;
+  opacity: 0.6;
+}
 .dashboard-layout {
   display: grid;
   grid-template-columns: 240px 1fr;

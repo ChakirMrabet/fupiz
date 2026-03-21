@@ -68,14 +68,14 @@ let AppController = class AppController {
         }
         const link = await this.linksService.findByShortCode(shortCode);
         if (!link || !link.isActive) {
-            throw new common_1.NotFoundException('Link not found or is deactivated.');
+            return res.redirect(`http://localhost:4200/go/${shortCode}?error=notfound`);
         }
         if (link.expiresAt && link.expiresAt < new Date()) {
-            throw new common_1.NotFoundException('Link has expired.');
+            return res.redirect(`http://localhost:4200/go/${shortCode}?error=expired`);
         }
         if (this.linksService.hasReachedClickLimit(link)) {
             await this.linksService.deactivate(link.id);
-            throw new common_1.NotFoundException('Link has expired.');
+            return res.redirect(`http://localhost:4200/go/${shortCode}?error=expired`);
         }
         if (this.linksService.hasLandingPage(link)) {
             return res.redirect(`http://localhost:4200/go/${shortCode}`);

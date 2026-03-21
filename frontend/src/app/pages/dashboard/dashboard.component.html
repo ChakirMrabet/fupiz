@@ -64,7 +64,19 @@
       <div class="links-list">
         <div class="glass-card link-item" *ngFor="let link of paginatedLinks">
           <div class="link-details">
-            <h4><a [href]="'http://localhost:3000/s/' + link.shortCode" target="_blank" class="short-link">http://localhost:3000/s/{{ link.shortCode }}</a></h4>
+            <h4>
+              <a
+                *ngIf="link.isActive; else disabledLink"
+                [href]="'http://localhost:3000/s/' + link.shortCode"
+                target="_blank"
+                class="short-link"
+              >
+                http://localhost:3000/s/{{ link.shortCode }}
+              </a>
+              <ng-template #disabledLink>
+                <span class="short-link disabled-link">http://localhost:3000/s/{{ link.shortCode }}</span>
+              </ng-template>
+            </h4>
             <p class="original-link">{{ link.originalUrl }}</p>
             <div class="link-meta">
               <span class="badge" *ngIf="link.passwordProtected">🔒 Password Protected</span>

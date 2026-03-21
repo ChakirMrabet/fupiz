@@ -28,9 +28,21 @@ export class GoComponent implements OnInit {
 
   ngOnInit() {
     this.shortCode = this.route.snapshot.paramMap.get('shortCode') || '';
+    const errorParam = this.route.snapshot.queryParamMap.get('error');
     if (!this.shortCode) {
       this.isLoading = false;
       this.errorMsg = 'Invalid link.';
+      return;
+    }
+
+    if (errorParam === 'notfound') {
+      this.isLoading = false;
+      this.errorMsg = 'This link was not found or is deactivated.';
+      return;
+    }
+    if (errorParam === 'expired') {
+      this.isLoading = false;
+      this.errorMsg = 'This link has expired.';
       return;
     }
 
