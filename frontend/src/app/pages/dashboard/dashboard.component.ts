@@ -100,7 +100,12 @@ export class DashboardComponent implements OnInit {
           this.webhooks = [];
         }
       },
-      error: (err) => console.error(err)
+      error: () => {
+        // If the backend rejects the token after the guard, immediately drop the
+        // local session instead of leaving the protected screen half-rendered.
+        this.authService.logout();
+        this.router.navigate(['/login']);
+      },
     });
   }
 

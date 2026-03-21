@@ -67,7 +67,7 @@
             <h4><a [href]="'http://localhost:3000/s/' + link.shortCode" target="_blank" class="short-link">http://localhost:3000/s/{{ link.shortCode }}</a></h4>
             <p class="original-link">{{ link.originalUrl }}</p>
             <div class="link-meta">
-              <span class="badge" *ngIf="link.password">🔒 Password Protected</span>
+              <span class="badge" *ngIf="link.passwordProtected">🔒 Password Protected</span>
               <span class="badge" *ngIf="link.expiresAt">⏰ Expires: {{ link.expiresAt | date:'shortDate' }}</span>
               <span class="badge clicks">📈 Clicks: {{ link.clicks }}</span>
               <span class="badge" *ngIf="link.singleUse">⚡ One-Time Link</span>

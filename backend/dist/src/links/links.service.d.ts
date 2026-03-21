@@ -8,6 +8,8 @@ export declare class LinksService {
     generateShortCode(): string;
     private getNormalizedOriginalUrl;
     private parseMaxClicks;
+    private getStoredLinkPassword;
+    private sanitizeLinkForClient;
     getEffectiveMaxClicks(link: {
         maxClicks: number | null;
         singleUse: boolean;
@@ -23,14 +25,32 @@ export declare class LinksService {
         landingButtonLabel: string | null;
     }): boolean;
     createAnonymous(data: any): Promise<Link>;
-    create(userId: number, data: any): Promise<Link>;
+    create(userId: number, data: any): Promise<Omit<{
+        id: number;
+        password: string | null;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        userId: number | null;
+        originalUrl: string;
+        shortCode: string;
+        expiresAt: Date | null;
+        maxClicks: number | null;
+        singleUse: boolean;
+        landingTitle: string | null;
+        landingDescription: string | null;
+        landingButtonLabel: string | null;
+        clicks: number;
+    }, "password"> & {
+        passwordProtected: boolean;
+    }>;
     bulkCreate(userId: number, entries: any[]): Promise<{
         createdCount: number;
         failedCount: number;
         results: ({
             index: number;
             success: boolean;
-            link: {
+            link: Omit<{
                 id: number;
                 password: string | null;
                 isActive: boolean;
@@ -46,6 +66,8 @@ export declare class LinksService {
                 landingDescription: string | null;
                 landingButtonLabel: string | null;
                 clicks: number;
+            }, "password"> & {
+                passwordProtected: boolean;
             };
             error?: undefined;
         } | {
@@ -55,10 +77,46 @@ export declare class LinksService {
             link?: undefined;
         })[];
     }>;
-    findAll(userId: number): Promise<Link[]>;
+    findAll(userId: number): Promise<(Omit<{
+        id: number;
+        password: string | null;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        userId: number | null;
+        originalUrl: string;
+        shortCode: string;
+        expiresAt: Date | null;
+        maxClicks: number | null;
+        singleUse: boolean;
+        landingTitle: string | null;
+        landingDescription: string | null;
+        landingButtonLabel: string | null;
+        clicks: number;
+    }, "password"> & {
+        passwordProtected: boolean;
+    })[]>;
     findByShortCode(shortCode: string): Promise<Link | null>;
     deactivate(id: number): Promise<Link>;
-    update(id: number, userId: number, data: any): Promise<Link>;
+    update(id: number, userId: number, data: any): Promise<Omit<{
+        id: number;
+        password: string | null;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        userId: number | null;
+        originalUrl: string;
+        shortCode: string;
+        expiresAt: Date | null;
+        maxClicks: number | null;
+        singleUse: boolean;
+        landingTitle: string | null;
+        landingDescription: string | null;
+        landingButtonLabel: string | null;
+        clicks: number;
+    }, "password"> & {
+        passwordProtected: boolean;
+    }>;
     remove(id: number, userId: number): Promise<Link>;
     recordClick(linkId: number, metadata: {
         ip: string;

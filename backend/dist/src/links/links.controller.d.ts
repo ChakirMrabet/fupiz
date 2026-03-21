@@ -2,7 +2,7 @@ import { LinksService } from './links.service';
 export declare class LinksController {
     private readonly linksService;
     constructor(linksService: LinksService);
-    create(req: any, body: any): Promise<{
+    create(req: any, body: any): Promise<Omit<{
         id: number;
         password: string | null;
         isActive: boolean;
@@ -18,6 +18,8 @@ export declare class LinksController {
         landingDescription: string | null;
         landingButtonLabel: string | null;
         clicks: number;
+    }, "password"> & {
+        passwordProtected: boolean;
     }>;
     bulkCreate(req: any, body: any): Promise<{
         createdCount: number;
@@ -25,7 +27,7 @@ export declare class LinksController {
         results: ({
             index: number;
             success: boolean;
-            link: {
+            link: Omit<{
                 id: number;
                 password: string | null;
                 isActive: boolean;
@@ -41,6 +43,8 @@ export declare class LinksController {
                 landingDescription: string | null;
                 landingButtonLabel: string | null;
                 clicks: number;
+            }, "password"> & {
+                passwordProtected: boolean;
             };
             error?: undefined;
         } | {
@@ -50,7 +54,7 @@ export declare class LinksController {
             link?: undefined;
         })[];
     }>;
-    findAll(req: any): Promise<{
+    findAll(req: any): Promise<(Omit<{
         id: number;
         password: string | null;
         isActive: boolean;
@@ -66,8 +70,10 @@ export declare class LinksController {
         landingDescription: string | null;
         landingButtonLabel: string | null;
         clicks: number;
-    }[]>;
-    update(req: any, id: string, body: any): Promise<{
+    }, "password"> & {
+        passwordProtected: boolean;
+    })[]>;
+    update(req: any, id: string, body: any): Promise<Omit<{
         id: number;
         password: string | null;
         isActive: boolean;
@@ -83,6 +89,8 @@ export declare class LinksController {
         landingDescription: string | null;
         landingButtonLabel: string | null;
         clicks: number;
+    }, "password"> & {
+        passwordProtected: boolean;
     }>;
     remove(req: any, id: string): Promise<{
         id: number;

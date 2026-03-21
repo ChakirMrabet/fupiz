@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PLAN_IDS, isPlanId } from '../plans/plans.config';
+import * as bcrypt from 'bcrypt';
 
 type AdminAuditContext = {
   actorUserId: number;
@@ -11,6 +12,24 @@ type AdminAuditContext = {
 @Injectable()
 export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private async getStoredLinkPassword(value: unknown) {
+    if (value === undefined) return undefined;
+    if (value === null || value === '') return null;
+
+    // Admin-side link updates must follow the same password-storage rules as the
+    // self-serve dashboard so the browser never receives reusable secrets.
+    return bcrypt.hash(String(value), 10);
+  }
+
+  private sanitizeLinkForClient<T extends { password?: string | null }>(link: T) {
+    const { password, ...rest } = link;
+
+    return {
+      ...rest,
+      passwordProtected: Boolean(password),
+    };
+  }
 
   async listUsers(params: {
     search?: string;
@@ -144,7 +163,7 @@ export class AdminService {
   async getUserLinks(userId: number) {
     await this.ensureUserExists(userId);
 
-    return this.prisma.link.findMany({
+    const links = await this.prisma.link.findMany({
       where: { userId },
       include: {
         user: {
@@ -159,6 +178,8 @@ export class AdminService {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    return links.map((link) => this.sanitizeLinkForClient(link));
   }
 
   async listLinks(params: {
@@ -222,7 +243,7 @@ export class AdminService {
     ]);
 
     return {
-      items: links,
+      items: links.map((link) => this.sanitizeLinkForClient(link)),
       totalItems,
       page: currentPage,
       pageSize: currentPageSize,
@@ -328,13 +349,15 @@ export class AdminService {
       throw new BadRequestException('Max clicks must be a positive whole number');
     }
 
+    const storedPassword = await this.getStoredLinkPassword(data.password);
+
     const updatedLink = await this.prisma.link.update({
       where: { id: linkId },
       data: {
         originalUrl:
           data.originalUrl !== undefined ? String(data.originalUrl).trim() : undefined,
         shortCode: nextShortCode,
-        password: data.password !== undefined ? data.password || null : undefined,
+        password: storedPassword !== undefined ? storedPassword : undefined,
         expiresAt,
         maxClicks,
         singleUse: data.singleUse !== undefined ? Boolean(data.singleUse) : undefined,
@@ -361,7 +384,7 @@ export class AdminService {
       changes: this.buildLinkAuditChanges(link, updatedLink),
     });
 
-    return updatedLink;
+    return this.sanitizeLinkForClient(updatedLink);
   }
 
   async removeLink(linkId: number, auditContext: AdminAuditContext) {
@@ -405,7 +428,7 @@ export class AdminService {
       }),
     });
 
-    return deletedLink;
+    return this.sanitizeLinkForClient(deletedLink);
   }
 
   private async ensureUserExists(userId: number) {

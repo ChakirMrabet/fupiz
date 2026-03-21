@@ -95,7 +95,8 @@ export class AdminUserDetailComponent implements OnInit {
     this.linkForm = {
       originalUrl: link.originalUrl,
       shortCode: link.shortCode,
-      password: link.password || '',
+      password: '',
+      clearPassword: false,
       isActive: link.isActive,
       expiresAt: link.expiresAt ? this.toDateTimeLocal(link.expiresAt) : '',
       maxClicks: link.maxClicks ?? '',
@@ -107,7 +108,28 @@ export class AdminUserDetailComponent implements OnInit {
   }
 
   saveLink(linkId: number) {
-    this.adminService.updateLink(linkId, this.linkForm).subscribe({
+    const payload: any = {
+      originalUrl: this.linkForm.originalUrl,
+      shortCode: this.linkForm.shortCode,
+      isActive: this.linkForm.isActive,
+      expiresAt: this.linkForm.expiresAt,
+      maxClicks: this.linkForm.maxClicks,
+      singleUse: this.linkForm.singleUse,
+      landingTitle: this.linkForm.landingTitle,
+      landingDescription: this.linkForm.landingDescription,
+      landingButtonLabel: this.linkForm.landingButtonLabel,
+    };
+
+    // Leaving the password field blank should preserve the existing password.
+    // Password updates and removals must be explicit so admins do not clear a
+    // protected link by opening and saving the form.
+    if (this.linkForm.password) {
+      payload.password = this.linkForm.password;
+    } else if (this.linkForm.clearPassword) {
+      payload.password = '';
+    }
+
+    this.adminService.updateLink(linkId, payload).subscribe({
       next: () => {
         this.editingLinkId = null;
         this.linkForm = null;

@@ -7,7 +7,13 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, {
         rawBody: true,
     });
-    app.enableCors();
+    const allowedOrigins = (process.env.FRONTEND_URL || '')
+        .split(',')
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+    app.enableCors({
+        origin: allowedOrigins.length > 0 ? allowedOrigins : false,
+    });
     app.setGlobalPrefix('api', {
         exclude: ['s/:shortCode', 's/:shortCode/verify-password'],
     });

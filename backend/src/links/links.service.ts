@@ -10,6 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Link, Prisma } from '@prisma/client';
 import { randomBytes } from 'crypto';
 import { UAParser } from 'ua-parser-js';
+import * as bcrypt from 'bcrypt';
 
 import { getPlanConfig } from '../plans/plans.config';
 import { WebhooksService } from '../webhooks/webhooks.service';
@@ -43,6 +44,24 @@ export class LinksService {
     }
 
     return parsedValue;
+  }
+
+  private async getStoredLinkPassword(value: unknown) {
+    if (value === undefined) return undefined;
+    if (value === null || value === '') return null;
+
+    // Link passwords are treated like account passwords: only a bcrypt hash is stored,
+    // and client-facing responses expose a boolean capability instead of the secret.
+    return bcrypt.hash(String(value), 10);
+  }
+
+  private sanitizeLinkForClient<T extends { password?: string | null }>(link: T) {
+    const { password, ...rest } = link;
+
+    return {
+      ...rest,
+      passwordProtected: Boolean(password),
+    };
   }
 
   getEffectiveMaxClicks(link: { maxClicks: number | null; singleUse: boolean }): number | null {
@@ -83,7 +102,7 @@ export class LinksService {
     });
   }
 
-  async create(userId: number, data: any): Promise<Link> {
+  async create(userId: number, data: any) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -132,13 +151,14 @@ export class LinksService {
 
     const maxClicks = this.parseMaxClicks(data.maxClicks);
     const singleUse = Boolean(data.singleUse);
+    const storedPassword = await this.getStoredLinkPassword(data.password);
 
     let shortCode = data.customCode || this.generateShortCode();
     const link = await this.prisma.link.create({
       data: {
         originalUrl: this.getNormalizedOriginalUrl(data.originalUrl),
         shortCode,
-        password: data.password || null,
+        password: storedPassword ?? null,
         expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
         maxClicks: singleUse ? null : maxClicks ?? null,
         singleUse,
@@ -155,7 +175,7 @@ export class LinksService {
       originalUrl: link.originalUrl,
     });
 
-    return link;
+    return this.sanitizeLinkForClient(link);
   }
 
   async bulkCreate(userId: number, entries: any[]) {
@@ -204,11 +224,13 @@ export class LinksService {
     };
   }
 
-  async findAll(userId: number): Promise<Link[]> {
-    return this.prisma.link.findMany({
+  async findAll(userId: number) {
+    const links = await this.prisma.link.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
     });
+
+    return links.map((link) => this.sanitizeLinkForClient(link));
   }
 
   async findByShortCode(shortCode: string): Promise<Link | null> {
@@ -224,7 +246,7 @@ export class LinksService {
     });
   }
 
-  async update(id: number, userId: number, data: any): Promise<Link> {
+  async update(id: number, userId: number, data: any) {
     const link = await this.prisma.link.findFirst({ where: { id, userId }, include: { user: true } });
     if (!link) throw new NotFoundException('Link not found or unauthorized');
 
@@ -238,7 +260,7 @@ export class LinksService {
           ? data.customCode.trim()
           : undefined;
 
-    if (data.password !== undefined && data.password !== link.password && !planLimits.canUsePassword) {
+    if (data.password !== undefined && !planLimits.canUsePassword) {
        throw new HttpException('Password protection is available on the PRO plan.', HttpStatus.FORBIDDEN);
     }
 
@@ -288,6 +310,8 @@ export class LinksService {
       }
     }
     
+    const storedPassword = await this.getStoredLinkPassword(data.password);
+
     const updatedLink = await this.prisma.link.update({
       where: { id },
       data: {
@@ -295,7 +319,7 @@ export class LinksService {
         shortCode:
           requestedShortCodeRaw !== undefined ? requestedShortCodeRaw : link.shortCode,
         isActive: data.isActive !== undefined ? data.isActive : link.isActive,
-        password: data.password !== undefined ? data.password : link.password,
+        password: storedPassword !== undefined ? storedPassword : link.password,
         expiresAt: data.expiresAt !== undefined ? (data.expiresAt ? new Date(data.expiresAt) : null) : link.expiresAt,
         maxClicks: nextSingleUse
           ? null
@@ -323,7 +347,7 @@ export class LinksService {
       isActive: updatedLink.isActive,
     });
 
-    return updatedLink;
+    return this.sanitizeLinkForClient(updatedLink);
   }
 
   async remove(id: number, userId: number): Promise<Link> {

@@ -1,10 +1,43 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
@@ -14,6 +47,7 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const crypto_1 = require("crypto");
 const ua_parser_js_1 = require("ua-parser-js");
+const bcrypt = __importStar(require("bcrypt"));
 const plans_config_1 = require("../plans/plans.config");
 const webhooks_service_1 = require("../webhooks/webhooks.service");
 let LinksService = class LinksService {
@@ -42,6 +76,20 @@ let LinksService = class LinksService {
             throw new common_1.BadRequestException('Max clicks must be a positive whole number');
         }
         return parsedValue;
+    }
+    async getStoredLinkPassword(value) {
+        if (value === undefined)
+            return undefined;
+        if (value === null || value === '')
+            return null;
+        return bcrypt.hash(String(value), 10);
+    }
+    sanitizeLinkForClient(link) {
+        const { password, ...rest } = link;
+        return {
+            ...rest,
+            passwordProtected: Boolean(password),
+        };
     }
     getEffectiveMaxClicks(link) {
         return link.singleUse ? 1 : link.maxClicks;
@@ -105,12 +153,13 @@ let LinksService = class LinksService {
         }
         const maxClicks = this.parseMaxClicks(data.maxClicks);
         const singleUse = Boolean(data.singleUse);
+        const storedPassword = await this.getStoredLinkPassword(data.password);
         let shortCode = data.customCode || this.generateShortCode();
         const link = await this.prisma.link.create({
             data: {
                 originalUrl: this.getNormalizedOriginalUrl(data.originalUrl),
                 shortCode,
-                password: data.password || null,
+                password: storedPassword ?? null,
                 expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
                 maxClicks: singleUse ? null : maxClicks ?? null,
                 singleUse,
@@ -125,7 +174,7 @@ let LinksService = class LinksService {
             shortCode: link.shortCode,
             originalUrl: link.originalUrl,
         });
-        return link;
+        return this.sanitizeLinkForClient(link);
     }
     async bulkCreate(userId, entries) {
         const user = await this.prisma.user.findUnique({
@@ -166,10 +215,11 @@ let LinksService = class LinksService {
         };
     }
     async findAll(userId) {
-        return this.prisma.link.findMany({
+        const links = await this.prisma.link.findMany({
             where: { userId },
             orderBy: { createdAt: 'desc' },
         });
+        return links.map((link) => this.sanitizeLinkForClient(link));
     }
     async findByShortCode(shortCode) {
         return this.prisma.link.findUnique({
@@ -193,7 +243,7 @@ let LinksService = class LinksService {
             : typeof data.customCode === 'string'
                 ? data.customCode.trim()
                 : undefined;
-        if (data.password !== undefined && data.password !== link.password && !planLimits.canUsePassword) {
+        if (data.password !== undefined && !planLimits.canUsePassword) {
             throw new common_1.HttpException('Password protection is available on the PRO plan.', common_1.HttpStatus.FORBIDDEN);
         }
         if (data.expiresAt !== undefined && data.expiresAt !== link.expiresAt && !planLimits.canUseExpiration) {
@@ -230,13 +280,14 @@ let LinksService = class LinksService {
                 throw new common_1.ConflictException('This short code is already in use');
             }
         }
+        const storedPassword = await this.getStoredLinkPassword(data.password);
         const updatedLink = await this.prisma.link.update({
             where: { id },
             data: {
                 originalUrl: nextOriginalUrl !== undefined ? nextOriginalUrl : link.originalUrl,
                 shortCode: requestedShortCodeRaw !== undefined ? requestedShortCodeRaw : link.shortCode,
                 isActive: data.isActive !== undefined ? data.isActive : link.isActive,
-                password: data.password !== undefined ? data.password : link.password,
+                password: storedPassword !== undefined ? storedPassword : link.password,
                 expiresAt: data.expiresAt !== undefined ? (data.expiresAt ? new Date(data.expiresAt) : null) : link.expiresAt,
                 maxClicks: nextSingleUse
                     ? null
@@ -259,7 +310,7 @@ let LinksService = class LinksService {
             originalUrl: updatedLink.originalUrl,
             isActive: updatedLink.isActive,
         });
-        return updatedLink;
+        return this.sanitizeLinkForClient(updatedLink);
     }
     async remove(id, userId) {
         const link = await this.prisma.link.findFirst({ where: { id, userId } });

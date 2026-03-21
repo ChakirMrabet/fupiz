@@ -13,21 +13,39 @@ exports.JwtStrategy = void 0;
 const passport_jwt_1 = require("passport-jwt");
 const passport_1 = require("@nestjs/passport");
 const common_1 = require("@nestjs/common");
+const users_service_1 = require("../users/users.service");
+const admin_emails_util_1 = require("./admin-emails.util");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
-    constructor() {
+    usersService;
+    constructor(usersService) {
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: process.env.JWT_SECRET || 'secretKey',
+            secretOrKey: (() => {
+                const jwtSecret = process.env.JWT_SECRET;
+                if (!jwtSecret) {
+                    throw new Error('JWT_SECRET must be configured');
+                }
+                return jwtSecret;
+            })(),
         });
+        this.usersService = usersService;
     }
     async validate(payload) {
-        return { userId: payload.sub, email: payload.email, role: payload.role || 'USER' };
+        const user = await this.usersService.findById(payload.sub);
+        if (!user || !user.isActive) {
+            throw new common_1.UnauthorizedException('User is no longer allowed to authenticate');
+        }
+        return {
+            userId: user.id,
+            email: user.email,
+            role: (0, admin_emails_util_1.getEffectiveRole)(user),
+        };
     }
 };
 exports.JwtStrategy = JwtStrategy;
 exports.JwtStrategy = JwtStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [users_service_1.UsersService])
 ], JwtStrategy);
 //# sourceMappingURL=jwt.strategy.js.map

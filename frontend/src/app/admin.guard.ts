@@ -22,6 +22,7 @@ export const AdminGuard = () => {
       return false;
     }),
     catchError(() => {
+      authService.logout();
       router.navigate(['/login']);
       return of(false);
     }),

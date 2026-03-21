@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Res, Post, Body, NotFoundException, UnauthorizedException, Req } from '@nestjs/common';
 import { LinksService } from './links/links.service';
 import type { Response, Request } from 'express';
+import * as bcrypt from 'bcrypt';
 
 @Controller()
 export class AppController {
@@ -64,7 +65,11 @@ export class AppController {
       await this.linksService.deactivate(link.id);
       throw new NotFoundException('Link has expired.');
     }
-    if (link.password !== body.password) throw new UnauthorizedException('Incorrect password');
+    // Protected-link secrets are stored as bcrypt hashes, so unlock checks must
+    // compare against the hash instead of reading plaintext from the database.
+    if (!link.password || !body?.password || !(await bcrypt.compare(body.password, link.password))) {
+      throw new UnauthorizedException('Incorrect password');
+    }
     
     await this.linksService.recordClick(link.id, {
       ip: req.ip || 'Unknown',
