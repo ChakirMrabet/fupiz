@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { LinksService } from '../../services/links.service';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
@@ -12,11 +12,14 @@ import { BillingService } from '../../services/billing.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+  profileForm: FormGroup;
+  createLinkForm: FormGroup;
+  webhookFormGroup: FormGroup;
   activeSection: 'links' | 'integrations' | 'profile' | 'billing' = 'links';
   links: any[] = [];
   linkSearch = '';
@@ -63,14 +66,40 @@ export class DashboardComponent implements OnInit {
   profileMessage = '';
   isBillingActionPending = false;
 
+
   constructor(
     private linksService: LinksService,
     private authService: AuthService,
     private billingService: BillingService,
     private notificationService: NotificationService,
     private router: Router,
-    public themeService: ThemeService
-  ) {}
+    public themeService: ThemeService,
+    private fb: FormBuilder
+  ) {
+    this.profileForm = this.fb.group({
+      name: ['', [Validators.required, Validators.maxLength(50)]],
+      newPassword: ['', [Validators.minLength(6)]]
+    });
+    this.createLinkForm = this.fb.group({
+      originalUrl: ['', [Validators.required, Validators.pattern('https?://.+')]],
+      customCode: [''],
+      password: [''],
+      expiresAt: [''],
+      maxClicks: ['', [Validators.min(1)]],
+      singleUse: [false],
+      landingTitle: [''],
+      landingDescription: [''],
+      landingButtonLabel: ['']
+    });
+    this.webhookFormGroup = this.fb.group({
+      url: ['', [Validators.required, Validators.pattern('https?://.+')]],
+      events: this.fb.array([
+        'link.created',
+        'link.updated',
+        'link.clicked'
+      ], Validators.required)
+    });
+  }
 
   ngOnInit() {
     if (!this.authService.isLoggedIn()) {
@@ -110,18 +139,20 @@ export class DashboardComponent implements OnInit {
   }
 
   onUpdateProfile() {
+    if (this.profileForm.invalid) {
+      this.profileForm.markAllAsTouched();
+      return;
+    }
     this.isUpdatingProfile = true;
     this.profileMessage = '';
-    
-    const updatePayload: any = { name: this.profile.name };
-    if (this.passwordUpdate.newPassword.trim()) {
-      updatePayload.password = this.passwordUpdate.newPassword;
+    const updatePayload: any = { name: this.profileForm.value.name };
+    if (this.profileForm.value.newPassword?.trim()) {
+      updatePayload.password = this.profileForm.value.newPassword;
     }
-
     this.authService.updateProfile(updatePayload).subscribe({
       next: (res) => {
         this.profileMessage = 'Profile updated successfully!';
-        this.passwordUpdate.newPassword = ''; // clear password field
+        this.profileForm.patchValue({ newPassword: '' });
         this.isUpdatingProfile = false;
       },
       error: (err) => {
@@ -281,30 +312,15 @@ export class DashboardComponent implements OnInit {
   }
 
   onCreateLink() {
+    if (this.createLinkForm.invalid) {
+      this.createLinkForm.markAllAsTouched();
+      return;
+    }
     this.isCreating = true;
-    const data: any = { originalUrl: this.newLink.originalUrl };
-    if (this.newLink.customCode) data.customCode = this.newLink.customCode;
-    if (this.newLink.password) data.password = this.newLink.password;
-    if (this.newLink.expiresAt) data.expiresAt = this.newLink.expiresAt;
-    if (this.newLink.maxClicks) data.maxClicks = this.newLink.maxClicks;
-    if (this.newLink.singleUse) data.singleUse = true;
-    if (this.newLink.landingTitle) data.landingTitle = this.newLink.landingTitle;
-    if (this.newLink.landingDescription) data.landingDescription = this.newLink.landingDescription;
-    if (this.newLink.landingButtonLabel) data.landingButtonLabel = this.newLink.landingButtonLabel;
-
+    const data = { ...this.createLinkForm.value };
     this.linksService.create(data).subscribe({
       next: () => {
-        this.newLink = {
-          originalUrl: '',
-          customCode: '',
-          password: '',
-          expiresAt: '',
-          maxClicks: '',
-          singleUse: false,
-          landingTitle: '',
-          landingDescription: '',
-          landingButtonLabel: '',
-        };
+        this.createLinkForm.reset();
         this.loadLinks();
         this.isCreating = false;
         this.closeCreateModal();

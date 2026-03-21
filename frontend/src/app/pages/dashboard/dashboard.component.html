@@ -124,17 +124,24 @@
         <h3>Account Settings</h3>
         <p class="account-email">Signed in as: <strong>{{ profile.email }}</strong></p>
         
-        <form (ngSubmit)="onUpdateProfile()" class="account-form">
+        <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()" class="account-form" novalidate>
           <div class="form-group">
             <label>Name</label>
-            <input type="text" class="input-field" placeholder="Enter your name" [(ngModel)]="profile.name" name="name">
+            <input type="text" class="input-field" placeholder="Enter your name" formControlName="name">
+            <div class="error-msg" *ngIf="profileForm.get('name')?.touched && profileForm.get('name')?.invalid">
+              <span *ngIf="profileForm.get('name')?.errors?.['required']">Name is required.</span>
+              <span *ngIf="profileForm.get('name')?.errors?.['maxlength']">Name is too long.</span>
+            </div>
           </div>
           <div class="form-group">
             <label>New Password</label>
-            <input type="password" class="input-field" placeholder="Enter new password (optional)" [(ngModel)]="passwordUpdate.newPassword" name="newPassword">
+            <input type="password" class="input-field" placeholder="Enter new password (optional)" formControlName="newPassword">
             <small class="help-text">Leave blank to keep current password</small>
+            <div class="error-msg" *ngIf="profileForm.get('newPassword')?.touched && profileForm.get('newPassword')?.invalid">
+              <span *ngIf="profileForm.get('newPassword')?.errors?.['minlength']">Password must be at least 6 characters.</span>
+            </div>
           </div>
-          <button type="submit" class="btn-primary w-full" [disabled]="isUpdatingProfile">
+          <button type="submit" class="btn-primary w-full" [disabled]="isUpdatingProfile || profileForm.invalid">
             {{ isUpdatingProfile ? 'Saving...' : 'Save Changes' }}
           </button>
           <p class="success-msg" *ngIf="profileMessage">{{ profileMessage }}</p>
@@ -266,17 +273,21 @@
   <div class="modal-content glass-card create-modal" (click)="$event.stopPropagation()">
     <h3>Create New Link</h3>
     <p>Use a focused creation flow instead of crowding the main links workspace.</p>
-    <form (ngSubmit)="onCreateLink()" class="create-form">
+    <form [formGroup]="createLinkForm" (ngSubmit)="onCreateLink()" class="create-form" novalidate>
       <div class="form-row">
-        <input type="url" class="input-field" placeholder="Original URL (https://...)" [(ngModel)]="newLink.originalUrl" name="url" required>
+        <input type="url" class="input-field" placeholder="Original URL (https://...)" formControlName="originalUrl">
+        <div class="error-msg" *ngIf="createLinkForm.get('originalUrl')?.touched && createLinkForm.get('originalUrl')?.invalid">
+          <span *ngIf="createLinkForm.get('originalUrl')?.errors?.['required']">URL is required.</span>
+          <span *ngIf="createLinkForm.get('originalUrl')?.errors?.['pattern']">Enter a valid URL.</span>
+        </div>
       </div>
       <div class="advanced-options">
-        <input type="text" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Custom Code (optional)' : '👑 Custom Code (Paid Plans)'" [(ngModel)]="newLink.customCode" name="customCode" [disabled]="!canUseAdvancedLinkControls()">
-        <input type="password" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Password (optional)' : '👑 Password (Paid Plans)'" [(ngModel)]="newLink.password" name="password" [disabled]="!canUseAdvancedLinkControls()">
-        <input type="datetime-local" class="input-field half" [(ngModel)]="newLink.expiresAt" name="expiresAt" [title]="canUseAdvancedLinkControls() ? 'Expiration (optional)' : 'Expiration (Paid Plans)'" [disabled]="!canUseAdvancedLinkControls()">
-        <input type="number" min="1" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Max Clicks (optional)' : '👑 Click Limit (Paid Plans)'" [(ngModel)]="newLink.maxClicks" name="maxClicks" [disabled]="!canUseAdvancedLinkControls() || newLink.singleUse">
+        <input type="text" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Custom Code (optional)' : '👑 Custom Code (Paid Plans)'" formControlName="customCode" [disabled]="!canUseAdvancedLinkControls()">
+        <input type="password" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Password (optional)' : '👑 Password (Paid Plans)'" formControlName="password" [disabled]="!canUseAdvancedLinkControls()">
+        <input type="datetime-local" class="input-field half" formControlName="expiresAt" [title]="canUseAdvancedLinkControls() ? 'Expiration (optional)' : 'Expiration (Paid Plans)'" [disabled]="!canUseAdvancedLinkControls()">
+        <input type="number" min="1" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Max Clicks (optional)' : '👑 Click Limit (Paid Plans)'" formControlName="maxClicks" [disabled]="!canUseAdvancedLinkControls() || createLinkForm.get('singleUse')?.value">
         <label class="toggle-field">
-          <input type="checkbox" [(ngModel)]="newLink.singleUse" name="singleUse" [disabled]="!canUseAdvancedLinkControls()">
+          <input type="checkbox" formControlName="singleUse" [disabled]="!canUseAdvancedLinkControls()">
           <span>{{ canUseAdvancedLinkControls() ? 'One-Time Link' : '👑 One-Time Link (Paid Plans)' }}</span>
         </label>
       </div>
@@ -285,28 +296,25 @@
           type="text"
           class="input-field"
           [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Title (optional)' : '👑 Landing Title (Paid Plans)'"
-          [(ngModel)]="newLink.landingTitle"
-          name="landingTitle"
+          formControlName="landingTitle"
           [disabled]="!canUseAdvancedLinkControls()"
         >
         <textarea
           class="input-field landing-textarea"
           [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Description (optional)' : '👑 Landing Description (Paid Plans)'"
-          [(ngModel)]="newLink.landingDescription"
-          name="landingDescription"
+          formControlName="landingDescription"
           [disabled]="!canUseAdvancedLinkControls()"
         ></textarea>
         <input
           type="text"
           class="input-field"
           [placeholder]="canUseAdvancedLinkControls() ? 'CTA Button Label (optional)' : '👑 CTA Label (Paid Plans)'"
-          [(ngModel)]="newLink.landingButtonLabel"
-          name="landingButtonLabel"
+          formControlName="landingButtonLabel"
           [disabled]="!canUseAdvancedLinkControls()"
         >
       </div>
       <div class="modal-actions">
-        <button type="submit" class="btn-primary" [disabled]="isCreating">{{ isCreating ? 'Creating...' : 'Create Link' }}</button>
+        <button type="submit" class="btn-primary" [disabled]="isCreating || createLinkForm.invalid">{{ isCreating ? 'Creating...' : 'Create Link' }}</button>
         <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancel</button>
       </div>
     </form>
