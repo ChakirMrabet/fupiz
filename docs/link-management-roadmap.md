@@ -166,3 +166,13 @@ Expand the existing link CRUD flow with higher-value management features that ma
 - Added a backend cron-based cleanup job for anonymous links so unpaid, unowned links do not accumulate indefinitely.
 - Implemented daily deletion of anonymous links older than 30 days using Nest's schedule module.
 - Kept the retention rule scoped only to links with `userId = null`, so account-owned links are unaffected.
+
+### 2026-03-21
+
+- Improved user experience for disabled/expired links:
+  - Backend now redirects to a user-friendly Angular error page instead of returning a JSON error for deactivated, expired, or not found links.
+  - The frontend `/go/:shortCode` page displays a clear error message for these cases.
+- Dashboard link list:
+  - Disabled links are now visually distinct (gray, strikethrough, not clickable).
+  - Only enabled links are clickable; clicking a disabled link is prevented in the UI.
+  - This prevents accidental navigation to error pages and improves clarity for users managing links.
