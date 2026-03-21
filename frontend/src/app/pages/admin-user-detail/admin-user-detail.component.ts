@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { AuthService } from '../../services/auth.service';
@@ -10,7 +10,7 @@ import { NotificationService } from '../../services/notification.service';
 @Component({
   selector: 'app-admin-user-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   templateUrl: './admin-user-detail.component.html',
   styleUrls: ['./admin-user-detail.component.css'],
 })
@@ -24,12 +24,7 @@ export class AdminUserDetailComponent implements OnInit {
   editingLinkId: number | null = null;
   linkForm: any = null;
 
-  userForm = {
-    name: '',
-    role: 'USER',
-    plan: 'FREE',
-    isActive: true,
-  };
+  userFormGroup: FormGroup;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -38,7 +33,15 @@ export class AdminUserDetailComponent implements OnInit {
     private readonly adminService: AdminService,
     private readonly notificationService: NotificationService,
     public themeService: ThemeService,
-  ) {}
+    private fb: FormBuilder
+  ) {
+    this.userFormGroup = this.fb.group({
+      name: ['', [Validators.required, Validators.maxLength(50)]],
+      role: ['USER', Validators.required],
+      plan: ['FREE', Validators.required],
+      isActive: [true]
+    });
+  }
 
   ngOnInit() {
     this.userId = Number(this.route.snapshot.paramMap.get('id'));
@@ -50,12 +53,12 @@ export class AdminUserDetailComponent implements OnInit {
     this.adminService.getUser(this.userId).subscribe({
       next: (user) => {
         this.user = user;
-        this.userForm = {
+        this.userFormGroup.patchValue({
           name: user.name || '',
           role: user.role,
           plan: user.plan,
           isActive: user.isActive,
-        };
+        });
         this.loadLinks();
       },
       error: () => {
@@ -77,8 +80,12 @@ export class AdminUserDetailComponent implements OnInit {
   }
 
   saveUser() {
+    if (this.userFormGroup.invalid) {
+      this.userFormGroup.markAllAsTouched();
+      return;
+    }
     this.isSavingUser = true;
-    this.adminService.updateUser(this.userId, this.userForm).subscribe({
+    this.adminService.updateUser(this.userId, this.userFormGroup.value).subscribe({
       next: (updatedUser) => {
         this.user = { ...this.user, ...updatedUser };
         this.isSavingUser = false;

@@ -22,28 +22,32 @@
   <div class="admin-detail-grid">
     <section class="glass-card admin-panel">
       <h3>Profile & Subscription</h3>
-      <form class="admin-form" (ngSubmit)="saveUser()">
+      <form [formGroup]="userFormGroup" class="admin-form" (ngSubmit)="saveUser()" novalidate>
         <div class="form-group">
           <label>Name</label>
-          <input class="input-field" [(ngModel)]="userForm.name" name="name">
+          <input class="input-field" formControlName="name">
+          <div class="error-msg" *ngIf="userFormGroup.get('name')?.touched && userFormGroup.get('name')?.invalid">
+            <span *ngIf="userFormGroup.get('name')?.errors?.['required']">Name is required.</span>
+            <span *ngIf="userFormGroup.get('name')?.errors?.['maxlength']">Name is too long.</span>
+          </div>
         </div>
         <div class="form-group">
           <label>Role</label>
-          <select class="input-field" [(ngModel)]="userForm.role" name="role">
+          <select class="input-field" formControlName="role">
             <option value="USER">USER</option>
             <option value="ADMIN">ADMIN</option>
           </select>
         </div>
         <div class="form-group">
           <label>Plan</label>
-          <select class="input-field" [(ngModel)]="userForm.plan" name="plan">
+          <select class="input-field" formControlName="plan">
             <option value="FREE">FREE</option>
             <option value="PRO">PRO</option>
             <option value="BUSINESS">BUSINESS</option>
           </select>
         </div>
         <label class="toggle-field">
-          <input type="checkbox" [(ngModel)]="userForm.isActive" name="isActive">
+          <input type="checkbox" formControlName="isActive">
           <span>Account active</span>
         </label>
         <div class="admin-metadata">
@@ -52,7 +56,7 @@
           <p>Cancel at period end: {{ user.cancelAtPeriodEnd ? 'Yes' : 'No' }}</p>
           <p>Links: {{ user._count.links }}</p>
         </div>
-        <button class="btn-primary" type="submit" [disabled]="isSavingUser">
+        <button class="btn-primary" type="submit" [disabled]="isSavingUser || userFormGroup.invalid">
           {{ isSavingUser ? 'Saving...' : 'Save User' }}
         </button>
       </form>

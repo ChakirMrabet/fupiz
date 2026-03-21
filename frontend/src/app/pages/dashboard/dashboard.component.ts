@@ -29,10 +29,7 @@ export class DashboardComponent implements OnInit {
   isBulkCreating = false;
   bulkCreateSummary: null | { createdCount: number; failedCount: number; results: Array<{ index: number; success: boolean; error?: string }> } = null;
   webhooks: any[] = [];
-  webhookForm = {
-    url: '',
-    events: ['link.created', 'link.updated', 'link.clicked'],
-  };
+  // webhookForm removed, now using webhookFormGroup
   isSavingWebhook = false;
   newLink = {
     originalUrl: '',
@@ -389,15 +386,16 @@ export class DashboardComponent implements OnInit {
       this.notificationService.error('Webhooks are available on the Business plan.', 'Upgrade Required');
       return;
     }
-
+    if (this.webhookFormGroup.invalid) {
+      this.webhookFormGroup.markAllAsTouched();
+      return;
+    }
     this.isSavingWebhook = true;
-    this.linksService.createWebhook(this.webhookForm).subscribe({
+    const { url, events } = this.webhookFormGroup.value;
+    this.linksService.createWebhook({ url, events }).subscribe({
       next: () => {
         this.isSavingWebhook = false;
-        this.webhookForm = {
-          url: '',
-          events: ['link.created', 'link.updated', 'link.clicked'],
-        };
+        this.webhookFormGroup.reset({ url: '', events: [] });
         this.loadWebhooks();
         this.notificationService.success('Webhook created successfully.');
       },
@@ -410,11 +408,18 @@ export class DashboardComponent implements OnInit {
   }
 
   toggleWebhookEvent(eventName: string, enabled: boolean) {
-    const nextEvents = enabled
-      ? [...this.webhookForm.events, eventName]
-      : this.webhookForm.events.filter((event) => event !== eventName);
-
-    this.webhookForm.events = Array.from(new Set(nextEvents));
+    const eventsArray = this.webhookFormGroup.get('events') as FormArray;
+    const current = eventsArray.value as string[];
+    if (enabled) {
+      if (!current.includes(eventName)) {
+        eventsArray.push(this.fb.control(eventName));
+      }
+    } else {
+      const idx = current.indexOf(eventName);
+      if (idx > -1) {
+        eventsArray.removeAt(idx);
+      }
+    }
   }
 
   toggleWebhook(webhook: any) {

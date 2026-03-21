@@ -208,31 +208,36 @@
         <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Register outbound HTTP callbacks for link lifecycle events.</p>
 
         <div *ngIf="canUseWebhooks(); else webhookUpgrade">
-          <form class="account-form" (ngSubmit)="onCreateWebhook()">
+          <form [formGroup]="webhookFormGroup" class="account-form" (ngSubmit)="onCreateWebhook()" novalidate>
             <div class="form-group">
               <label>Endpoint URL</label>
-              <input type="url" class="input-field" [(ngModel)]="webhookForm.url" name="webhookUrl" placeholder="https://example.com/webhooks/fupiz" required>
+              <input type="url" class="input-field" formControlName="url" placeholder="https://example.com/webhooks/fupiz">
+              <div class="error-msg" *ngIf="webhookFormGroup.get('url')?.touched && webhookFormGroup.get('url')?.invalid">
+                <span *ngIf="webhookFormGroup.get('url')?.errors?.['required']">URL is required.</span>
+                <span *ngIf="webhookFormGroup.get('url')?.errors?.['pattern']">Enter a valid URL.</span>
+              </div>
             </div>
-
             <div class="form-group">
               <label>Events</label>
               <div class="webhook-events">
                 <label class="toggle-field">
-                  <input type="checkbox" [checked]="webhookForm.events.includes('link.created')" (change)="toggleWebhookEvent('link.created', $any($event.target).checked)">
+                  <input type="checkbox" [checked]="webhookFormGroup.get('events')?.value.includes('link.created')" (change)="toggleWebhookEvent('link.created', $any($event.target).checked)">
                   <span>link.created</span>
                 </label>
                 <label class="toggle-field">
-                  <input type="checkbox" [checked]="webhookForm.events.includes('link.updated')" (change)="toggleWebhookEvent('link.updated', $any($event.target).checked)">
+                  <input type="checkbox" [checked]="webhookFormGroup.get('events')?.value.includes('link.updated')" (change)="toggleWebhookEvent('link.updated', $any($event.target).checked)">
                   <span>link.updated</span>
                 </label>
                 <label class="toggle-field">
-                  <input type="checkbox" [checked]="webhookForm.events.includes('link.clicked')" (change)="toggleWebhookEvent('link.clicked', $any($event.target).checked)">
+                  <input type="checkbox" [checked]="webhookFormGroup.get('events')?.value.includes('link.clicked')" (change)="toggleWebhookEvent('link.clicked', $any($event.target).checked)">
                   <span>link.clicked</span>
                 </label>
               </div>
+              <div class="error-msg" *ngIf="webhookFormGroup.get('events')?.touched && webhookFormGroup.get('events')?.invalid">
+                <span *ngIf="webhookFormGroup.get('events')?.errors?.['required']">Select at least one event.</span>
+              </div>
             </div>
-
-            <button type="submit" class="btn-primary w-full btn-business" [disabled]="isSavingWebhook">
+            <button type="submit" class="btn-primary w-full btn-business" [disabled]="isSavingWebhook || webhookFormGroup.invalid">
               {{ isSavingWebhook ? 'Saving...' : 'Create Webhook' }}
             </button>
           </form>
