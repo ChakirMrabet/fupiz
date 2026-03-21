@@ -3,16 +3,24 @@
     <h2 class="hero-title auth-title gradient-text">Welcome Back</h2>
     <p class="auth-subtitle">Login to manage your links</p>
 
-    <form (ngSubmit)="onSubmit()" class="auth-form">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
       <div class="form-group">
         <label>Email</label>
-        <input type="email" class="input-field" [(ngModel)]="email" name="email" required>
+        <input type="email" class="input-field" formControlName="email" autocomplete="username">
+        <div class="error-msg" *ngIf="email?.touched && email?.invalid">
+          <span *ngIf="email?.errors?.['required']">Email is required.</span>
+          <span *ngIf="email?.errors?.['email']">Enter a valid email address.</span>
+        </div>
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" class="input-field" [(ngModel)]="password" name="password" required>
+        <input type="password" class="input-field" formControlName="password" autocomplete="current-password">
+        <div class="error-msg" *ngIf="password?.touched && password?.invalid">
+          <span *ngIf="password?.errors?.['required']">Password is required.</span>
+          <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters.</span>
+        </div>
       </div>
-      <button type="submit" class="btn-primary w-full" [disabled]="isLoading">
+      <button type="submit" class="btn-primary w-full" [disabled]="isLoading || loginForm.invalid">
         {{ isLoading ? 'Logging in...' : 'Login' }}
       </button>
       <p class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</p>
