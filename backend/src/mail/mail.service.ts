@@ -16,10 +16,11 @@ export class MailService {
   });
 
   private readonly from = process.env.MAIL_FROM;
+  private readonly supportInbox = process.env.SUPPORT_EMAIL || process.env.MAIL_FROM;
   private readonly frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
 
   private ensureConfigured() {
-    if (!this.from || !process.env.SMTP_HOST) {
+    if (!this.from || !this.supportInbox || !process.env.SMTP_HOST) {
       throw new InternalServerErrorException('Email delivery is not configured');
     }
   }
@@ -47,6 +48,58 @@ export class MailService {
         `<p><a href="${activationUrl.toString()}">Activate your account</a></p>`,
         '<p>This link expires automatically.</p>',
       ].join(''),
+    });
+  }
+
+  async sendPublicContactEmail(payload: {
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+  }) {
+    this.ensureConfigured();
+
+    await this.transporter.sendMail({
+      from: this.from,
+      to: this.supportInbox,
+      replyTo: payload.email,
+      subject: `[Public Contact] ${payload.subject}`,
+      text: [
+        'New public contact submission',
+        '',
+        `Name: ${payload.name}`,
+        `Email: ${payload.email}`,
+        `Subject: ${payload.subject}`,
+        '',
+        payload.message,
+      ].join('\n'),
+    });
+  }
+
+  async sendDashboardSupportEmail(payload: {
+    userEmail: string;
+    userName?: string | null;
+    subject: string;
+    category: string;
+    message: string;
+  }) {
+    this.ensureConfigured();
+
+    await this.transporter.sendMail({
+      from: this.from,
+      to: this.supportInbox,
+      replyTo: payload.userEmail,
+      subject: `[Dashboard Support] ${payload.subject}`,
+      text: [
+        'New dashboard support request',
+        '',
+        `User: ${payload.userName || 'Unnamed user'}`,
+        `Email: ${payload.userEmail}`,
+        `Category: ${payload.category}`,
+        `Subject: ${payload.subject}`,
+        '',
+        payload.message,
+      ].join('\n'),
     });
   }
 }

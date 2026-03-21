@@ -55,9 +55,10 @@ let MailService = class MailService {
             : undefined,
     });
     from = process.env.MAIL_FROM;
+    supportInbox = process.env.SUPPORT_EMAIL || process.env.MAIL_FROM;
     frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
     ensureConfigured() {
-        if (!this.from || !process.env.SMTP_HOST) {
+        if (!this.from || !this.supportInbox || !process.env.SMTP_HOST) {
             throw new common_1.InternalServerErrorException('Email delivery is not configured');
         }
     }
@@ -82,6 +83,43 @@ let MailService = class MailService {
                 `<p><a href="${activationUrl.toString()}">Activate your account</a></p>`,
                 '<p>This link expires automatically.</p>',
             ].join(''),
+        });
+    }
+    async sendPublicContactEmail(payload) {
+        this.ensureConfigured();
+        await this.transporter.sendMail({
+            from: this.from,
+            to: this.supportInbox,
+            replyTo: payload.email,
+            subject: `[Public Contact] ${payload.subject}`,
+            text: [
+                'New public contact submission',
+                '',
+                `Name: ${payload.name}`,
+                `Email: ${payload.email}`,
+                `Subject: ${payload.subject}`,
+                '',
+                payload.message,
+            ].join('\n'),
+        });
+    }
+    async sendDashboardSupportEmail(payload) {
+        this.ensureConfigured();
+        await this.transporter.sendMail({
+            from: this.from,
+            to: this.supportInbox,
+            replyTo: payload.userEmail,
+            subject: `[Dashboard Support] ${payload.subject}`,
+            text: [
+                'New dashboard support request',
+                '',
+                `User: ${payload.userName || 'Unnamed user'}`,
+                `Email: ${payload.userEmail}`,
+                `Category: ${payload.category}`,
+                `Subject: ${payload.subject}`,
+                '',
+                payload.message,
+            ].join('\n'),
         });
     }
 };

@@ -171,3 +171,69 @@
     </div>
   </div>
 </section>
+
+<section id="contact" class="contact-section container">
+  <div class="section-header">
+    <h2 class="hero-title">Contact <span class="gradient-text">Us</span></h2>
+    <p class="hero-subtitle">Reach out with general questions, partnership ideas, or anything else you need before signing up.</p>
+  </div>
+
+  <div class="contact-grid">
+    <div class="glass-card contact-info-card">
+      <h3>We are reachable</h3>
+      <p>Use the form for general questions about the product, pricing, or setup.</p>
+      <p>If you are already a customer and something is broken, use the support form inside your dashboard so the message is tied to your account.</p>
+      <div class="contact-points">
+        <div>
+          <strong>General support</strong>
+          <p>Questions, onboarding, product guidance</p>
+        </div>
+        <div>
+          <strong>Response path</strong>
+          <p>Messages are delivered to the configured support inbox</p>
+        </div>
+      </div>
+    </div>
+
+    <form class="glass-card contact-form-card" (ngSubmit)="onContactSubmit()">
+      <div class="contact-form-grid">
+        <input
+          type="text"
+          class="input-field"
+          [(ngModel)]="contactForm.name"
+          name="contactName"
+          placeholder="Your name"
+          required
+        >
+        <input
+          type="email"
+          class="input-field"
+          [(ngModel)]="contactForm.email"
+          name="contactEmail"
+          placeholder="Your email"
+          required
+        >
+      </div>
+      <input
+        type="text"
+        class="input-field"
+        [(ngModel)]="contactForm.subject"
+        name="contactSubject"
+        placeholder="Subject"
+        required
+      >
+      <textarea
+        class="input-field contact-textarea"
+        [(ngModel)]="contactForm.message"
+        name="contactMessage"
+        placeholder="How can we help?"
+        required
+      ></textarea>
+      <button class="btn-primary" type="submit" [disabled]="isSendingContact">
+        {{ isSendingContact ? 'Sending...' : 'Send Message' }}
+      </button>
+      <p class="quick-shorten-error" *ngIf="contactError">{{ contactError }}</p>
+      <p class="contact-success" *ngIf="contactSuccess">{{ contactSuccess }}</p>
+    </form>
+  </div>
+</section>

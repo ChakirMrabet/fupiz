@@ -30,6 +30,9 @@
       <li [class.active]="activeSection === 'billing'" (click)="setSection('billing')">
         <span>💳 Billing</span>
       </li>
+      <li [class.active]="activeSection === 'support'" (click)="setSection('support')">
+        <span>🛟 Support</span>
+      </li>
     </ul>
   </aside>
 
@@ -281,6 +284,56 @@
         <ng-template #webhookUpgrade>
           <p class="help-text">Webhooks are available on the Business plan.</p>
         </ng-template>
+      </div>
+    </div>
+
+    <div *ngIf="activeSection === 'support'">
+      <div class="dashboard-header">
+        <div>
+          <h2 class="hero-title dashboard-title">Account <span class="gradient-text">Support</span></h2>
+          <p class="dashboard-subtitle">Report issues, ask for help, or send account-specific questions from inside your dashboard.</p>
+        </div>
+      </div>
+
+      <div class="glass-card account-card">
+        <h3>Support Request</h3>
+        <p class="account-email">We will route this using your signed-in email: <strong>{{ profile.email }}</strong></p>
+
+        <form [formGroup]="supportForm" (ngSubmit)="onSubmitSupport()" class="account-form" novalidate>
+          <div class="form-group">
+            <label>Category</label>
+            <select class="input-field" formControlName="category">
+              <option value="bug">Bug report</option>
+              <option value="billing">Billing</option>
+              <option value="account">Account</option>
+              <option value="feature">Feature request</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Subject</label>
+            <input type="text" class="input-field" formControlName="subject" placeholder="Short summary of the issue">
+            <div class="error-msg" *ngIf="supportForm.get('subject')?.touched && supportForm.get('subject')?.invalid">
+              <span *ngIf="supportForm.get('subject')?.errors?.['required']">Subject is required.</span>
+              <span *ngIf="supportForm.get('subject')?.errors?.['maxlength']">Subject is too long.</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Message</label>
+            <textarea class="input-field landing-textarea" formControlName="message" placeholder="Describe what happened, what you expected, and how we can help."></textarea>
+            <div class="error-msg" *ngIf="supportForm.get('message')?.touched && supportForm.get('message')?.invalid">
+              <span *ngIf="supportForm.get('message')?.errors?.['required']">Message is required.</span>
+              <span *ngIf="supportForm.get('message')?.errors?.['minlength']">Please include a bit more detail.</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary w-full" [disabled]="isSendingSupport || supportForm.invalid">
+            {{ isSendingSupport ? 'Sending...' : 'Send Support Request' }}
+          </button>
+          <p class="success-msg" *ngIf="supportMessage">{{ supportMessage }}</p>
+        </form>
       </div>
     </div>
   </main>

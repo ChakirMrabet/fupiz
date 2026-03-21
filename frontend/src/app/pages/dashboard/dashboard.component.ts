@@ -8,6 +8,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { toDataURL } from 'qrcode';
 import { BillingService } from '../../services/billing.service';
+import { SupportService } from '../../services/support.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,7 +21,7 @@ export class DashboardComponent implements OnInit {
   profileForm: FormGroup;
   createLinkForm: FormGroup;
   webhookFormGroup: FormGroup;
-  activeSection: 'links' | 'integrations' | 'profile' | 'billing' = 'links';
+  activeSection: 'links' | 'integrations' | 'profile' | 'billing' | 'support' = 'links';
   links: any[] = [];
   linkSearch = '';
   currentPage = 1;
@@ -62,12 +63,16 @@ export class DashboardComponent implements OnInit {
   isUpdatingProfile = false;
   profileMessage = '';
   isBillingActionPending = false;
+  supportForm: FormGroup;
+  isSendingSupport = false;
+  supportMessage = '';
 
 
   constructor(
     private linksService: LinksService,
     private authService: AuthService,
     private billingService: BillingService,
+    private supportService: SupportService,
     private notificationService: NotificationService,
     private router: Router,
     public themeService: ThemeService,
@@ -96,6 +101,11 @@ export class DashboardComponent implements OnInit {
         'link.clicked'
       ], Validators.required)
     });
+    this.supportForm = this.fb.group({
+      category: ['bug', [Validators.required]],
+      subject: ['', [Validators.required, Validators.maxLength(120)]],
+      message: ['', [Validators.required, Validators.minLength(10)]],
+    });
   }
 
   ngOnInit() {
@@ -107,7 +117,7 @@ export class DashboardComponent implements OnInit {
     this.loadProfile();
   }
 
-  setSection(section: 'links' | 'integrations' | 'profile' | 'billing') {
+  setSection(section: 'links' | 'integrations' | 'profile' | 'billing' | 'support') {
     this.activeSection = section;
   }
 
@@ -184,6 +194,32 @@ export class DashboardComponent implements OnInit {
         console.error(err);
         this.isBillingActionPending = false;
         this.notificationService.error('Could not open the billing portal.', 'Billing Error');
+      },
+    });
+  }
+
+  onSubmitSupport() {
+    if (this.supportForm.invalid) {
+      this.supportForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSendingSupport = true;
+    this.supportMessage = '';
+
+    this.supportService.submitDashboardSupport(this.supportForm.getRawValue()).subscribe({
+      next: () => {
+        this.supportForm.reset({
+          category: 'bug',
+          subject: '',
+          message: '',
+        });
+        this.supportMessage = 'Your support request has been sent.';
+        this.isSendingSupport = false;
+      },
+      error: (error) => {
+        this.supportMessage = error?.error?.message || 'Unable to send your support request.';
+        this.isSendingSupport = false;
       },
     });
   }
