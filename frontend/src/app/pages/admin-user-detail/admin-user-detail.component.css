@@ -61,13 +61,26 @@
   flex-wrap: wrap;
 }
 
+.admin-link-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .admin-link-item p,
 .admin-link-item strong,
 .admin-link-item button,
 .admin-link-item label,
-.admin-link-item span {
+.admin-link-item span,
+.admin-link-item textarea,
+.admin-link-item input {
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.admin-textarea {
+  min-height: 96px;
+  resize: vertical;
 }
 
 .btn-danger {

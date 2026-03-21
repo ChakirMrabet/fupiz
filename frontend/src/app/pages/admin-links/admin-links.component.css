@@ -58,6 +58,19 @@
 .admin-search-row {
   display: flex;
   gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-search-row-secondary {
+  margin-top: 0.75rem;
+}
+
+.admin-select {
+  max-width: 220px;
+}
+
+.admin-page-size {
+  max-width: 140px;
 }
 
 .admin-list {
@@ -103,6 +116,20 @@
   margin-top: 1rem;
 }
 
+.admin-results-bar,
+.pagination-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.pagination-label {
+  color: var(--text-secondary);
+}
+
 .btn-danger {
   background: linear-gradient(135deg, #f97316, #ef4444);
 }
@@ -118,5 +145,10 @@
 
   .admin-search-row {
     flex-direction: column;
+  }
+
+  .admin-select,
+  .admin-page-size {
+    max-width: none;
   }
 }

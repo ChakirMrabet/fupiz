@@ -65,10 +65,22 @@
           <div *ngIf="editingLinkId !== link.id">
             <div class="admin-link-topline">
               <strong>{{ link.shortCode }}</strong>
-              <span class="badge status-badge" [class.active]="link.isActive" [class.inactive]="!link.isActive">{{ link.isActive ? 'Active' : 'Disabled' }}</span>
+              <div class="admin-link-badges">
+                <span class="badge status-badge" [class.active]="link.isActive" [class.inactive]="!link.isActive">{{ link.isActive ? 'Active' : 'Disabled' }}</span>
+                <span class="badge" *ngIf="link.password">🔒 Password Protected</span>
+                <span class="badge" *ngIf="link.expiresAt">⏰ Expires: {{ link.expiresAt | date:'shortDate' }}</span>
+                <span class="badge" *ngIf="link.singleUse || (link.maxClicks !== null && link.maxClicks !== undefined)">🎯 {{ formatClickLimit(link) }}</span>
+                <span class="badge" *ngIf="link.singleUse">⚡ One-Time Link</span>
+                <span class="badge" *ngIf="hasLandingPage(link)">🛬 Landing Page</span>
+              </div>
             </div>
             <p class="muted-text">{{ link.originalUrl }}</p>
             <p class="muted-text">Clicks: {{ link.clicks }} | Expires: {{ link.expiresAt ? (link.expiresAt | date:'short') : 'Never' }}</p>
+            <p class="muted-text" *ngIf="hasLandingPage(link)">
+              Landing:
+              {{ link.landingTitle || 'Untitled landing page' }}
+              <span *ngIf="link.landingButtonLabel">| CTA: {{ link.landingButtonLabel }}</span>
+            </p>
             <div class="admin-link-actions">
               <button class="btn-secondary" (click)="editLink(link)">Edit Link</button>
               <button
@@ -84,8 +96,12 @@
           <form *ngIf="editingLinkId === link.id" class="admin-form admin-link-form" (ngSubmit)="saveLink(link.id)">
             <input class="input-field" [(ngModel)]="linkForm.originalUrl" name="originalUrl" placeholder="Destination URL">
             <input class="input-field" [(ngModel)]="linkForm.shortCode" name="shortCode" placeholder="Short code">
+            <input class="input-field" type="password" [(ngModel)]="linkForm.password" name="password" placeholder="Password (leave blank to remove)">
             <input class="input-field" type="datetime-local" [(ngModel)]="linkForm.expiresAt" name="expiresAt">
             <input class="input-field" type="number" min="1" [(ngModel)]="linkForm.maxClicks" name="maxClicks" placeholder="Max clicks">
+            <input class="input-field" [(ngModel)]="linkForm.landingTitle" name="landingTitle" placeholder="Landing page title (optional)">
+            <textarea class="input-field admin-textarea" [(ngModel)]="linkForm.landingDescription" name="landingDescription" placeholder="Landing page description (optional)"></textarea>
+            <input class="input-field" [(ngModel)]="linkForm.landingButtonLabel" name="landingButtonLabel" placeholder="Landing page button label (optional)">
             <label class="toggle-field">
               <input type="checkbox" [(ngModel)]="linkForm.singleUse" name="singleUse">
               <span>One-time link</span>

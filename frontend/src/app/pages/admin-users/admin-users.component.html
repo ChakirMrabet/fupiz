@@ -33,10 +33,47 @@
           name="adminUserSearch"
           placeholder="Search by email or name"
         >
-        <button class="btn-primary" (click)="loadUsers()" [disabled]="isLoading">
+        <select class="input-field admin-select" [(ngModel)]="role" name="adminUserRole">
+          <option value="ALL">All roles</option>
+          <option value="USER">User</option>
+          <option value="ADMIN">Admin</option>
+        </select>
+        <select class="input-field admin-select" [(ngModel)]="plan" name="adminUserPlan">
+          <option value="ALL">All plans</option>
+          <option value="FREE">Free</option>
+          <option value="PRO">Pro</option>
+          <option value="BUSINESS">Business</option>
+        </select>
+      </div>
+      <div class="admin-search-row admin-search-row-secondary">
+        <select class="input-field admin-select" [(ngModel)]="isActive" name="adminUserActive">
+          <option value="ALL">Any status</option>
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+        <select class="input-field admin-select" [(ngModel)]="subscriptionStatus" name="adminUserSubscription">
+          <option value="ALL">Any subscription</option>
+          <option value="active">Active</option>
+          <option value="trialing">Trialing</option>
+          <option value="past_due">Past due</option>
+          <option value="canceled">Canceled</option>
+          <option value="none">None</option>
+        </select>
+        <select class="input-field admin-select admin-page-size" [(ngModel)]="pageSize" name="adminUserPageSize">
+          <option [ngValue]="10">10 / page</option>
+          <option [ngValue]="25">25 / page</option>
+          <option [ngValue]="50">50 / page</option>
+        </select>
+        <button class="btn-primary" (click)="applyFilters()" [disabled]="isLoading">
           {{ isLoading ? 'Loading...' : 'Search' }}
         </button>
+        <button class="btn-secondary" (click)="resetFilters()" [disabled]="isLoading">Reset</button>
       </div>
+    </div>
+
+    <div class="admin-results-bar" *ngIf="!isLoading">
+      <p class="muted-text">{{ totalItems }} users found</p>
+      <p class="muted-text">Page {{ page }} of {{ totalPages }}</p>
     </div>
 
     <div class="admin-list">
@@ -66,6 +103,12 @@
       <div class="glass-card empty-state" *ngIf="users.length === 0 && !isLoading">
         <p>No users found.</p>
       </div>
+    </div>
+
+    <div class="pagination-bar" *ngIf="totalPages > 1">
+      <button class="btn-secondary" (click)="changePage(page - 1)" [disabled]="page === 1 || isLoading">Previous</button>
+      <span class="pagination-label">Page {{ page }} of {{ totalPages }}</span>
+      <button class="btn-secondary" (click)="changePage(page + 1)" [disabled]="page === totalPages || isLoading">Next</button>
     </div>
   </main>
 </div>

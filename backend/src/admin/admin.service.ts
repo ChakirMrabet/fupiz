@@ -6,30 +6,64 @@ import { PLAN_IDS, isPlanId } from '../plans/plans.config';
 export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async listUsers(search?: string) {
+  async listUsers(params: {
+    search?: string;
+    role?: string;
+    plan?: string;
+    isActive?: string;
+    subscriptionStatus?: string;
+    page?: string;
+    pageSize?: string;
+  }) {
+    const { search, role, plan, isActive, subscriptionStatus, page, pageSize } = params;
     const normalizedSearch = search?.trim();
-
-    const users = await this.prisma.user.findMany({
-      where: normalizedSearch
+    const currentPage = this.parsePositiveInt(page, 1);
+    const currentPageSize = this.parseBoundedPageSize(pageSize, 10);
+    const where: any = {
+      ...(normalizedSearch
         ? {
             OR: [
               { email: { contains: normalizedSearch } },
               { name: { contains: normalizedSearch } },
             ],
           }
-        : undefined,
-      include: {
-        _count: {
-          select: { links: true },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        : {}),
+      ...(role && role !== 'ALL' ? { role } : {}),
+      ...(plan && plan !== 'ALL' ? { plan } : {}),
+      ...(isActive === 'true' ? { isActive: true } : {}),
+      ...(isActive === 'false' ? { isActive: false } : {}),
+      ...(subscriptionStatus && subscriptionStatus !== 'ALL'
+        ? subscriptionStatus === 'none'
+          ? { stripeSubscriptionStatus: null }
+          : { stripeSubscriptionStatus: subscriptionStatus }
+        : {}),
+    };
 
-    return users.map((user) => {
-      const { password, activationToken, activationTokenExpiresAt, ...result } = user;
-      return result;
-    });
+    const [users, totalItems] = await this.prisma.$transaction([
+      this.prisma.user.findMany({
+        where,
+        include: {
+          _count: {
+            select: { links: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: (currentPage - 1) * currentPageSize,
+        take: currentPageSize,
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return {
+      items: users.map((user) => {
+        const { password, activationToken, activationTokenExpiresAt, ...result } = user;
+        return result;
+      }),
+      totalItems,
+      page: currentPage,
+      pageSize: currentPageSize,
+      totalPages: Math.max(1, Math.ceil(totalItems / currentPageSize)),
+    };
   }
 
   async getUser(userId: number) {
@@ -112,11 +146,29 @@ export class AdminService {
     });
   }
 
-  async listLinks(search?: string) {
+  async listLinks(params: {
+    search?: string;
+    ownerType?: string;
+    isActive?: string;
+    plan?: string;
+    subscriptionStatus?: string;
+    page?: string;
+    pageSize?: string;
+  }) {
+    const { search, ownerType, isActive, plan, subscriptionStatus, page, pageSize } = params;
     const normalizedSearch = search?.trim();
-
-    return this.prisma.link.findMany({
-      where: normalizedSearch
+    const currentPage = this.parsePositiveInt(page, 1);
+    const currentPageSize = this.parseBoundedPageSize(pageSize, 10);
+    const userFilters: Record<string, unknown> = {
+      ...(plan && plan !== 'ALL' ? { plan } : {}),
+      ...(subscriptionStatus && subscriptionStatus !== 'ALL'
+        ? subscriptionStatus === 'none'
+          ? { stripeSubscriptionStatus: null }
+          : { stripeSubscriptionStatus: subscriptionStatus }
+        : {}),
+    };
+    const where: any = {
+      ...(normalizedSearch
         ? {
             OR: [
               { shortCode: { contains: normalizedSearch } },
@@ -125,20 +177,42 @@ export class AdminService {
               { user: { name: { contains: normalizedSearch } } },
             ],
           }
-        : undefined,
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            plan: true,
-            stripeSubscriptionStatus: true,
+        : {}),
+      ...(ownerType === 'ACCOUNT' ? { userId: { not: null } } : {}),
+      ...(ownerType === 'ANONYMOUS' ? { userId: null } : {}),
+      ...(isActive === 'true' ? { isActive: true } : {}),
+      ...(isActive === 'false' ? { isActive: false } : {}),
+      ...(Object.keys(userFilters).length > 0 ? { user: userFilters } : {}),
+    };
+
+    const [links, totalItems] = await this.prisma.$transaction([
+      this.prisma.link.findMany({
+        where,
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              plan: true,
+              stripeSubscriptionStatus: true,
+            },
           },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+        skip: (currentPage - 1) * currentPageSize,
+        take: currentPageSize,
+      }),
+      this.prisma.link.count({ where }),
+    ]);
+
+    return {
+      items: links,
+      totalItems,
+      page: currentPage,
+      pageSize: currentPageSize,
+      totalPages: Math.max(1, Math.ceil(totalItems / currentPageSize)),
+    };
   }
 
   async updateLink(linkId: number, data: any) {
@@ -234,5 +308,15 @@ export class AdminService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+  }
+
+  private parsePositiveInt(value: string | undefined, fallback: number) {
+    const parsedValue = Number(value);
+    return Number.isInteger(parsedValue) && parsedValue > 0 ? parsedValue : fallback;
+  }
+
+  private parseBoundedPageSize(value: string | undefined, fallback: number) {
+    const parsedValue = this.parsePositiveInt(value, fallback);
+    return Math.min(parsedValue, 100);
   }
 }

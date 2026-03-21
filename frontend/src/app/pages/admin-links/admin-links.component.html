@@ -33,10 +33,47 @@
           name="adminLinkSearch"
           placeholder="Search by short code, destination, owner email, or owner name"
         >
-        <button class="btn-primary" (click)="loadLinks()" [disabled]="isLoading">
+        <select class="input-field admin-select" [(ngModel)]="ownerType" name="adminLinkOwnerType">
+          <option value="ALL">All owners</option>
+          <option value="ACCOUNT">Account owned</option>
+          <option value="ANONYMOUS">Anonymous</option>
+        </select>
+        <select class="input-field admin-select" [(ngModel)]="isActive" name="adminLinkActive">
+          <option value="ALL">Any status</option>
+          <option value="true">Active</option>
+          <option value="false">Disabled</option>
+        </select>
+      </div>
+      <div class="admin-search-row admin-search-row-secondary">
+        <select class="input-field admin-select" [(ngModel)]="plan" name="adminLinkPlan">
+          <option value="ALL">Any owner plan</option>
+          <option value="FREE">Free</option>
+          <option value="PRO">Pro</option>
+          <option value="BUSINESS">Business</option>
+        </select>
+        <select class="input-field admin-select" [(ngModel)]="subscriptionStatus" name="adminLinkSubscription">
+          <option value="ALL">Any subscription</option>
+          <option value="active">Active</option>
+          <option value="trialing">Trialing</option>
+          <option value="past_due">Past due</option>
+          <option value="canceled">Canceled</option>
+          <option value="none">None</option>
+        </select>
+        <select class="input-field admin-select admin-page-size" [(ngModel)]="pageSize" name="adminLinkPageSize">
+          <option [ngValue]="10">10 / page</option>
+          <option [ngValue]="25">25 / page</option>
+          <option [ngValue]="50">50 / page</option>
+        </select>
+        <button class="btn-primary" (click)="applyFilters()" [disabled]="isLoading">
           {{ isLoading ? 'Loading...' : 'Search' }}
         </button>
+        <button class="btn-secondary" (click)="resetFilters()" [disabled]="isLoading">Reset</button>
       </div>
+    </div>
+
+    <div class="admin-results-bar" *ngIf="!isLoading">
+      <p class="muted-text">{{ totalItems }} links found</p>
+      <p class="muted-text">Page {{ page }} of {{ totalPages }}</p>
     </div>
 
     <div class="admin-list">
@@ -86,6 +123,12 @@
       <div class="glass-card empty-state" *ngIf="links.length === 0 && !isLoading">
         <p>No links found.</p>
       </div>
+    </div>
+
+    <div class="pagination-bar" *ngIf="totalPages > 1">
+      <button class="btn-secondary" (click)="changePage(page - 1)" [disabled]="page === 1 || isLoading">Previous</button>
+      <span class="pagination-label">Page {{ page }} of {{ totalPages }}</span>
+      <button class="btn-secondary" (click)="changePage(page + 1)" [disabled]="page === totalPages || isLoading">Next</button>
     </div>
   </main>
 </div>

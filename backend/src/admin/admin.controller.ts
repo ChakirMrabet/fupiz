@@ -11,8 +11,24 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get('users')
-  listUsers(@Query('search') search?: string) {
-    return this.adminService.listUsers(search);
+  listUsers(
+    @Query('search') search?: string,
+    @Query('role') role?: string,
+    @Query('plan') plan?: string,
+    @Query('isActive') isActive?: string,
+    @Query('subscriptionStatus') subscriptionStatus?: string,
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    return this.adminService.listUsers({
+      search,
+      role,
+      plan,
+      isActive,
+      subscriptionStatus,
+      page,
+      pageSize,
+    });
   }
 
   @Get('users/:id')
@@ -34,8 +50,24 @@ export class AdminController {
   }
 
   @Get('links')
-  listLinks(@Query('search') search?: string) {
-    return this.adminService.listLinks(search);
+  listLinks(
+    @Query('search') search?: string,
+    @Query('ownerType') ownerType?: string,
+    @Query('isActive') isActive?: string,
+    @Query('plan') plan?: string,
+    @Query('subscriptionStatus') subscriptionStatus?: string,
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    return this.adminService.listLinks({
+      search,
+      ownerType,
+      isActive,
+      plan,
+      subscriptionStatus,
+      page,
+      pageSize,
+    });
   }
 
   @Patch('links/:id')

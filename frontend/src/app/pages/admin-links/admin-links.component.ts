@@ -17,6 +17,14 @@ import { NotificationService } from '../../services/notification.service';
 export class AdminLinksComponent implements OnInit {
   links: any[] = [];
   search = '';
+  ownerType = 'ALL';
+  isActive = 'ALL';
+  plan = 'ALL';
+  subscriptionStatus = 'ALL';
+  page = 1;
+  pageSize = 10;
+  totalPages = 1;
+  totalItems = 0;
   isLoading = false;
   deletingLinkId: number | null = null;
 
@@ -34,9 +42,20 @@ export class AdminLinksComponent implements OnInit {
 
   loadLinks() {
     this.isLoading = true;
-    this.adminService.getLinks(this.search.trim()).subscribe({
-      next: (links) => {
-        this.links = links;
+    this.adminService.getLinks({
+      search: this.search.trim(),
+      ownerType: this.ownerType,
+      isActive: this.isActive,
+      plan: this.plan,
+      subscriptionStatus: this.subscriptionStatus,
+      page: this.page,
+      pageSize: this.pageSize,
+    }).subscribe({
+      next: (response) => {
+        this.links = response.items;
+        this.totalPages = response.totalPages;
+        this.totalItems = response.totalItems;
+        this.page = response.page;
         this.isLoading = false;
       },
       error: () => {
@@ -44,6 +63,31 @@ export class AdminLinksComponent implements OnInit {
         this.notificationService.error('Unable to load admin links right now.', 'Admin');
       },
     });
+  }
+
+  applyFilters() {
+    this.page = 1;
+    this.loadLinks();
+  }
+
+  resetFilters() {
+    this.search = '';
+    this.ownerType = 'ALL';
+    this.isActive = 'ALL';
+    this.plan = 'ALL';
+    this.subscriptionStatus = 'ALL';
+    this.page = 1;
+    this.pageSize = 10;
+    this.loadLinks();
+  }
+
+  changePage(nextPage: number) {
+    if (nextPage < 1 || nextPage > this.totalPages || nextPage === this.page) {
+      return;
+    }
+
+    this.page = nextPage;
+    this.loadLinks();
   }
 
   async deleteLink(link: any) {
@@ -61,7 +105,10 @@ export class AdminLinksComponent implements OnInit {
     this.deletingLinkId = link.id;
     this.adminService.deleteLink(link.id).subscribe({
       next: () => {
-        this.links = this.links.filter((entry) => entry.id !== link.id);
+        if (this.links.length === 1 && this.page > 1) {
+          this.page -= 1;
+        }
+        this.loadLinks();
         this.deletingLinkId = null;
         this.notificationService.success('Link deleted successfully.', 'Admin');
       },

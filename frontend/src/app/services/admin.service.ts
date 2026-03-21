@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -14,10 +14,10 @@ export class AdminService {
     return new HttpHeaders().set('Authorization', `Bearer ${this.auth.token}`);
   }
 
-  getUsers(search = '') {
-    return this.http.get<any[]>(`${this.apiUrl}/users`, {
+  getUsers(params: Record<string, string | number>) {
+    return this.http.get<any>(`${this.apiUrl}/users`, {
       headers: this.headers,
-      params: search ? { search } : {},
+      params: this.buildParams(params),
     });
   }
 
@@ -39,10 +39,10 @@ export class AdminService {
     });
   }
 
-  getLinks(search = '') {
-    return this.http.get<any[]>(`${this.apiUrl}/links`, {
+  getLinks(params: Record<string, string | number>) {
+    return this.http.get<any>(`${this.apiUrl}/links`, {
       headers: this.headers,
-      params: search ? { search } : {},
+      params: this.buildParams(params),
     });
   }
 
@@ -56,5 +56,19 @@ export class AdminService {
     return this.http.delete<any>(`${this.apiUrl}/links/${linkId}`, {
       headers: this.headers,
     });
+  }
+
+  private buildParams(values: Record<string, string | number>) {
+    let params = new HttpParams();
+
+    for (const [key, value] of Object.entries(values)) {
+      if (value === '' || value === 'ALL' || value === undefined || value === null) {
+        continue;
+      }
+
+      params = params.set(key, String(value));
+    }
+
+    return params;
   }
 }

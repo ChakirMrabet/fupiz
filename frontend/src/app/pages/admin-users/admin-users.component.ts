@@ -16,6 +16,14 @@ import { AdminService } from '../../services/admin.service';
 export class AdminUsersComponent implements OnInit {
   users: any[] = [];
   search = '';
+  role = 'ALL';
+  plan = 'ALL';
+  isActive = 'ALL';
+  subscriptionStatus = 'ALL';
+  page = 1;
+  pageSize = 10;
+  totalPages = 1;
+  totalItems = 0;
   isLoading = false;
 
   constructor(
@@ -31,15 +39,51 @@ export class AdminUsersComponent implements OnInit {
 
   loadUsers() {
     this.isLoading = true;
-    this.adminService.getUsers(this.search.trim()).subscribe({
-      next: (users) => {
-        this.users = users;
+    this.adminService.getUsers({
+      search: this.search.trim(),
+      role: this.role,
+      plan: this.plan,
+      isActive: this.isActive,
+      subscriptionStatus: this.subscriptionStatus,
+      page: this.page,
+      pageSize: this.pageSize,
+    }).subscribe({
+      next: (response) => {
+        this.users = response.items;
+        this.totalPages = response.totalPages;
+        this.totalItems = response.totalItems;
+        this.page = response.page;
         this.isLoading = false;
       },
       error: () => {
         this.isLoading = false;
       },
     });
+  }
+
+  applyFilters() {
+    this.page = 1;
+    this.loadUsers();
+  }
+
+  resetFilters() {
+    this.search = '';
+    this.role = 'ALL';
+    this.plan = 'ALL';
+    this.isActive = 'ALL';
+    this.subscriptionStatus = 'ALL';
+    this.page = 1;
+    this.pageSize = 10;
+    this.loadUsers();
+  }
+
+  changePage(nextPage: number) {
+    if (nextPage < 1 || nextPage > this.totalPages || nextPage === this.page) {
+      return;
+    }
+
+    this.page = nextPage;
+    this.loadUsers();
   }
 
   logout() {

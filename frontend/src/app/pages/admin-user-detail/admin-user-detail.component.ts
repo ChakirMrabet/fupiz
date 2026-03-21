@@ -95,10 +95,14 @@ export class AdminUserDetailComponent implements OnInit {
     this.linkForm = {
       originalUrl: link.originalUrl,
       shortCode: link.shortCode,
+      password: link.password || '',
       isActive: link.isActive,
       expiresAt: link.expiresAt ? this.toDateTimeLocal(link.expiresAt) : '',
       maxClicks: link.maxClicks ?? '',
       singleUse: link.singleUse,
+      landingTitle: link.landingTitle || '',
+      landingDescription: link.landingDescription || '',
+      landingButtonLabel: link.landingButtonLabel || '',
     };
   }
 
@@ -148,6 +152,22 @@ export class AdminUserDetailComponent implements OnInit {
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  hasLandingPage(link: any) {
+    return !!(link.landingTitle || link.landingDescription || link.landingButtonLabel);
+  }
+
+  formatClickLimit(link: any) {
+    if (link.singleUse) {
+      return `${link.clicks} / 1 clicks`;
+    }
+
+    if (link.maxClicks === null || link.maxClicks === undefined) {
+      return '';
+    }
+
+    return `${link.clicks} / ${link.maxClicks} clicks`;
   }
 
   private toDateTimeLocal(value: string) {
