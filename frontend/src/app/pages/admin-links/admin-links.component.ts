@@ -6,11 +6,12 @@ import { ThemeService } from '../../services/theme.service';
 import { AuthService } from '../../services/auth.service';
 import { AdminService } from '../../services/admin.service';
 import { NotificationService } from '../../services/notification.service';
+import { NavbarComponent } from '../../components/ui/ui-navbar.component';
 
 @Component({
   selector: 'app-admin-links',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive, NavbarComponent],
   templateUrl: './admin-links.component.html',
   styleUrls: ['./admin-links.component.css'],
 })

@@ -1,28 +1,16 @@
-<nav class="navbar container">
-  <div class="logo gradient-text">Fupiz</div>
-  <div class="nav-links">
-    <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
-      {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
-    </button>
-    <a routerLink="/login" class="btn-secondary">Login</a>
-    <a routerLink="/register" class="btn-primary" style="text-decoration: none;">Get Started</a>
-  </div>
-</nav>
+<app-ui-navbar>
+  <a routerLink="/login" class="btn-secondary">Login</a>
+</app-ui-navbar>
 
 <main class="hero container">
   <h1 class="hero-title">Shorten Your Links, <br><span class="gradient-text">Expand Your Reach</span></h1>
-  <p class="hero-subtitle">Fuipiz is the modern, fast, and secure way to manage your scattered links. Password protect
+  <p class="hero-subtitle">Fupiz is the modern, fast, and secure way to manage your scattered links. Password protect
     them, set expirations, and track your success.</p>
 
   <div class="quick-shorten glass-card">
     <div class="quick-shorten-form">
-      <input
-        type="url"
-        class="input-field"
-        placeholder="Paste your long URL here..."
-        [(ngModel)]="urlToShorten"
-        [disabled]="isCreating"
-      >
+      <input type="url" class="input-field" placeholder="Paste your long URL here..." [(ngModel)]="urlToShorten"
+        [disabled]="isCreating">
       <button class="btn-primary" (click)="onShorten()" [disabled]="isCreating || !urlToShorten.trim()">
         {{ isCreating ? 'Shortening...' : 'Shorten Now' }}
       </button>
@@ -48,19 +36,47 @@
   <p class="sponsors-label">Built for teams like yours</p>
   <div class="sponsors-track">
     <div class="sponsors-slide">
-      <div class="sponsor-logo"><span class="sponsor-icon">⚡</span> Nexova</div>
-      <div class="sponsor-logo"><span class="sponsor-icon">☁️</span> Cloudly</div>
-      <div class="sponsor-logo"><span class="sponsor-icon">📦</span> Dataplex</div>
-      <div class="sponsor-logo"><span class="sponsor-icon">🌊</span> Synthwave</div>
-      <div class="sponsor-logo"><span class="sponsor-icon">🪐</span> Orbitra</div>
-      <div class="sponsor-logo"><span class="sponsor-icon">📚</span> Flowstack</div>
+      <div class="sponsor-logo"><img src="logos/google.svg" alt="Google"></div>
+      <div class="sponsor-logo"><img src="logos/microsoft.svg" alt="Microsoft"></div>
+      <div class="sponsor-logo"><img src="logos/amazon.svg" alt="Amazon"></div>
+      <div class="sponsor-logo"><img src="logos/meta.svg" alt="Meta"></div>
+      <div class="sponsor-logo"><img src="logos/apple.svg" alt="Apple"></div>
+      <div class="sponsor-logo"><img src="logos/slack.svg" alt="Slack"></div>
+      <div class="sponsor-logo"><img src="logos/spotify.svg" alt="Spotify"></div>
+      <div class="sponsor-logo"><img src="logos/nvidia.svg" alt="NVIDIA"></div>
+      <div class="sponsor-logo"><img src="logos/ibm.svg" alt="IBM"></div>
+      <div class="sponsor-logo"><img src="logos/oracle.svg" alt="Oracle"></div>
+      <div class="sponsor-logo"><img src="logos/sap.svg" alt="SAP"></div>
+      <div class="sponsor-logo"><img src="logos/paypal.svg" alt="PayPal"></div>
+      <div class="sponsor-logo"><img src="logos/tesla.svg" alt="Tesla"></div>
+      <div class="sponsor-logo"><img src="logos/dropbox.svg" alt="Dropbox"></div>
+      <div class="sponsor-logo"><img src="logos/accenture.svg" alt="Accenture"></div>
+      <div class="sponsor-logo"><img src="logos/evernote.svg" alt="Evernote"></div>
+      <div class="sponsor-logo"><img src="logos/grammarly.svg" alt="Grammarly"></div>
+      <div class="sponsor-logo"><img src="logos/yahoo.svg" alt="Yahoo"></div>
+      <div class="sponsor-logo"><img src="logos/ebay.svg" alt="eBay"></div>
+      <div class="sponsor-logo"><img src="logos/firefox.svg" alt="Firefox"></div>
       <!-- Duplicate for seamless loop -->
-      <div class="sponsor-logo"><span class="sponsor-icon">⚡</span> Nexova</div>
-      <div class="sponsor-logo"><span class="sponsor-icon">☁️</span> Cloudly</div>
-      <div class="sponsor-logo"><span class="sponsor-icon">📦</span> Dataplex</div>
-      <div class="sponsor-logo"><span class="sponsor-icon">🌊</span> Synthwave</div>
-      <div class="sponsor-logo"><span class="sponsor-icon">🪐</span> Orbitra</div>
-      <div class="sponsor-logo"><span class="sponsor-icon">📚</span> Flowstack</div>
+      <div class="sponsor-logo"><img src="logos/google.svg" alt="Google"></div>
+      <div class="sponsor-logo"><img src="logos/microsoft.svg" alt="Microsoft"></div>
+      <div class="sponsor-logo"><img src="logos/amazon.svg" alt="Amazon"></div>
+      <div class="sponsor-logo"><img src="logos/meta.svg" alt="Meta"></div>
+      <div class="sponsor-logo"><img src="logos/apple.svg" alt="Apple"></div>
+      <div class="sponsor-logo"><img src="logos/slack.svg" alt="Slack"></div>
+      <div class="sponsor-logo"><img src="logos/spotify.svg" alt="Spotify"></div>
+      <div class="sponsor-logo"><img src="logos/nvidia.svg" alt="NVIDIA"></div>
+      <div class="sponsor-logo"><img src="logos/ibm.svg" alt="IBM"></div>
+      <div class="sponsor-logo"><img src="logos/oracle.svg" alt="Oracle"></div>
+      <div class="sponsor-logo"><img src="logos/sap.svg" alt="SAP"></div>
+      <div class="sponsor-logo"><img src="logos/paypal.svg" alt="PayPal"></div>
+      <div class="sponsor-logo"><img src="logos/tesla.svg" alt="Tesla"></div>
+      <div class="sponsor-logo"><img src="logos/dropbox.svg" alt="Dropbox"></div>
+      <div class="sponsor-logo"><img src="logos/accenture.svg" alt="Accenture"></div>
+      <div class="sponsor-logo"><img src="logos/evernote.svg" alt="Evernote"></div>
+      <div class="sponsor-logo"><img src="logos/grammarly.svg" alt="Grammarly"></div>
+      <div class="sponsor-logo"><img src="logos/yahoo.svg" alt="Yahoo"></div>
+      <div class="sponsor-logo"><img src="logos/ebay.svg" alt="eBay"></div>
+      <div class="sponsor-logo"><img src="logos/firefox.svg" alt="Firefox"></div>
     </div>
   </div>
 </section>
@@ -80,13 +96,15 @@
     <div class="feature-card glass-card">
       <div class="feature-icon">2</div>
       <h3>Upgrade the Experience</h3>
-      <p>Sign in when you want more control, including custom codes, passwords, expiration rules, landing pages, and analytics.</p>
+      <p>Sign in when you want more control, including custom codes, passwords, expiration rules, landing pages, and
+        analytics.</p>
     </div>
 
     <div class="feature-card glass-card">
       <div class="feature-icon">3</div>
       <h3>Share and Grow</h3>
-      <p>Publish your short link anywhere, track engagement, and scale into bulk creation, webhooks, and branded domains.</p>
+      <p>Publish your short link anywhere, track engagement, and scale into bulk creation, webhooks, and branded
+        domains.</p>
     </div>
   </div>
 </section>
@@ -99,75 +117,78 @@
 
   <div class="dashboard-features-grid">
     <div class="df-card glass-card">
-      <div class="df-icon">🔗</div>
+      <div class="df-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
       <h3>Link Management</h3>
       <p>Create, search, edit, and organize your links from one workspace built for growing libraries.</p>
     </div>
 
     <div class="df-card glass-card">
-      <div class="df-icon">📊</div>
+      <div class="df-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
       <h3>Click Analytics</h3>
       <p>Track how many times each link has been clicked. Monitor your reach and optimize your sharing strategy.</p>
     </div>
 
     <div class="df-card glass-card">
-      <div class="df-icon">📱</div>
+      <div class="df-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="5" y="5" width="3" height="3"/><rect x="16" y="5" width="3" height="3"/><rect x="16" y="16" width="3" height="3"/><rect x="5" y="16" width="3" height="3"/></svg></div>
       <h3>QR Code Generation</h3>
       <p>Instantly generate downloadable QR codes for any link. Perfect for print materials, events, and signage.</p>
     </div>
 
     <div class="df-card glass-card">
-      <div class="df-icon">🔒</div>
+      <div class="df-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
       <h3>Password Protection</h3>
       <p>Secure sensitive links behind a password. Only people with the correct password can access the destination.</p>
     </div>
 
     <div class="df-card glass-card">
-      <div class="df-icon">⏱️</div>
+      <div class="df-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
       <h3>Smart Expiration</h3>
       <p>Expire links by date, by click count, or after a single successful visit when access must stay temporary.</p>
     </div>
 
     <div class="df-card glass-card">
-      <div class="df-icon">✏️</div>
+      <div class="df-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
       <h3>Custom Short Codes</h3>
       <p>Choose your own memorable alias instead of a random code. Make your links branded and recognizable.</p>
     </div>
 
     <div class="df-card glass-card">
-      <div class="df-icon">🪄</div>
+      <div class="df-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
       <h3>Custom Landing Pages</h3>
-      <p>Add a title, message, and call to action before redirecting to create a cleaner and more intentional visitor flow.</p>
+      <p>Add a title, message, and call to action before redirecting to create a cleaner and more intentional visitor
+        flow.</p>
     </div>
 
     <div class="df-card glass-card">
-      <div class="df-icon">⚡</div>
+      <div class="df-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
       <h3>Bulk Link Creation</h3>
       <p>Create many short links at once for campaigns, product catalogs, events, and large content batches.</p>
     </div>
 
     <div class="df-card glass-card">
-      <div class="df-icon">🪝</div>
+      <div class="df-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
       <h3>Webhooks</h3>
       <p>Push link events into your own systems so clicks and lifecycle updates can trigger downstream automation.</p>
     </div>
 
     <div class="df-card glass-card">
-      <div class="df-icon">🌐</div>
+      <div class="df-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
       <h3>Branded Domains</h3>
       <p>Use your own domain for short links to strengthen trust, improve recall, and keep the experience on-brand.</p>
     </div>
 
     <div class="df-card glass-card">
-      <div class="df-icon">🤝</div>
+      <div class="df-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
       <h3>Team Collaboration</h3>
-      <p>Invite teammates to manage links together, share analytics, and coordinate campaigns from a single dashboard.</p>
+      <p>Invite teammates to manage links together, share analytics, and coordinate campaigns from a single dashboard.
+      </p>
     </div>
 
     <div class="df-card glass-card">
-      <div class="df-icon">🚀</div>
+      <div class="df-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div>
       <h3>99.99% Uptime & Fast Redirects</h3>
-      <p>Enjoy enterprise-grade reliability and instant link redirection, powered by global infrastructure and trusted payment partners like Stripe.</p>
+      <p>Enjoy enterprise-grade reliability and instant link redirection, powered by global infrastructure and trusted
+        payment partners like Stripe.</p>
     </div>
   </div>
 </section>
@@ -175,14 +196,16 @@
 <section id="contact" class="contact-section container">
   <div class="section-header">
     <h2 class="hero-title">Contact <span class="gradient-text">Us</span></h2>
-    <p class="hero-subtitle">Reach out with general questions, partnership ideas, or anything else you need before signing up.</p>
+    <p class="hero-subtitle">Reach out with general questions, partnership ideas, or anything else you need before
+      signing up.</p>
   </div>
 
   <div class="contact-grid">
     <div class="glass-card contact-info-card">
       <h3>We are reachable</h3>
       <p>Use the form for general questions about the product, pricing, or setup.</p>
-      <p>If you are already a customer and something is broken, use the support form inside your dashboard so the message is tied to your account.</p>
+      <p>If you are already a customer and something is broken, use the support form inside your dashboard so the
+        message is tied to your account.</p>
       <div class="contact-points">
         <div>
           <strong>General support</strong>
@@ -197,38 +220,15 @@
 
     <form class="glass-card contact-form-card" (ngSubmit)="onContactSubmit()">
       <div class="contact-form-grid">
-        <input
-          type="text"
-          class="input-field"
-          [(ngModel)]="contactForm.name"
-          name="contactName"
-          placeholder="Your name"
-          required
-        >
-        <input
-          type="email"
-          class="input-field"
-          [(ngModel)]="contactForm.email"
-          name="contactEmail"
-          placeholder="Your email"
-          required
-        >
+        <input type="text" class="input-field" [(ngModel)]="contactForm.name" name="contactName" placeholder="Your name"
+          required>
+        <input type="email" class="input-field" [(ngModel)]="contactForm.email" name="contactEmail"
+          placeholder="Your email" required>
       </div>
-      <input
-        type="text"
-        class="input-field"
-        [(ngModel)]="contactForm.subject"
-        name="contactSubject"
-        placeholder="Subject"
-        required
-      >
-      <textarea
-        class="input-field contact-textarea"
-        [(ngModel)]="contactForm.message"
-        name="contactMessage"
-        placeholder="How can we help?"
-        required
-      ></textarea>
+      <input type="text" class="input-field" [(ngModel)]="contactForm.subject" name="contactSubject"
+        placeholder="Subject" required>
+      <textarea class="input-field contact-textarea" [(ngModel)]="contactForm.message" name="contactMessage"
+        placeholder="How can we help?" required></textarea>
       <button class="btn-primary" type="submit" [disabled]="isSendingContact">
         {{ isSendingContact ? 'Sending...' : 'Send Message' }}
       </button>

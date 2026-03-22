@@ -1,13 +1,7 @@
-<nav class="navbar container">
-  <div class="logo gradient-text" routerLink="/">Fuipiz Admin</div>
-  <div class="nav-links">
-    <a class="btn-secondary" routerLink="/dashboard">User App</a>
-    <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
-      {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
-    </button>
-    <button class="btn-secondary" (click)="logout()">Logout</button>
-  </div>
-</nav>
+<app-ui-navbar>
+  <a class="btn-secondary" routerLink="/dashboard">User App</a>
+  <button class="btn-secondary" (click)="logout()">Logout</button>
+</app-ui-navbar>
 
 <div class="container admin-shell">
   <aside class="admin-sidebar glass-card">
@@ -21,19 +15,15 @@
     <div class="admin-header">
       <div>
         <h1 class="hero-title admin-title">Admin <span class="gradient-text">Links</span></h1>
-        <p class="admin-subtitle">Search every link in the system, inspect its owner, and remove broken or unwanted entries.</p>
+        <p class="admin-subtitle">Search every link in the system, inspect its owner, and remove broken or unwanted
+          entries.</p>
       </div>
     </div>
 
     <div class="glass-card admin-search-card">
       <div class="admin-search-row">
-        <input
-          type="text"
-          class="input-field"
-          [(ngModel)]="search"
-          name="adminLinkSearch"
-          placeholder="Search by short code, destination, owner email, or owner name"
-        >
+        <input type="text" class="input-field" [(ngModel)]="search" name="adminLinkSearch"
+          placeholder="Search by short code, destination, owner email, or owner name">
         <select class="input-field admin-select" [(ngModel)]="ownerType" name="adminLinkOwnerType">
           <option value="ALL">All owners</option>
           <option value="ACCOUNT">Account owned</option>
@@ -89,7 +79,8 @@
               {{ link.isActive ? 'Active' : 'Disabled' }}
             </span>
             <span class="badge">{{ link.user ? 'Account' : 'Anonymous' }}</span>
-            <span class="badge" *ngIf="link.user" [class.badge-pro]="link.user.plan === 'PRO'" [class.badge-business]="link.user.plan === 'BUSINESS'">
+            <span class="badge" *ngIf="link.user" [class.badge-pro]="link.user.plan === 'PRO'"
+              [class.badge-business]="link.user.plan === 'BUSINESS'">
               {{ link.user.plan }}
             </span>
           </div>
@@ -104,18 +95,10 @@
         </div>
 
         <div class="admin-actions">
-          <a
-            *ngIf="link.user"
-            class="btn-secondary"
-            [routerLink]="['/admin/users', link.user.id]"
-          >
+          <a *ngIf="link.user" class="btn-secondary" [routerLink]="['/admin/users', link.user.id]">
             Open Owner
           </a>
-          <button
-            class="btn-primary btn-danger"
-            (click)="deleteLink(link)"
-            [disabled]="deletingLinkId === link.id"
-          >
+          <button class="btn-primary btn-danger" (click)="deleteLink(link)" [disabled]="deletingLinkId === link.id">
             {{ deletingLinkId === link.id ? 'Deleting...' : 'Delete Link' }}
           </button>
         </div>
@@ -127,9 +110,11 @@
     </div>
 
     <div class="pagination-bar" *ngIf="totalPages > 1">
-      <button class="btn-secondary" (click)="changePage(page - 1)" [disabled]="page === 1 || isLoading">Previous</button>
+      <button class="btn-secondary" (click)="changePage(page - 1)"
+        [disabled]="page === 1 || isLoading">Previous</button>
       <span class="pagination-label">Page {{ page }} of {{ totalPages }}</span>
-      <button class="btn-secondary" (click)="changePage(page + 1)" [disabled]="page === totalPages || isLoading">Next</button>
+      <button class="btn-secondary" (click)="changePage(page + 1)"
+        [disabled]="page === totalPages || isLoading">Next</button>
     </div>
   </main>
 </div>

@@ -1,13 +1,7 @@
-<nav class="navbar container">
-  <div class="logo gradient-text" routerLink="/">Fuipiz Admin</div>
-  <div class="nav-links">
-    <a class="btn-secondary" routerLink="/dashboard">User App</a>
-    <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
-      {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
-    </button>
-    <button class="btn-secondary" (click)="logout()">Logout</button>
-  </div>
-</nav>
+<app-ui-navbar>
+  <a class="btn-secondary" routerLink="/dashboard">User App</a>
+  <button class="btn-secondary" (click)="logout()">Logout</button>
+</app-ui-navbar>
 
 <div class="container admin-shell">
   <aside class="admin-sidebar glass-card">
@@ -21,19 +15,15 @@
     <div class="admin-header">
       <div>
         <h1 class="hero-title admin-title">Admin <span class="gradient-text">Audit Log</span></h1>
-        <p class="admin-subtitle">Review admin-side changes to users and links, including who made them and what changed.</p>
+        <p class="admin-subtitle">Review admin-side changes to users and links, including who made them and what
+          changed.</p>
       </div>
     </div>
 
     <div class="glass-card admin-search-card">
       <div class="admin-search-row">
-        <input
-          type="text"
-          class="input-field"
-          [(ngModel)]="search"
-          name="adminAuditSearch"
-          placeholder="Search by action, target, or admin email"
-        >
+        <input type="text" class="input-field" [(ngModel)]="search" name="adminAuditSearch"
+          placeholder="Search by action, target, or admin email">
         <select class="input-field admin-select" [(ngModel)]="action" name="adminAuditAction">
           <option value="ALL">All actions</option>
           <option value="user.updated">User updated</option>
@@ -74,11 +64,8 @@
           </div>
           <div class="admin-badges">
             <span class="badge">{{ log.targetType }}</span>
-            <a
-              *ngIf="getTargetRoute(log); else staticTargetBadge"
-              class="badge badge-link"
-              [routerLink]="getTargetRoute(log)"
-            >
+            <a *ngIf="getTargetRoute(log); else staticTargetBadge" class="badge badge-link"
+              [routerLink]="getTargetRoute(log)">
               {{ log.targetLabel || ('ID ' + log.targetId) }}
             </a>
             <ng-template #staticTargetBadge>
@@ -118,9 +105,11 @@
     </div>
 
     <div class="pagination-bar" *ngIf="totalPages > 1">
-      <button class="btn-secondary" (click)="changePage(page - 1)" [disabled]="page === 1 || isLoading">Previous</button>
+      <button class="btn-secondary" (click)="changePage(page - 1)"
+        [disabled]="page === 1 || isLoading">Previous</button>
       <span class="pagination-label">Page {{ page }} of {{ totalPages }}</span>
-      <button class="btn-secondary" (click)="changePage(page + 1)" [disabled]="page === totalPages || isLoading">Next</button>
+      <button class="btn-secondary" (click)="changePage(page + 1)"
+        [disabled]="page === totalPages || isLoading">Next</button>
     </div>
   </main>
 </div>

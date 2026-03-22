@@ -1,15 +1,7 @@
-<nav class="navbar container">
-  <div class="logo gradient-text" routerLink="/">Fuipiz</div>
-  <div class="nav-links">
-    <a class="btn-secondary" *ngIf="profile.role === 'ADMIN'" routerLink="/admin/users">Admin</a>
-    <button class="btn-primary header-cta" *ngIf="activeSection === 'links'" (click)="openCreateModal()">New Link</button>
-    <button class="btn-secondary" *ngIf="activeSection === 'links' && canUseBulkCreation()" (click)="openBulkModal()">Bulk Create</button>
-    <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
-      {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
-    </button>
-    <button class="btn-secondary" (click)="logout()">Logout</button>
-  </div>
-</nav>
+<app-ui-navbar>
+  <a class="btn-secondary" *ngIf="profile.role === 'ADMIN'" routerLink="/admin/users">Admin</a>
+  <button class="btn-secondary" (click)="logout()">Logout</button>
+</app-ui-navbar>
 
 <div class="container dashboard-layout">
   <!-- Sidebar Navigation -->
@@ -38,7 +30,7 @@
 
   <!-- Main Content Area -->
   <main class="dashboard-content">
-    
+
     <!-- MY LINKS TAB -->
     <div *ngIf="activeSection === 'links'">
       <div class="dashboard-header">
@@ -53,14 +45,8 @@
       </div>
 
       <div class="links-toolbar">
-        <input
-          type="text"
-          class="input-field links-search"
-          [(ngModel)]="linkSearch"
-          (ngModelChange)="onSearchChange()"
-          name="linkSearch"
-          placeholder="Search by short code, destination, or landing content"
-        >
+        <input type="text" class="input-field links-search" [(ngModel)]="linkSearch" (ngModelChange)="onSearchChange()"
+          name="linkSearch" placeholder="Search by short code, destination, or landing content">
         <p class="links-count">{{ filteredLinks.length }} results</p>
       </div>
 
@@ -68,12 +54,8 @@
         <div class="glass-card link-item" *ngFor="let link of paginatedLinks">
           <div class="link-details">
             <h4>
-              <a
-                *ngIf="link.isActive; else disabledLink"
-                [href]="'http://localhost:3000/s/' + link.shortCode"
-                target="_blank"
-                class="short-link"
-              >
+              <a *ngIf="link.isActive; else disabledLink" [href]="'http://localhost:3000/s/' + link.shortCode"
+                target="_blank" class="short-link">
                 http://localhost:3000/s/{{ link.shortCode }}
               </a>
               <ng-template #disabledLink>
@@ -86,7 +68,8 @@
               <span class="badge" *ngIf="link.expiresAt">⏰ Expires: {{ link.expiresAt | date:'shortDate' }}</span>
               <span class="badge clicks">📈 Clicks: {{ link.clicks }}</span>
               <span class="badge" *ngIf="link.singleUse">⚡ One-Time Link</span>
-              <span class="badge" *ngIf="link.singleUse || (link.maxClicks !== null && link.maxClicks !== undefined)">🎯 {{ formatClickLimit(link) }}</span>
+              <span class="badge" *ngIf="link.singleUse || (link.maxClicks !== null && link.maxClicks !== undefined)">🎯
+                {{ formatClickLimit(link) }}</span>
               <span class="badge" *ngIf="hasLandingPage(link)">🛬 Landing Page</span>
               <span class="badge status-badge" [class.active]="link.isActive" [class.inactive]="!link.isActive">
                 {{ link.isActive ? 'Active' : 'Disabled' }}
@@ -106,7 +89,8 @@
             <button (click)="copyLink(link.shortCode)" class="action-btn" title="Copy Link">
               <span class="icon">📋</span>
             </button>
-            <button (click)="toggleActive(link)" class="action-btn" [class.active]="link.isActive" title="Toggle Active">
+            <button (click)="toggleActive(link)" class="action-btn" [class.active]="link.isActive"
+              title="Toggle Active">
               <span class="icon">{{ link.isActive ? '🟢' : '⚪' }}</span>
             </button>
             <button (click)="deleteLink(link.id)" class="action-btn delete" title="Delete">
@@ -114,16 +98,18 @@
             </button>
           </div>
         </div>
-        
+
         <div *ngIf="filteredLinks.length === 0" class="empty-state">
           <p>You haven't created any links yet.</p>
         </div>
       </div>
 
       <div class="pagination-bar" *ngIf="filteredLinks.length > pageSize">
-        <button class="btn-secondary" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+        <button class="btn-secondary" (click)="goToPage(currentPage - 1)"
+          [disabled]="currentPage === 1">Previous</button>
         <span class="pagination-label">Page {{ currentPage }} of {{ totalPages }}</span>
-        <button class="btn-secondary" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+        <button class="btn-secondary" (click)="goToPage(currentPage + 1)"
+          [disabled]="currentPage === totalPages">Next</button>
       </div>
     </div>
 
@@ -131,14 +117,15 @@
       <div class="dashboard-header">
         <div>
           <h2 class="hero-title dashboard-title">Your <span class="gradient-text">Profile</span></h2>
-          <p class="dashboard-subtitle">Update your account details and password without burying them under a general settings page.</p>
+          <p class="dashboard-subtitle">Update your account details and password without burying them under a general
+            settings page.</p>
         </div>
       </div>
 
       <div class="glass-card account-card">
         <h3>Account Settings</h3>
         <p class="account-email">Signed in as: <strong>{{ profile.email }}</strong></p>
-        
+
         <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()" class="account-form" novalidate>
           <div class="form-group">
             <label>Name</label>
@@ -150,10 +137,13 @@
           </div>
           <div class="form-group">
             <label>New Password</label>
-            <input type="password" class="input-field" placeholder="Enter new password (optional)" formControlName="newPassword">
+            <input type="password" class="input-field" placeholder="Enter new password (optional)"
+              formControlName="newPassword">
             <small class="help-text">Leave blank to keep current password</small>
-            <div class="error-msg" *ngIf="profileForm.get('newPassword')?.touched && profileForm.get('newPassword')?.invalid">
-              <span *ngIf="profileForm.get('newPassword')?.errors?.['minlength']">Password must be at least 6 characters.</span>
+            <div class="error-msg"
+              *ngIf="profileForm.get('newPassword')?.touched && profileForm.get('newPassword')?.invalid">
+              <span *ngIf="profileForm.get('newPassword')?.errors?.['minlength']">Password must be at least 6
+                characters.</span>
             </div>
           </div>
           <button type="submit" class="btn-primary w-full" [disabled]="isUpdatingProfile || profileForm.invalid">
@@ -168,24 +158,30 @@
       <div class="dashboard-header">
         <div>
           <h2 class="hero-title dashboard-title">Plan & <span class="gradient-text">Billing</span></h2>
-          <p class="dashboard-subtitle">Manage upgrades, subscriptions, and payment details from a section dedicated to billing.</p>
+          <p class="dashboard-subtitle">Manage upgrades, subscriptions, and payment details from a section dedicated to
+            billing.</p>
         </div>
       </div>
 
       <div class="glass-card account-card">
         <h3>Billing & Plan</h3>
         <div class="plan-status">
-          <p>Current Plan: <span class="badge" [class.badge-pro]="profile.plan === 'PRO'" [class.badge-business]="profile.plan === 'BUSINESS'">{{ profile.plan }}</span></p>
+          <p>Current Plan: <span class="badge" [class.badge-pro]="profile.plan === 'PRO'"
+              [class.badge-business]="profile.plan === 'BUSINESS'">{{ profile.plan }}</span></p>
         </div>
-        
+
         <div class="upgrade-simulation" *ngIf="profile.plan === 'FREE'">
           <hr style="border: 1px solid var(--glass-border); margin: 1.5rem 0;">
           <h4>Upgrade Your Plan</h4>
-          <p style="color: var(--text-secondary); margin-bottom: 1rem;">Choose the tier that matches how deeply you want to manage, automate, and brand your links.</p>
-          <button class="btn-primary w-full" style="background: linear-gradient(135deg, #10b981, #059669); margin-bottom: 0.75rem;" (click)="startCheckout('PRO')" [disabled]="isBillingActionPending">
+          <p style="color: var(--text-secondary); margin-bottom: 1rem;">Choose the tier that matches how deeply you want
+            to manage, automate, and brand your links.</p>
+          <button class="btn-primary w-full"
+            style="background: linear-gradient(135deg, #10b981, #059669); margin-bottom: 0.75rem;"
+            (click)="startCheckout('PRO')" [disabled]="isBillingActionPending">
             {{ isBillingActionPending ? 'Redirecting...' : 'Upgrade to Pro ($9.00)' }}
           </button>
-          <button class="btn-primary w-full btn-business" (click)="startCheckout('BUSINESS')" [disabled]="isBillingActionPending">
+          <button class="btn-primary w-full btn-business" (click)="startCheckout('BUSINESS')"
+            [disabled]="isBillingActionPending">
             {{ isBillingActionPending ? 'Redirecting...' : 'Upgrade to Business ($29.00)' }}
           </button>
         </div>
@@ -193,8 +189,10 @@
         <div class="upgrade-simulation" *ngIf="profile.plan === 'PRO'">
           <hr style="border: 1px solid var(--glass-border); margin: 1.5rem 0;">
           <h4 style="color: var(--accent-primary);">👑 You are a Pro Member</h4>
-          <p style="color: var(--text-secondary); margin-bottom: 1rem;">Manage upgrades, payment methods, and cancellation in the Stripe billing portal.</p>
-          <button class="btn-primary w-full btn-business" (click)="openBillingPortal()" [disabled]="isBillingActionPending">
+          <p style="color: var(--text-secondary); margin-bottom: 1rem;">Manage upgrades, payment methods, and
+            cancellation in the Stripe billing portal.</p>
+          <button class="btn-primary w-full btn-business" (click)="openBillingPortal()"
+            [disabled]="isBillingActionPending">
             {{ isBillingActionPending ? 'Redirecting...' : 'Manage Billing' }}
           </button>
         </div>
@@ -202,8 +200,10 @@
         <div class="upgrade-simulation" *ngIf="profile.plan === 'BUSINESS'">
           <hr style="border: 1px solid var(--glass-border); margin: 1.5rem 0;">
           <h4 style="color: #14b8a6;">You are on Business</h4>
-          <p style="color: var(--text-secondary); margin-bottom: 1rem;">You are on the highest current plan. Use the billing portal to manage payment details or cancellation.</p>
-          <button class="btn-primary w-full btn-business" (click)="openBillingPortal()" [disabled]="isBillingActionPending">
+          <p style="color: var(--text-secondary); margin-bottom: 1rem;">You are on the highest current plan. Use the
+            billing portal to manage payment details or cancellation.</p>
+          <button class="btn-primary w-full btn-business" (click)="openBillingPortal()"
+            [disabled]="isBillingActionPending">
             {{ isBillingActionPending ? 'Redirecting...' : 'Manage Billing' }}
           </button>
         </div>
@@ -220,14 +220,17 @@
 
       <div class="glass-card account-card">
         <h3>Webhooks</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Register outbound HTTP callbacks for link lifecycle events.</p>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Register outbound HTTP callbacks for link
+          lifecycle events.</p>
 
         <div *ngIf="canUseWebhooks(); else webhookUpgrade">
           <form [formGroup]="webhookFormGroup" class="account-form" (ngSubmit)="onCreateWebhook()" novalidate>
             <div class="form-group">
               <label>Endpoint URL</label>
-              <input type="url" class="input-field" formControlName="url" placeholder="https://example.com/webhooks/fupiz">
-              <div class="error-msg" *ngIf="webhookFormGroup.get('url')?.touched && webhookFormGroup.get('url')?.invalid">
+              <input type="url" class="input-field" formControlName="url"
+                placeholder="https://example.com/webhooks/fupiz">
+              <div class="error-msg"
+                *ngIf="webhookFormGroup.get('url')?.touched && webhookFormGroup.get('url')?.invalid">
                 <span *ngIf="webhookFormGroup.get('url')?.errors?.['required']">URL is required.</span>
                 <span *ngIf="webhookFormGroup.get('url')?.errors?.['pattern']">Enter a valid URL.</span>
               </div>
@@ -236,23 +239,28 @@
               <label>Events</label>
               <div class="webhook-events">
                 <label class="toggle-field">
-                  <input type="checkbox" [checked]="webhookFormGroup.get('events')?.value.includes('link.created')" (change)="toggleWebhookEvent('link.created', $any($event.target).checked)">
+                  <input type="checkbox" [checked]="webhookFormGroup.get('events')?.value.includes('link.created')"
+                    (change)="toggleWebhookEvent('link.created', $any($event.target).checked)">
                   <span>link.created</span>
                 </label>
                 <label class="toggle-field">
-                  <input type="checkbox" [checked]="webhookFormGroup.get('events')?.value.includes('link.updated')" (change)="toggleWebhookEvent('link.updated', $any($event.target).checked)">
+                  <input type="checkbox" [checked]="webhookFormGroup.get('events')?.value.includes('link.updated')"
+                    (change)="toggleWebhookEvent('link.updated', $any($event.target).checked)">
                   <span>link.updated</span>
                 </label>
                 <label class="toggle-field">
-                  <input type="checkbox" [checked]="webhookFormGroup.get('events')?.value.includes('link.clicked')" (change)="toggleWebhookEvent('link.clicked', $any($event.target).checked)">
+                  <input type="checkbox" [checked]="webhookFormGroup.get('events')?.value.includes('link.clicked')"
+                    (change)="toggleWebhookEvent('link.clicked', $any($event.target).checked)">
                   <span>link.clicked</span>
                 </label>
               </div>
-              <div class="error-msg" *ngIf="webhookFormGroup.get('events')?.touched && webhookFormGroup.get('events')?.invalid">
+              <div class="error-msg"
+                *ngIf="webhookFormGroup.get('events')?.touched && webhookFormGroup.get('events')?.invalid">
                 <span *ngIf="webhookFormGroup.get('events')?.errors?.['required']">Select at least one event.</span>
               </div>
             </div>
-            <button type="submit" class="btn-primary w-full btn-business" [disabled]="isSavingWebhook || webhookFormGroup.invalid">
+            <button type="submit" class="btn-primary w-full btn-business"
+              [disabled]="isSavingWebhook || webhookFormGroup.invalid">
               {{ isSavingWebhook ? 'Saving...' : 'Create Webhook' }}
             </button>
           </form>
@@ -263,10 +271,12 @@
                 <p class="webhook-url">{{ webhook.url }}</p>
                 <p class="webhook-meta">Events: {{ webhook.events.join(', ') }}</p>
                 <p class="webhook-meta">Secret: {{ webhook.secret }}</p>
-                <p class="webhook-meta" *ngIf="webhook.lastDeliveryStatus">Last delivery: {{ webhook.lastDeliveryStatus }}</p>
+                <p class="webhook-meta" *ngIf="webhook.lastDeliveryStatus">Last delivery: {{ webhook.lastDeliveryStatus
+                  }}</p>
               </div>
               <div class="link-actions">
-                <button (click)="toggleWebhook(webhook)" class="action-btn" [class.active]="webhook.isActive" title="Toggle Webhook">
+                <button (click)="toggleWebhook(webhook)" class="action-btn" [class.active]="webhook.isActive"
+                  title="Toggle Webhook">
                   <span class="icon">{{ webhook.isActive ? '🟢' : '⚪' }}</span>
                 </button>
                 <button (click)="deleteWebhook(webhook.id)" class="action-btn delete" title="Delete Webhook">
@@ -291,7 +301,8 @@
       <div class="dashboard-header">
         <div>
           <h2 class="hero-title dashboard-title">Account <span class="gradient-text">Support</span></h2>
-          <p class="dashboard-subtitle">Report issues, ask for help, or send account-specific questions from inside your dashboard.</p>
+          <p class="dashboard-subtitle">Report issues, ask for help, or send account-specific questions from inside your
+            dashboard.</p>
         </div>
       </div>
 
@@ -322,7 +333,8 @@
 
           <div class="form-group">
             <label>Message</label>
-            <textarea class="input-field landing-textarea" formControlName="message" placeholder="Describe what happened, what you expected, and how we can help."></textarea>
+            <textarea class="input-field landing-textarea" formControlName="message"
+              placeholder="Describe what happened, what you expected, and how we can help."></textarea>
             <div class="error-msg" *ngIf="supportForm.get('message')?.touched && supportForm.get('message')?.invalid">
               <span *ngIf="supportForm.get('message')?.errors?.['required']">Message is required.</span>
               <span *ngIf="supportForm.get('message')?.errors?.['minlength']">Please include a bit more detail.</span>
@@ -346,45 +358,45 @@
     <form [formGroup]="createLinkForm" (ngSubmit)="onCreateLink()" class="create-form" novalidate>
       <div class="form-row">
         <input type="url" class="input-field" placeholder="Original URL (https://...)" formControlName="originalUrl">
-        <div class="error-msg" *ngIf="createLinkForm.get('originalUrl')?.touched && createLinkForm.get('originalUrl')?.invalid">
+        <div class="error-msg"
+          *ngIf="createLinkForm.get('originalUrl')?.touched && createLinkForm.get('originalUrl')?.invalid">
           <span *ngIf="createLinkForm.get('originalUrl')?.errors?.['required']">URL is required.</span>
           <span *ngIf="createLinkForm.get('originalUrl')?.errors?.['pattern']">Enter a valid URL.</span>
         </div>
       </div>
       <div class="advanced-options">
-        <input type="text" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Custom Code (optional)' : '👑 Custom Code (Paid Plans)'" formControlName="customCode" [disabled]="!canUseAdvancedLinkControls()">
-        <input type="password" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Password (optional)' : '👑 Password (Paid Plans)'" formControlName="password" [disabled]="!canUseAdvancedLinkControls()">
-        <input type="datetime-local" class="input-field half" formControlName="expiresAt" [title]="canUseAdvancedLinkControls() ? 'Expiration (optional)' : 'Expiration (Paid Plans)'" [disabled]="!canUseAdvancedLinkControls()">
-        <input type="number" min="1" class="input-field half" [placeholder]="canUseAdvancedLinkControls() ? 'Max Clicks (optional)' : '👑 Click Limit (Paid Plans)'" formControlName="maxClicks" [disabled]="!canUseAdvancedLinkControls() || createLinkForm.get('singleUse')?.value">
+        <input type="text" class="input-field half"
+          [placeholder]="canUseAdvancedLinkControls() ? 'Custom Code (optional)' : '👑 Custom Code (Paid Plans)'"
+          formControlName="customCode" [disabled]="!canUseAdvancedLinkControls()">
+        <input type="password" class="input-field half"
+          [placeholder]="canUseAdvancedLinkControls() ? 'Password (optional)' : '👑 Password (Paid Plans)'"
+          formControlName="password" [disabled]="!canUseAdvancedLinkControls()">
+        <input type="datetime-local" class="input-field half" formControlName="expiresAt"
+          [title]="canUseAdvancedLinkControls() ? 'Expiration (optional)' : 'Expiration (Paid Plans)'"
+          [disabled]="!canUseAdvancedLinkControls()">
+        <input type="number" min="1" class="input-field half"
+          [placeholder]="canUseAdvancedLinkControls() ? 'Max Clicks (optional)' : '👑 Click Limit (Paid Plans)'"
+          formControlName="maxClicks"
+          [disabled]="!canUseAdvancedLinkControls() || createLinkForm.get('singleUse')?.value">
         <label class="toggle-field">
           <input type="checkbox" formControlName="singleUse" [disabled]="!canUseAdvancedLinkControls()">
           <span>{{ canUseAdvancedLinkControls() ? 'One-Time Link' : '👑 One-Time Link (Paid Plans)' }}</span>
         </label>
       </div>
       <div class="landing-options">
-        <input
-          type="text"
-          class="input-field"
+        <input type="text" class="input-field"
           [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Title (optional)' : '👑 Landing Title (Paid Plans)'"
-          formControlName="landingTitle"
-          [disabled]="!canUseAdvancedLinkControls()"
-        >
-        <textarea
-          class="input-field landing-textarea"
+          formControlName="landingTitle" [disabled]="!canUseAdvancedLinkControls()">
+        <textarea class="input-field landing-textarea"
           [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Description (optional)' : '👑 Landing Description (Paid Plans)'"
-          formControlName="landingDescription"
-          [disabled]="!canUseAdvancedLinkControls()"
-        ></textarea>
-        <input
-          type="text"
-          class="input-field"
+          formControlName="landingDescription" [disabled]="!canUseAdvancedLinkControls()"></textarea>
+        <input type="text" class="input-field"
           [placeholder]="canUseAdvancedLinkControls() ? 'CTA Button Label (optional)' : '👑 CTA Label (Paid Plans)'"
-          formControlName="landingButtonLabel"
-          [disabled]="!canUseAdvancedLinkControls()"
-        >
+          formControlName="landingButtonLabel" [disabled]="!canUseAdvancedLinkControls()">
       </div>
       <div class="modal-actions">
-        <button type="submit" class="btn-primary" [disabled]="isCreating || createLinkForm.invalid">{{ isCreating ? 'Creating...' : 'Create Link' }}</button>
+        <button type="submit" class="btn-primary" [disabled]="isCreating || createLinkForm.invalid">{{ isCreating ?
+          'Creating...' : 'Create Link' }}</button>
         <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancel</button>
       </div>
     </form>
@@ -394,22 +406,22 @@
 <div class="modal-overlay" *ngIf="isBulkModalOpen" (click)="closeBulkModal()">
   <div class="modal-content glass-card bulk-modal" (click)="$event.stopPropagation()">
     <h3>Bulk Create Links</h3>
-    <p class="bulk-help">Paste one URL per line. You can optionally add a custom code after a comma, for example: <code>https://example.com/sale,summer-sale</code></p>
-    <textarea
-      class="input-field landing-textarea bulk-textarea"
-      [(ngModel)]="bulkLinkInput"
-      name="bulkLinkInput"
+    <p class="bulk-help">Paste one URL per line. You can optionally add a custom code after a comma, for example:
+      <code>https://example.com/sale,summer-sale</code>
+    </p>
+    <textarea class="input-field landing-textarea bulk-textarea" [(ngModel)]="bulkLinkInput" name="bulkLinkInput"
       [disabled]="!canUseBulkCreation() || isBulkCreating"
-      [placeholder]="canUseBulkCreation() ? 'https://example.com/page-one\nhttps://example.com/page-two,launch-page' : '👑 Bulk creation is available on the Business plan'"
-    ></textarea>
+      [placeholder]="canUseBulkCreation() ? 'https://example.com/page-one\nhttps://example.com/page-two,launch-page' : '👑 Bulk creation is available on the Business plan'"></textarea>
     <div class="bulk-actions">
-      <button class="btn-primary btn-business" (click)="onBulkCreate()" [disabled]="!canUseBulkCreation() || isBulkCreating">
+      <button class="btn-primary btn-business" (click)="onBulkCreate()"
+        [disabled]="!canUseBulkCreation() || isBulkCreating">
         {{ isBulkCreating ? 'Creating...' : 'Create Links in Bulk' }}
       </button>
       <button class="btn-secondary" (click)="closeBulkModal()">Close</button>
     </div>
     <div class="bulk-summary" *ngIf="bulkCreateSummary">
-      <p><strong>{{ bulkCreateSummary.createdCount }}</strong> created, <strong>{{ bulkCreateSummary.failedCount }}</strong> failed.</p>
+      <p><strong>{{ bulkCreateSummary.createdCount }}</strong> created, <strong>{{ bulkCreateSummary.failedCount
+          }}</strong> failed.</p>
       <div *ngIf="bulkCreateSummary.failedCount > 0">
         <p class="bulk-errors-title">Failed rows</p>
         <ul class="bulk-errors">
@@ -445,87 +457,57 @@
     <div class="edit-form">
       <div class="form-group">
         <label>Destination URL</label>
-        <input
-          type="url"
-          class="input-field"
-          [(ngModel)]="editLinkForm.originalUrl"
-          name="editOriginalUrl"
-          required
-        >
+        <input type="url" class="input-field" [(ngModel)]="editLinkForm.originalUrl" name="editOriginalUrl" required>
       </div>
 
       <div class="form-group">
         <label>Short Code</label>
-        <input
-          type="text"
-          class="input-field"
-          [(ngModel)]="editLinkForm.shortCode"
-          name="editShortCode"
-          [disabled]="!canUseAdvancedLinkControls()"
-        >
-        <small class="help-text" *ngIf="!canUseAdvancedLinkControls()">Custom short-code edits are available on paid plans.</small>
+        <input type="text" class="input-field" [(ngModel)]="editLinkForm.shortCode" name="editShortCode"
+          [disabled]="!canUseAdvancedLinkControls()">
+        <small class="help-text" *ngIf="!canUseAdvancedLinkControls()">Custom short-code edits are available on paid
+          plans.</small>
       </div>
 
       <div class="form-group">
         <label>Max Clicks</label>
-        <input
-          type="number"
-          min="1"
-          class="input-field"
-          [(ngModel)]="editLinkForm.maxClicks"
-          name="editMaxClicks"
-          [disabled]="!canUseAdvancedLinkControls() || editLinkForm.singleUse"
-        >
+        <input type="number" min="1" class="input-field" [(ngModel)]="editLinkForm.maxClicks" name="editMaxClicks"
+          [disabled]="!canUseAdvancedLinkControls() || editLinkForm.singleUse">
         <small class="help-text" *ngIf="canUseAdvancedLinkControls()">Leave blank for unlimited clicks.</small>
         <small class="help-text" *ngIf="!canUseAdvancedLinkControls()">Click limits are available on paid plans.</small>
       </div>
 
       <div class="form-group">
         <label class="toggle-field">
-          <input
-            type="checkbox"
-            [(ngModel)]="editLinkForm.singleUse"
-            name="editSingleUse"
-            [disabled]="!canUseAdvancedLinkControls()"
-          >
+          <input type="checkbox" [(ngModel)]="editLinkForm.singleUse" name="editSingleUse"
+            [disabled]="!canUseAdvancedLinkControls()">
           <span>One-Time Link</span>
         </label>
-        <small class="help-text" *ngIf="canUseAdvancedLinkControls()">One-time links deactivate automatically after the first successful visit.</small>
-        <small class="help-text" *ngIf="!canUseAdvancedLinkControls()">One-time links are available on paid plans.</small>
+        <small class="help-text" *ngIf="canUseAdvancedLinkControls()">One-time links deactivate automatically after the
+          first successful visit.</small>
+        <small class="help-text" *ngIf="!canUseAdvancedLinkControls()">One-time links are available on paid
+          plans.</small>
       </div>
 
       <div class="form-group">
         <label>Landing Title</label>
-        <input
-          type="text"
-          class="input-field"
-          [(ngModel)]="editLinkForm.landingTitle"
-          name="editLandingTitle"
-          [disabled]="!canUseAdvancedLinkControls()"
-        >
+        <input type="text" class="input-field" [(ngModel)]="editLinkForm.landingTitle" name="editLandingTitle"
+          [disabled]="!canUseAdvancedLinkControls()">
       </div>
 
       <div class="form-group">
         <label>Landing Description</label>
-        <textarea
-          class="input-field landing-textarea"
-          [(ngModel)]="editLinkForm.landingDescription"
-          name="editLandingDescription"
-          [disabled]="!canUseAdvancedLinkControls()"
-        ></textarea>
+        <textarea class="input-field landing-textarea" [(ngModel)]="editLinkForm.landingDescription"
+          name="editLandingDescription" [disabled]="!canUseAdvancedLinkControls()"></textarea>
       </div>
 
       <div class="form-group">
         <label>CTA Label</label>
-        <input
-          type="text"
-          class="input-field"
-          [(ngModel)]="editLinkForm.landingButtonLabel"
-          name="editLandingButtonLabel"
-          [disabled]="!canUseAdvancedLinkControls()"
-        >
-        <small class="help-text" *ngIf="canUseAdvancedLinkControls()">Leave landing fields blank to disable the custom landing page.</small>
-        <small class="help-text" *ngIf="!canUseAdvancedLinkControls()">Custom landing pages are available on paid plans.</small>
+        <input type="text" class="input-field" [(ngModel)]="editLinkForm.landingButtonLabel"
+          name="editLandingButtonLabel" [disabled]="!canUseAdvancedLinkControls()">
+        <small class="help-text" *ngIf="canUseAdvancedLinkControls()">Leave landing fields blank to disable the custom
+          landing page.</small>
+        <small class="help-text" *ngIf="!canUseAdvancedLinkControls()">Custom landing pages are available on paid
+          plans.</small>
       </div>
     </div>
 

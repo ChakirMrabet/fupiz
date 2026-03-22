@@ -1,13 +1,7 @@
-<nav class="navbar container">
-  <div class="logo gradient-text" routerLink="/">Fuipiz Admin</div>
-  <div class="nav-links">
-    <a class="btn-secondary" routerLink="/dashboard">User App</a>
-    <button class="theme-toggle" (click)="themeService.toggleTheme()" [title]="'Toggle ' + (themeService.theme() === 'dark' ? 'Light' : 'Dark') + ' Mode'">
-      {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
-    </button>
-    <button class="btn-secondary" (click)="logout()">Logout</button>
-  </div>
-</nav>
+<app-ui-navbar>
+  <a class="btn-secondary" routerLink="/dashboard">User App</a>
+  <button class="btn-secondary" (click)="logout()">Logout</button>
+</app-ui-navbar>
 
 <div class="container admin-shell">
   <aside class="admin-sidebar glass-card">
@@ -21,19 +15,15 @@
     <div class="admin-header">
       <div>
         <h1 class="hero-title admin-title">Admin <span class="gradient-text">Users</span></h1>
-        <p class="admin-subtitle">Search subscribers, inspect their profile and billing state, and drill into their links.</p>
+        <p class="admin-subtitle">Search subscribers, inspect their profile and billing state, and drill into their
+          links.</p>
       </div>
     </div>
 
     <div class="glass-card admin-search-card">
       <div class="admin-search-row">
-        <input
-          type="text"
-          class="input-field"
-          [(ngModel)]="search"
-          name="adminUserSearch"
-          placeholder="Search by email or name"
-        >
+        <input type="text" class="input-field" [(ngModel)]="search" name="adminUserSearch"
+          placeholder="Search by email or name">
         <select class="input-field admin-select" [(ngModel)]="role" name="adminUserRole">
           <option value="ALL">All roles</option>
           <option value="USER">User</option>
@@ -86,7 +76,8 @@
           </div>
           <div class="admin-badges">
             <span class="badge">{{ user.role }}</span>
-            <span class="badge" [class.badge-pro]="user.plan === 'PRO'" [class.badge-business]="user.plan === 'BUSINESS'">{{ user.plan }}</span>
+            <span class="badge" [class.badge-pro]="user.plan === 'PRO'"
+              [class.badge-business]="user.plan === 'BUSINESS'">{{ user.plan }}</span>
             <span class="badge status-badge" [class.active]="user.isActive" [class.inactive]="!user.isActive">
               {{ user.isActive ? 'Active' : 'Inactive' }}
             </span>
@@ -107,9 +98,11 @@
     </div>
 
     <div class="pagination-bar" *ngIf="totalPages > 1">
-      <button class="btn-secondary" (click)="changePage(page - 1)" [disabled]="page === 1 || isLoading">Previous</button>
+      <button class="btn-secondary" (click)="changePage(page - 1)"
+        [disabled]="page === 1 || isLoading">Previous</button>
       <span class="pagination-label">Page {{ page }} of {{ totalPages }}</span>
-      <button class="btn-secondary" (click)="changePage(page + 1)" [disabled]="page === totalPages || isLoading">Next</button>
+      <button class="btn-secondary" (click)="changePage(page + 1)"
+        [disabled]="page === totalPages || isLoading">Next</button>
     </div>
   </main>
 </div>

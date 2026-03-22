@@ -5,15 +5,15 @@ import { LinksService } from '../../services/links.service';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
 import { Router, RouterLink } from '@angular/router';
-import { ThemeService } from '../../services/theme.service';
 import { toDataURL } from 'qrcode';
 import { BillingService } from '../../services/billing.service';
 import { SupportService } from '../../services/support.service';
+import { NavbarComponent } from '../../components/ui/ui-navbar.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, NavbarComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -75,7 +75,6 @@ export class DashboardComponent implements OnInit {
     private supportService: SupportService,
     private notificationService: NotificationService,
     private router: Router,
-    public themeService: ThemeService,
     private fb: FormBuilder
   ) {
     this.profileForm = this.fb.group({

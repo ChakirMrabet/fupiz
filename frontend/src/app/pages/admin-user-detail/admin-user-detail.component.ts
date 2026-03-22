@@ -6,11 +6,12 @@ import { ThemeService } from '../../services/theme.service';
 import { AuthService } from '../../services/auth.service';
 import { AdminService } from '../../services/admin.service';
 import { NotificationService } from '../../services/notification.service';
+import { NavbarComponent } from '../../components/ui/ui-navbar.component';
 
 @Component({
   selector: 'app-admin-user-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, NavbarComponent],
   templateUrl: './admin-user-detail.component.html',
   styleUrls: ['./admin-user-detail.component.css'],
 })
