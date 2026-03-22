@@ -15,8 +15,18 @@ const client_1 = require("@prisma/client");
 const adapter_better_sqlite3_1 = require("@prisma/adapter-better-sqlite3");
 let PrismaService = class PrismaService extends client_1.PrismaClient {
     constructor() {
-        const adapter = new adapter_better_sqlite3_1.PrismaBetterSqlite3({ url: 'file:./dev.db' });
-        super({ adapter });
+        const databaseProvider = (process.env.DATABASE_PROVIDER || 'sqlite').toLowerCase();
+        const databaseUrl = process.env.DATABASE_URL || 'file:./dev.db';
+        if (databaseProvider === 'sqlite') {
+            const adapter = new adapter_better_sqlite3_1.PrismaBetterSqlite3({ url: databaseUrl });
+            super({ adapter });
+            return;
+        }
+        if (databaseProvider === 'postgresql' || databaseProvider === 'mysql') {
+            super();
+            return;
+        }
+        throw new Error(`Unsupported DATABASE_PROVIDER: ${databaseProvider}`);
     }
     async onModuleInit() {
         await this.$connect();

@@ -24,6 +24,26 @@ The backend uses `better-sqlite3`, which is a native Node module. If dependencie
 NODE_MODULE_VERSION 131 ... requires 137
 ```
 
+## Database Provider
+
+Local development is expected to use SQLite:
+
+```env
+DATABASE_PROVIDER=sqlite
+DATABASE_URL="file:./dev.db"
+```
+
+The backend now supports switching providers by environment:
+
+- `sqlite` for local development
+- `postgresql` for cloud deployment
+- `mysql` for cloud deployment
+
+Runtime behavior:
+
+- `sqlite` uses the `better-sqlite3` adapter
+- `postgresql` and `mysql` use the standard Prisma datasource URL
+
 ## Safe Recovery Steps
 
 Run these commands with the pinned Node version active:

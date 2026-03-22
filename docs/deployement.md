@@ -14,22 +14,26 @@ Explain how to deploy this application to the cloud and what to watch for with t
 
 ## Important Deployment Note
 
-The current backend is optimized for local development, not cloud production, because it still uses SQLite directly in code.
+The backend now supports provider switching by environment:
 
-Today the Prisma datasource and backend runtime are effectively tied to:
+- `sqlite` for local development
+- `postgresql` for deployment
+- `mysql` for deployment
 
-- local file database storage
-- `better-sqlite3`
-- `file:./dev.db`
-
-For most cloud deployments, you should plan to use a managed PostgreSQL database instead.
+For most cloud deployments, you should still plan to use a managed PostgreSQL database instead of SQLite.
 
 That means the production deployment path should include:
 
-1. switch Prisma datasource provider from `sqlite` to `postgresql`
-2. remove the SQLite adapter usage in the Nest Prisma service
-3. read the production database connection from `DATABASE_URL`
-4. run Prisma migration/deploy commands against that cloud database
+1. set `DATABASE_PROVIDER=postgresql` or `DATABASE_PROVIDER=mysql`
+2. set a production `DATABASE_URL`
+3. run Prisma migration/deploy commands against that cloud database
+
+SQLite remains the right default for local development:
+
+```env
+DATABASE_PROVIDER=sqlite
+DATABASE_URL="file:./dev.db"
+```
 
 ## Recommended Deployment Shape
 
@@ -183,9 +187,8 @@ SQLite is useful locally, but it is a poor default for cloud deployment because:
 ### Production Database Checklist
 
 - create a managed PostgreSQL instance
+- set `DATABASE_PROVIDER=postgresql`
 - set `DATABASE_URL`
-- update Prisma provider to `postgresql`
-- update backend Prisma adapter/runtime config
 - run Prisma migrations against production
 - verify connection from the deployed backend
 
@@ -224,6 +227,7 @@ At minimum, production will need:
 
 ```env
 JWT_SECRET=...
+DATABASE_PROVIDER=postgresql
 DATABASE_URL=...
 FRONTEND_URL=https://your-frontend-domain
 MAIL_FROM=...
@@ -245,10 +249,11 @@ ADMIN_EMAILS=admin@example.com
 The most practical first cloud deployment for this project is:
 
 1. move database setup to managed PostgreSQL
-2. deploy backend to Render or Railway
-3. deploy frontend to Render static hosting or another static host
-4. configure environment variables in the provider dashboard
-5. test:
+2. set `DATABASE_PROVIDER=postgresql`
+3. deploy backend to Render or Railway
+4. deploy frontend to Render static hosting or another static host
+5. configure environment variables in the provider dashboard
+6. test:
    - login
    - registration
    - activation email
@@ -256,6 +261,16 @@ The most practical first cloud deployment for this project is:
    - dashboard support form
    - billing webhook flow
    - admin area
+
+## Migration Caveat
+
+Prisma schema migrations are provider-specific enough that moving an existing SQLite project to PostgreSQL or MySQL should be treated as a real database migration step, not just an env flip.
+
+In practice:
+
+- new environments can start clean on PostgreSQL or MySQL
+- existing SQLite data should be exported and migrated deliberately
+- do not assume old SQLite migrations will be production-safe without review
 
 ## Official References
 
