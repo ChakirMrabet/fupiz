@@ -1,3 +1,9 @@
+<app-ui-navbar>
+  <a routerLink="/login" class="theme-toggle icon-btn" title="Login">
+    <app-feature-icon paths='<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>' />
+  </a>
+</app-ui-navbar>
+
 <div class="page-container">
   <div class="page-header">
     <h1 class="page-title">Choose Your <span class="gradient-text">Plan</span></h1>
@@ -5,12 +11,8 @@
   </div>
 
   <div class="pricing-grid">
-    <div
-      class="glass-card pricing-card"
-      *ngFor="let plan of plans"
-      [class.pricing-featured]="isFeatured(plan.id)"
-      [class.pricing-business]="plan.id === 'BUSINESS'"
-    >
+    <div class="glass-card pricing-card" *ngFor="let plan of plans" [class.pricing-featured]="isFeatured(plan.id)"
+      [class.pricing-business]="plan.id === 'BUSINESS'">
       <div class="pricing-badge" *ngIf="getBadge(plan.id)">{{ getBadge(plan.id) }}</div>
       <h2 class="pricing-name">{{ plan.name }}</h2>
       <p class="pricing-price">{{ plan.price }}</p>
@@ -22,59 +24,66 @@
           Up to <strong>{{ plan.maxLinks }}</strong> links
         </li>
         <li [class.feature-disabled]="!plan.canUseCustomCode">
-          <app-feature-icon class="feature-check" [paths]="plan.canUseCustomCode ? icons.included : icons.excluded" [size]="16" />
+          <app-feature-icon class="feature-check" [paths]="plan.canUseCustomCode ? icons.included : icons.excluded"
+            [size]="16" />
           Custom short codes
         </li>
         <li [class.feature-disabled]="!plan.canUsePassword">
-          <app-feature-icon class="feature-check" [paths]="plan.canUsePassword ? icons.included : icons.excluded" [size]="16" />
+          <app-feature-icon class="feature-check" [paths]="plan.canUsePassword ? icons.included : icons.excluded"
+            [size]="16" />
           Password protection
         </li>
         <li [class.feature-disabled]="!plan.canUseExpiration">
-          <app-feature-icon class="feature-check" [paths]="plan.canUseExpiration ? icons.included : icons.excluded" [size]="16" />
+          <app-feature-icon class="feature-check" [paths]="plan.canUseExpiration ? icons.included : icons.excluded"
+            [size]="16" />
           Link expiration
         </li>
         <li [class.feature-disabled]="!plan.canAccessStats">
-          <app-feature-icon class="feature-check" [paths]="plan.canAccessStats ? icons.included : icons.excluded" [size]="16" />
+          <app-feature-icon class="feature-check" [paths]="plan.canAccessStats ? icons.included : icons.excluded"
+            [size]="16" />
           Advanced analytics
         </li>
         <li [class.feature-disabled]="!plan.canEditDestination">
-          <app-feature-icon class="feature-check" [paths]="plan.canEditDestination ? icons.included : icons.excluded" [size]="16" />
+          <app-feature-icon class="feature-check" [paths]="plan.canEditDestination ? icons.included : icons.excluded"
+            [size]="16" />
           Edit destination after creation
         </li>
         <li [class.feature-disabled]="!plan.canUseClickLimit">
-          <app-feature-icon class="feature-check" [paths]="plan.canUseClickLimit ? icons.included : icons.excluded" [size]="16" />
+          <app-feature-icon class="feature-check" [paths]="plan.canUseClickLimit ? icons.included : icons.excluded"
+            [size]="16" />
           Click-count expiration
         </li>
         <li [class.feature-disabled]="!plan.canUseSingleUseLinks">
-          <app-feature-icon class="feature-check" [paths]="plan.canUseSingleUseLinks ? icons.included : icons.excluded" [size]="16" />
+          <app-feature-icon class="feature-check" [paths]="plan.canUseSingleUseLinks ? icons.included : icons.excluded"
+            [size]="16" />
           One-time links
         </li>
         <li [class.feature-disabled]="!plan.canUseCustomLanding">
-          <app-feature-icon class="feature-check" [paths]="plan.canUseCustomLanding ? icons.included : icons.excluded" [size]="16" />
+          <app-feature-icon class="feature-check" [paths]="plan.canUseCustomLanding ? icons.included : icons.excluded"
+            [size]="16" />
           Custom landing pages
         </li>
         <li [class.feature-disabled]="!plan.canUseBulkCreation">
-          <app-feature-icon class="feature-check" [paths]="plan.canUseBulkCreation ? icons.included : icons.excluded" [size]="16" />
+          <app-feature-icon class="feature-check" [paths]="plan.canUseBulkCreation ? icons.included : icons.excluded"
+            [size]="16" />
           Bulk link creation
         </li>
         <li [class.feature-disabled]="!plan.canUseWebhooks">
-          <app-feature-icon class="feature-check" [paths]="plan.canUseWebhooks ? icons.included : icons.excluded" [size]="16" />
+          <app-feature-icon class="feature-check" [paths]="plan.canUseWebhooks ? icons.included : icons.excluded"
+            [size]="16" />
           Webhooks
         </li>
         <li [class.feature-disabled]="!plan.canUseBrandedDomains">
-          <app-feature-icon class="feature-check" [paths]="plan.canUseBrandedDomains ? icons.included : icons.excluded" [size]="16" />
+          <app-feature-icon class="feature-check" [paths]="plan.canUseBrandedDomains ? icons.included : icons.excluded"
+            [size]="16" />
           Branded domains
         </li>
       </ul>
 
-      <button
-        type="button"
-        class="btn-primary pricing-cta"
-        [class.pricing-cta-pro]="plan.id === 'PRO'"
+      <button type="button" class="btn-primary pricing-cta" [class.pricing-cta-pro]="plan.id === 'PRO'"
         [class.pricing-cta-business]="plan.id === 'BUSINESS'"
         [disabled]="isStartingCheckout || (isLoggedIn && currentPlan === 'FREE' && plan.id === 'FREE')"
-        (click)="selectPlan(plan.id)"
-      >
+        (click)="selectPlan(plan.id)">
         {{ getCtaLabel(plan.id) }}
       </button>
     </div>

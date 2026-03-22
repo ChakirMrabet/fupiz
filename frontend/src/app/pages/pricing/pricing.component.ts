@@ -5,11 +5,12 @@ import { Router } from '@angular/router';
 import { BillingService } from '../../services/billing.service';
 import { AuthService } from '../../services/auth.service';
 import { FeatureIconComponent } from '../../components/ui/feature-icon.component';
+import { NavbarComponent } from '../../components/ui/ui-navbar.component';
 
 @Component({
   selector: 'app-pricing',
   standalone: true,
-  imports: [CommonModule, FeatureIconComponent],
+  imports: [CommonModule, FeatureIconComponent, NavbarComponent],
   templateUrl: './pricing.component.html',
   styleUrls: ['./pricing.component.css']
 })
@@ -29,7 +30,7 @@ export class PricingComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private billingService: BillingService,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.isLoggedIn = this.authService.isLoggedIn();
