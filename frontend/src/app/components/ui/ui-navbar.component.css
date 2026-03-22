@@ -13,11 +13,19 @@
 
 .nav-links {
   display: flex;
-  gap: 1rem;
+  justify-content: end;
+  align-items: center;
 }
 
 .nav-links a {
   text-decoration: none;
+}
+
+.nav-links .icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
 }
 
 .theme-toggle {

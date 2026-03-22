@@ -289,6 +289,10 @@
   gap: 1.5rem;
 }
 
+.df-card app-feature-icon {
+  margin-bottom: 1rem;
+}
+
 .df-card {
   padding: 2rem;
   display: flex;
@@ -299,13 +303,6 @@
 .df-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(139, 92, 246, 0.12);
-}
-
-.df-icon {
-  margin-bottom: 1rem;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
 }
 
 .df-card h3 {

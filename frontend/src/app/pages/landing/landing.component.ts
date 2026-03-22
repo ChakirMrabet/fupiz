@@ -6,11 +6,12 @@ import { ThemeService } from '../../services/theme.service';
 import { LinksService } from '../../services/links.service';
 import { SupportService } from '../../services/support.service';
 import { NavbarComponent } from '../../components/ui/ui-navbar.component';
+import { FeatureIconComponent } from '../../components/ui/feature-icon.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, NavbarComponent],
+  imports: [CommonModule, RouterLink, FormsModule, NavbarComponent, FeatureIconComponent],
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.css']
 })
