@@ -6,11 +6,12 @@ import { ThemeService } from '../../services/theme.service';
 import { AuthService } from '../../services/auth.service';
 import { AdminService } from '../../services/admin.service';
 import { NavbarComponent } from '../../components/ui/ui-navbar.component';
+import { FeatureIconComponent } from '../../components/ui/feature-icon.component';
 
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive, NavbarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive, NavbarComponent, FeatureIconComponent],
   templateUrl: './admin-users.component.html',
   styleUrls: ['./admin-users.component.css'],
 })

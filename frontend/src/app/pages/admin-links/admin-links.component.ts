@@ -7,11 +7,12 @@ import { AuthService } from '../../services/auth.service';
 import { AdminService } from '../../services/admin.service';
 import { NotificationService } from '../../services/notification.service';
 import { NavbarComponent } from '../../components/ui/ui-navbar.component';
+import { FeatureIconComponent } from '../../components/ui/feature-icon.component';
 
 @Component({
   selector: 'app-admin-links',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive, NavbarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive, NavbarComponent, FeatureIconComponent],
   templateUrl: './admin-links.component.html',
   styleUrls: ['./admin-links.component.css'],
 })

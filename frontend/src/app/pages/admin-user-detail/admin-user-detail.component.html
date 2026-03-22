@@ -1,7 +1,9 @@
 <app-ui-navbar>
   <a class="btn-secondary" routerLink="/admin/users">All Users</a>
   <a class="btn-secondary" routerLink="/admin/links">All Links</a>
-  <button class="btn-secondary" (click)="logout()">Logout</button>
+  <button class="theme-toggle icon-btn" (click)="logout()" title="Logout" aria-label="Logout">
+    <app-feature-icon [size]="20" paths='<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>' />
+  </button>
 </app-ui-navbar>
 
 <div class="container admin-detail-shell" *ngIf="user">

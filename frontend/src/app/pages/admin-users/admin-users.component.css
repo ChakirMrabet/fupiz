@@ -134,3 +134,7 @@
     max-width: none;
   }
 }
+
+app-ui-navbar .btn-secondary {
+  margin-right: 0.5rem;
+}

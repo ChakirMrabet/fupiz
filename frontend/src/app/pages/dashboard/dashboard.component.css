@@ -5,6 +5,7 @@
   text-decoration: line-through;
   opacity: 0.6;
 }
+
 .dashboard-layout {
   display: grid;
   grid-template-columns: 240px 1fr;
@@ -433,4 +434,8 @@
   .form-row {
     flex-direction: column;
   }
+}
+
+app-ui-navbar .btn-secondary {
+  margin-right: 0.5rem;
 }

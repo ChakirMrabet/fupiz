@@ -110,7 +110,6 @@ body {
   cursor: pointer;
   font-size: 1.2rem;
   transition: all 0.3s ease;
-  margin-right: 0.5rem;
 }
 
 .theme-toggle:hover {
