@@ -11,19 +11,34 @@
     </div>
     <ul class="sidebar-nav">
       <li [class.active]="activeSection === 'links'" (click)="setSection('links')">
-        <span>🔗 Links</span>
+        <span class="nav-item-label">
+          <app-feature-icon [paths]="icons.links" [size]="18" />
+          <span>Links</span>
+        </span>
       </li>
       <li [class.active]="activeSection === 'integrations'" (click)="setSection('integrations')">
-        <span>🪝 Integrations</span>
+        <span class="nav-item-label">
+          <app-feature-icon [paths]="icons.integrations" [size]="18" />
+          <span>Integrations</span>
+        </span>
       </li>
       <li [class.active]="activeSection === 'profile'" (click)="setSection('profile')">
-        <span>👤 Profile</span>
+        <span class="nav-item-label">
+          <app-feature-icon [paths]="icons.profile" [size]="18" />
+          <span>Profile</span>
+        </span>
       </li>
       <li [class.active]="activeSection === 'billing'" (click)="setSection('billing')">
-        <span>💳 Billing</span>
+        <span class="nav-item-label">
+          <app-feature-icon [paths]="icons.billing" [size]="18" />
+          <span>Billing</span>
+        </span>
       </li>
       <li [class.active]="activeSection === 'support'" (click)="setSection('support')">
-        <span>🛟 Support</span>
+        <span class="nav-item-label">
+          <app-feature-icon [paths]="icons.support" [size]="18" />
+          <span>Support</span>
+        </span>
       </li>
     </ul>
   </aside>
@@ -64,13 +79,30 @@
             </h4>
             <p class="original-link">{{ link.originalUrl }}</p>
             <div class="link-meta">
-              <span class="badge" *ngIf="link.passwordProtected">🔒 Password Protected</span>
-              <span class="badge" *ngIf="link.expiresAt">⏰ Expires: {{ link.expiresAt | date:'shortDate' }}</span>
-              <span class="badge clicks">📈 Clicks: {{ link.clicks }}</span>
-              <span class="badge" *ngIf="link.singleUse">⚡ One-Time Link</span>
-              <span class="badge" *ngIf="link.singleUse || (link.maxClicks !== null && link.maxClicks !== undefined)">🎯
-                {{ formatClickLimit(link) }}</span>
-              <span class="badge" *ngIf="hasLandingPage(link)">🛬 Landing Page</span>
+              <span class="badge badge-with-icon" *ngIf="link.passwordProtected">
+                <app-feature-icon [paths]="icons.lock" [size]="14" />
+                <span>Password Protected</span>
+              </span>
+              <span class="badge badge-with-icon" *ngIf="link.expiresAt">
+                <app-feature-icon [paths]="icons.clock" [size]="14" />
+                <span>Expires: {{ link.expiresAt | date:'shortDate' }}</span>
+              </span>
+              <span class="badge badge-with-icon clicks">
+                <app-feature-icon [paths]="icons.analytics" [size]="14" />
+                <span>Clicks: {{ link.clicks }}</span>
+              </span>
+              <span class="badge badge-with-icon" *ngIf="link.singleUse">
+                <app-feature-icon [paths]="icons.zap" [size]="14" />
+                <span>One-Time Link</span>
+              </span>
+              <span class="badge badge-with-icon" *ngIf="link.singleUse || (link.maxClicks !== null && link.maxClicks !== undefined)">
+                <app-feature-icon [paths]="icons.target" [size]="14" />
+                <span>{{ formatClickLimit(link) }}</span>
+              </span>
+              <span class="badge badge-with-icon" *ngIf="hasLandingPage(link)">
+                <app-feature-icon [paths]="icons.landing" [size]="14" />
+                <span>Landing Page</span>
+              </span>
               <span class="badge status-badge" [class.active]="link.isActive" [class.inactive]="!link.isActive">
                 {{ link.isActive ? 'Active' : 'Disabled' }}
               </span>
@@ -78,23 +110,23 @@
           </div>
           <div class="link-actions">
             <a [routerLink]="['/analytics', link.id]" class="action-btn" title="Analytics">
-              <span class="icon">📊</span>
+              <app-feature-icon class="icon" [paths]="icons.analytics" [size]="18" />
             </a>
             <button (click)="openEditModal(link)" class="action-btn" title="Edit Link">
-              <span class="icon">✏️</span>
+              <app-feature-icon class="icon" [paths]="icons.edit" [size]="18" />
             </button>
             <button (click)="showQrCode(link)" class="action-btn" title="QR Code">
-              <span class="icon">📱</span>
+              <app-feature-icon class="icon" [paths]="icons.qr" [size]="18" />
             </button>
             <button (click)="copyLink(link.shortCode)" class="action-btn" title="Copy Link">
-              <span class="icon">📋</span>
+              <app-feature-icon class="icon" [paths]="icons.copy" [size]="18" />
             </button>
             <button (click)="toggleActive(link)" class="action-btn" [class.active]="link.isActive"
               title="Toggle Active">
-              <span class="icon">{{ link.isActive ? '🟢' : '⚪' }}</span>
+              <app-feature-icon class="icon" [paths]="link.isActive ? icons.active : icons.inactive" [size]="18" />
             </button>
             <button (click)="deleteLink(link.id)" class="action-btn delete" title="Delete">
-              <span class="icon">🗑️</span>
+              <app-feature-icon class="icon" [paths]="icons.trash" [size]="18" />
             </button>
           </div>
         </div>
@@ -188,7 +220,10 @@
 
         <div class="upgrade-simulation" *ngIf="profile.plan === 'PRO'">
           <hr style="border: 1px solid var(--glass-border); margin: 1.5rem 0;">
-          <h4 style="color: var(--accent-primary);">👑 You are a Pro Member</h4>
+          <h4 class="plan-heading plan-heading-pro">
+            <app-feature-icon [paths]="icons.crown" [size]="18" />
+            <span>You are a Pro Member</span>
+          </h4>
           <p style="color: var(--text-secondary); margin-bottom: 1rem;">Manage upgrades, payment methods, and
             cancellation in the Stripe billing portal.</p>
           <button class="btn-primary w-full btn-business" (click)="openBillingPortal()"
@@ -277,10 +312,10 @@
               <div class="link-actions">
                 <button (click)="toggleWebhook(webhook)" class="action-btn" [class.active]="webhook.isActive"
                   title="Toggle Webhook">
-                  <span class="icon">{{ webhook.isActive ? '🟢' : '⚪' }}</span>
+                  <app-feature-icon class="icon" [paths]="webhook.isActive ? icons.active : icons.inactive" [size]="18" />
                 </button>
                 <button (click)="deleteWebhook(webhook.id)" class="action-btn delete" title="Delete Webhook">
-                  <span class="icon">🗑️</span>
+                  <app-feature-icon class="icon" [paths]="icons.trash" [size]="18" />
                 </button>
               </div>
             </div>
@@ -366,32 +401,32 @@
       </div>
       <div class="advanced-options">
         <input type="text" class="input-field half"
-          [placeholder]="canUseAdvancedLinkControls() ? 'Custom Code (optional)' : '👑 Custom Code (Paid Plans)'"
+          [placeholder]="canUseAdvancedLinkControls() ? 'Custom Code (optional)' : 'Custom Code (Paid Plans)'"
           formControlName="customCode" [disabled]="!canUseAdvancedLinkControls()">
         <input type="password" class="input-field half"
-          [placeholder]="canUseAdvancedLinkControls() ? 'Password (optional)' : '👑 Password (Paid Plans)'"
+          [placeholder]="canUseAdvancedLinkControls() ? 'Password (optional)' : 'Password (Paid Plans)'"
           formControlName="password" [disabled]="!canUseAdvancedLinkControls()">
         <input type="datetime-local" class="input-field half" formControlName="expiresAt"
           [title]="canUseAdvancedLinkControls() ? 'Expiration (optional)' : 'Expiration (Paid Plans)'"
           [disabled]="!canUseAdvancedLinkControls()">
         <input type="number" min="1" class="input-field half"
-          [placeholder]="canUseAdvancedLinkControls() ? 'Max Clicks (optional)' : '👑 Click Limit (Paid Plans)'"
+          [placeholder]="canUseAdvancedLinkControls() ? 'Max Clicks (optional)' : 'Click Limit (Paid Plans)'"
           formControlName="maxClicks"
           [disabled]="!canUseAdvancedLinkControls() || createLinkForm.get('singleUse')?.value">
         <label class="toggle-field">
           <input type="checkbox" formControlName="singleUse" [disabled]="!canUseAdvancedLinkControls()">
-          <span>{{ canUseAdvancedLinkControls() ? 'One-Time Link' : '👑 One-Time Link (Paid Plans)' }}</span>
+          <span>{{ canUseAdvancedLinkControls() ? 'One-Time Link' : 'One-Time Link (Paid Plans)' }}</span>
         </label>
       </div>
       <div class="landing-options">
         <input type="text" class="input-field"
-          [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Title (optional)' : '👑 Landing Title (Paid Plans)'"
+          [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Title (optional)' : 'Landing Title (Paid Plans)'"
           formControlName="landingTitle" [disabled]="!canUseAdvancedLinkControls()">
         <textarea class="input-field landing-textarea"
-          [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Description (optional)' : '👑 Landing Description (Paid Plans)'"
+          [placeholder]="canUseAdvancedLinkControls() ? 'Landing Page Description (optional)' : 'Landing Description (Paid Plans)'"
           formControlName="landingDescription" [disabled]="!canUseAdvancedLinkControls()"></textarea>
         <input type="text" class="input-field"
-          [placeholder]="canUseAdvancedLinkControls() ? 'CTA Button Label (optional)' : '👑 CTA Label (Paid Plans)'"
+          [placeholder]="canUseAdvancedLinkControls() ? 'CTA Button Label (optional)' : 'CTA Label (Paid Plans)'"
           formControlName="landingButtonLabel" [disabled]="!canUseAdvancedLinkControls()">
       </div>
       <div class="modal-actions">
@@ -411,7 +446,7 @@
     </p>
     <textarea class="input-field landing-textarea bulk-textarea" [(ngModel)]="bulkLinkInput" name="bulkLinkInput"
       [disabled]="!canUseBulkCreation() || isBulkCreating"
-      [placeholder]="canUseBulkCreation() ? 'https://example.com/page-one\nhttps://example.com/page-two,launch-page' : '👑 Bulk creation is available on the Business plan'"></textarea>
+      [placeholder]="canUseBulkCreation() ? 'https://example.com/page-one\nhttps://example.com/page-two,launch-page' : 'Bulk creation is available on the Business plan'"></textarea>
     <div class="bulk-actions">
       <button class="btn-primary btn-business" (click)="onBulkCreate()"
         [disabled]="!canUseBulkCreation() || isBulkCreating">

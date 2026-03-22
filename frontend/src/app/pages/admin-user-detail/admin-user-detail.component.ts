@@ -7,15 +7,24 @@ import { AuthService } from '../../services/auth.service';
 import { AdminService } from '../../services/admin.service';
 import { NotificationService } from '../../services/notification.service';
 import { NavbarComponent } from '../../components/ui/ui-navbar.component';
+import { FeatureIconComponent } from '../../components/ui/feature-icon.component';
 
 @Component({
   selector: 'app-admin-user-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, NavbarComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, NavbarComponent, FeatureIconComponent],
   templateUrl: './admin-user-detail.component.html',
   styleUrls: ['./admin-user-detail.component.css'],
 })
 export class AdminUserDetailComponent implements OnInit {
+  readonly icons = {
+    lock: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+    zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    landing: '<path d="M19 10v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/><polyline points="14 3 21 3 21 10"/><line x1="10" y1="14" x2="21" y2="3"/>'
+  };
+
   userId = 0;
   user: any = null;
   links: any[] = [];

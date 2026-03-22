@@ -67,6 +67,12 @@
   flex-wrap: wrap;
 }
 
+.badge-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .admin-link-item p,
 .admin-link-item strong,
 .admin-link-item button,

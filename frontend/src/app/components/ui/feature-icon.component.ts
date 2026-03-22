@@ -6,7 +6,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   standalone: true,
   template: `
     <div class="feature-icon-wrap">
-      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+      <svg xmlns="http://www.w3.org/2000/svg" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
            [innerHTML]="safePaths">
       </svg>
@@ -21,6 +21,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 })
 export class FeatureIconComponent {
   safePaths: SafeHtml = '';
+  @Input() size = 28;
 
   @Input() set paths(val: string) {
     this.safePaths = this.sanitizer.bypassSecurityTrustHtml(val);

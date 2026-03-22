@@ -67,13 +67,27 @@
               <div class="admin-link-badges">
                 <span class="badge status-badge" [class.active]="link.isActive" [class.inactive]="!link.isActive">{{
                   link.isActive ? 'Active' : 'Disabled' }}</span>
-                <span class="badge" *ngIf="link.passwordProtected">🔒 Password Protected</span>
-                <span class="badge" *ngIf="link.expiresAt">⏰ Expires: {{ link.expiresAt | date:'shortDate' }}</span>
-                <span class="badge"
-                  *ngIf="link.singleUse || (link.maxClicks !== null && link.maxClicks !== undefined)">🎯 {{
-                  formatClickLimit(link) }}</span>
-                <span class="badge" *ngIf="link.singleUse">⚡ One-Time Link</span>
-                <span class="badge" *ngIf="hasLandingPage(link)">🛬 Landing Page</span>
+                <span class="badge badge-with-icon" *ngIf="link.passwordProtected">
+                  <app-feature-icon [paths]="icons.lock" [size]="14" />
+                  <span>Password Protected</span>
+                </span>
+                <span class="badge badge-with-icon" *ngIf="link.expiresAt">
+                  <app-feature-icon [paths]="icons.clock" [size]="14" />
+                  <span>Expires: {{ link.expiresAt | date:'shortDate' }}</span>
+                </span>
+                <span class="badge badge-with-icon"
+                  *ngIf="link.singleUse || (link.maxClicks !== null && link.maxClicks !== undefined)">
+                  <app-feature-icon [paths]="icons.target" [size]="14" />
+                  <span>{{ formatClickLimit(link) }}</span>
+                </span>
+                <span class="badge badge-with-icon" *ngIf="link.singleUse">
+                  <app-feature-icon [paths]="icons.zap" [size]="14" />
+                  <span>One-Time Link</span>
+                </span>
+                <span class="badge badge-with-icon" *ngIf="hasLandingPage(link)">
+                  <app-feature-icon [paths]="icons.landing" [size]="14" />
+                  <span>Landing Page</span>
+                </span>
               </div>
             </div>
             <p class="muted-text">{{ link.originalUrl }}</p>

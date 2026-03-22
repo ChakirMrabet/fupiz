@@ -18,51 +18,51 @@
 
       <ul class="pricing-features">
         <li>
-          <span class="feature-check">✓</span>
+          <app-feature-icon class="feature-check" [paths]="icons.included" [size]="16" />
           Up to <strong>{{ plan.maxLinks }}</strong> links
         </li>
         <li [class.feature-disabled]="!plan.canUseCustomCode">
-          <span class="feature-check">{{ plan.canUseCustomCode ? '✓' : '✕' }}</span>
+          <app-feature-icon class="feature-check" [paths]="plan.canUseCustomCode ? icons.included : icons.excluded" [size]="16" />
           Custom short codes
         </li>
         <li [class.feature-disabled]="!plan.canUsePassword">
-          <span class="feature-check">{{ plan.canUsePassword ? '✓' : '✕' }}</span>
+          <app-feature-icon class="feature-check" [paths]="plan.canUsePassword ? icons.included : icons.excluded" [size]="16" />
           Password protection
         </li>
         <li [class.feature-disabled]="!plan.canUseExpiration">
-          <span class="feature-check">{{ plan.canUseExpiration ? '✓' : '✕' }}</span>
+          <app-feature-icon class="feature-check" [paths]="plan.canUseExpiration ? icons.included : icons.excluded" [size]="16" />
           Link expiration
         </li>
         <li [class.feature-disabled]="!plan.canAccessStats">
-          <span class="feature-check">{{ plan.canAccessStats ? '✓' : '✕' }}</span>
+          <app-feature-icon class="feature-check" [paths]="plan.canAccessStats ? icons.included : icons.excluded" [size]="16" />
           Advanced analytics
         </li>
         <li [class.feature-disabled]="!plan.canEditDestination">
-          <span class="feature-check">{{ plan.canEditDestination ? '✓' : '✕' }}</span>
+          <app-feature-icon class="feature-check" [paths]="plan.canEditDestination ? icons.included : icons.excluded" [size]="16" />
           Edit destination after creation
         </li>
         <li [class.feature-disabled]="!plan.canUseClickLimit">
-          <span class="feature-check">{{ plan.canUseClickLimit ? '✓' : '✕' }}</span>
+          <app-feature-icon class="feature-check" [paths]="plan.canUseClickLimit ? icons.included : icons.excluded" [size]="16" />
           Click-count expiration
         </li>
         <li [class.feature-disabled]="!plan.canUseSingleUseLinks">
-          <span class="feature-check">{{ plan.canUseSingleUseLinks ? '✓' : '✕' }}</span>
+          <app-feature-icon class="feature-check" [paths]="plan.canUseSingleUseLinks ? icons.included : icons.excluded" [size]="16" />
           One-time links
         </li>
         <li [class.feature-disabled]="!plan.canUseCustomLanding">
-          <span class="feature-check">{{ plan.canUseCustomLanding ? '✓' : '✕' }}</span>
+          <app-feature-icon class="feature-check" [paths]="plan.canUseCustomLanding ? icons.included : icons.excluded" [size]="16" />
           Custom landing pages
         </li>
         <li [class.feature-disabled]="!plan.canUseBulkCreation">
-          <span class="feature-check">{{ plan.canUseBulkCreation ? '✓' : '✕' }}</span>
+          <app-feature-icon class="feature-check" [paths]="plan.canUseBulkCreation ? icons.included : icons.excluded" [size]="16" />
           Bulk link creation
         </li>
         <li [class.feature-disabled]="!plan.canUseWebhooks">
-          <span class="feature-check">{{ plan.canUseWebhooks ? '✓' : '✕' }}</span>
+          <app-feature-icon class="feature-check" [paths]="plan.canUseWebhooks ? icons.included : icons.excluded" [size]="16" />
           Webhooks
         </li>
         <li [class.feature-disabled]="!plan.canUseBrandedDomains">
-          <span class="feature-check">{{ plan.canUseBrandedDomains ? '✓' : '✕' }}</span>
+          <app-feature-icon class="feature-check" [paths]="plan.canUseBrandedDomains ? icons.included : icons.excluded" [size]="16" />
           Branded domains
         </li>
       </ul>

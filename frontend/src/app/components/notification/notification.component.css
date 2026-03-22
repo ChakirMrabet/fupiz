@@ -32,7 +32,9 @@
 .toast-info    { border-left-color: #8b5cf6; }
 
 .toast-icon {
-  font-size: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   padding-top: 2px;
 }

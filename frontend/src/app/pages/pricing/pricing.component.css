@@ -92,12 +92,12 @@
 }
 
 .feature-check {
-  font-size: 1rem;
-  font-weight: 700;
   color: #10b981;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   width: 20px;
-  text-align: center;
 }
 
 .feature-disabled {

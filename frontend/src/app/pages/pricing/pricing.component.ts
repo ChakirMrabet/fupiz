@@ -4,15 +4,21 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BillingService } from '../../services/billing.service';
 import { AuthService } from '../../services/auth.service';
+import { FeatureIconComponent } from '../../components/ui/feature-icon.component';
 
 @Component({
   selector: 'app-pricing',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FeatureIconComponent],
   templateUrl: './pricing.component.html',
   styleUrls: ['./pricing.component.css']
 })
 export class PricingComponent implements OnInit {
+  readonly icons = {
+    included: '<path d="M20 6 9 17l-5-5"/>',
+    excluded: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'
+  };
+
   plans: any[] = [];
   currentPlan = 'FREE';
   isLoggedIn = false;
